@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import '../../../controllers/auth/auth_controller.dart';
+import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
-
-import 'owner_signup.dart';
+import 'package:salesapp/app/ui/widgets/textfield.dart';
 
 class OTPVerificationScreen extends StatelessWidget {
-  const OTPVerificationScreen({super.key});
+  final TextEditingController otpController = TextEditingController();
+  final AuthController authController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -16,72 +16,29 @@ class OTPVerificationScreen extends StatelessWidget {
       appBar: CustomAppbar(title: "OTP Verification"),
       backgroundColor: const Color(0xFFF6F6F9),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 50),
+            Text("Enter 6-digit OTP sent to your phone", style: AppTextStyles.subtitle),
             const SizedBox(height: 24),
-
-            const Text(
-              'Enter the Code',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            const Text(
-              'A verification code has been sent to',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            const Text(
-              '+971 1 123 123 1234',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            PinCodeTextField(
-              length: 6,
-              obscureText: false,
-              animationType: AnimationType.fade,
+            CustomTextField(
+              controller: otpController,
+              labelText: 'Enter OTP',
               keyboardType: TextInputType.number,
-              animationDuration: const Duration(milliseconds: 300),
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.circle,
-                borderRadius: BorderRadius.circular(5),
-                fieldHeight: 60,
-                fieldWidth: 60,
-                activeFillColor: Colors.white,
-                inactiveFillColor: Colors.white,
-                selectedFillColor: Colors.white,
-                activeColor: Colors.grey,
-                selectedColor: Colors.blue,
-                inactiveColor: Colors.grey,
-              ),
-              backgroundColor: const Color(0xFFF6F6F9),
-              enableActiveFill: false,
-              onChanged: (value) {
-                // handle code change
-              },
-              appContext: context,
             ),
-
-            const SizedBox(height: 24),
-            PrimaryButton(text: "Verify OTP", onPressed: (){Get.to(()=>OwnerSignUpScreen());})
+            const SizedBox(height: 32),
+            PrimaryButton(
+              text: "Verify OTP",
+              onPressed: () {
+                final code = otpController.text.trim();
+                if (code.length == 6) {
+                  authController.verifyOtp(code);
+                } else {
+                  Get.snackbar("Error", "Enter valid 6-digit OTP");
+                }
+              },
+            ),
           ],
         ),
       ),
