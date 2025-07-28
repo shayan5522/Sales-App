@@ -10,6 +10,7 @@ class AppTextStyles {
     color: AppColors.textPrimary,
     height: 1.2,
   );
+  
 
   static TextStyle subheading = GoogleFonts.poppins(
     fontSize: 18,
@@ -37,6 +38,12 @@ class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
+    height: 1.4,
+  );
+   static TextStyle subtitleSmall2 = GoogleFonts.poppins(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.primary,
     height: 1.4,
   );
 

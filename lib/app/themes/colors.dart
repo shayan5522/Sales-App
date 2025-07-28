@@ -8,4 +8,6 @@ class AppColors {
 
   //Text Color
   static const Color textPrimary = Color(0xFF0F1928);
+
+  static Color? get white => null;
 }
