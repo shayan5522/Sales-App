@@ -1,0 +1,77 @@
+import 'package:flutter/material.dart';
+import 'package:salesapp/app/themes/colors.dart';
+import 'package:salesapp/app/themes/styles.dart';
+
+class ExpenseCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final int price;
+
+  const ExpenseCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.price,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 320), // Set desired width
+        child: Card(
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          color: AppColors.secondary,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Heading
+                Text(title, style: AppTextStyles.title),
+
+                const SizedBox(height: 6),
+
+                // Description
+                Text(
+                  description,
+                  style: AppTextStyles.subtitleSmall.copyWith(
+                    color: AppColors.textseconadry,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Bottom right price
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'INR :',
+                        style: AppTextStyles.subtitleSmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        '$price',
+                        style: AppTextStyles.subtitleSmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
