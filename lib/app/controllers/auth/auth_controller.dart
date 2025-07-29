@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
 import '../../services/auth_service.dart';
-import '../../ui/screens/auth/labour_signin.dart';
+import '../../ui/screens/auth/labour_signup.dart';
 import '../../ui/screens/auth/otp.dart';
 import '../../ui/screens/auth/owner_signup.dart';
 import '../../ui/screens/auth/signup_as.dart';
@@ -14,8 +14,8 @@ class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   var verificationId = ''.obs;
 
-  void sendOtp(String phone) {
-    _authService.sendOtp(
+  Future<void> sendOtp(String phone) async {
+    await _authService.sendOtp(
       phone: phone,
       codeSent: (verId) {
         verificationId.value = verId;
@@ -28,7 +28,8 @@ class AuthController extends GetxController {
     );
   }
 
-  void verifyOtp(String otpCode) async {
+
+  Future<void> verifyOtp(String otpCode) async {
     try {
       final userCred = await _authService.verifyOtp(
         verificationId: verificationId.value,
@@ -41,19 +42,21 @@ class AuthController extends GetxController {
       if (doc.exists) {
         final role = doc['role'];
         if (role == 'owner') {
-          Get.offAll(()=>OwnerDashboard());
+          Get.offAll(() => OwnerDashboard());
         } else if (role == 'labour') {
-          Get.offAll(()=>LabourDashboard());
+          Get.offAll(() => LabourDashboard());
         } else {
           Get.snackbar("Error", "Unknown role");
         }
       } else {
-        Get.offAll(()=>OwnerSignUpScreen());
+        Get.offAll(() => OwnerSignUpScreen());
       }
 
     } catch (e) {
       Get.snackbar("Verification Failed", e.toString());
+      rethrow;
     }
   }
+
 
 }

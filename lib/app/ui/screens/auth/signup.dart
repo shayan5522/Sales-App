@@ -7,14 +7,21 @@ import 'package:salesapp/app/ui/widgets/textfield.dart';
 import 'otp.dart';
 import '../../../controllers/auth/auth_controller.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController phoneController = TextEditingController();
-    final AuthController authController = Get.put(AuthController());
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
 
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController phoneController = TextEditingController();
+  final AuthController authController = Get.put(AuthController());
+
+  bool _isLoading = false;// added
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: "SignUp"),
       backgroundColor: const Color(0xFFF6F6F9),
@@ -41,13 +48,22 @@ class SignUpScreen extends StatelessWidget {
               const SizedBox(height: 32),
               PrimaryButton(
                 text: "Send OTP",
-                onPressed: () {
+                isLoading: _isLoading, // adedd
+                onPressed: _isLoading
+                    ? () {}
+                    : () async {
+                  print(_isLoading);
                   final phone = phoneController.text.trim();
-                  if (phone.isNotEmpty) {
-                    authController.sendOtp(phone);
-                  } else {
+                  if (phone.isEmpty) {
                     Get.snackbar("Error", "Enter phone number");
+                    return;
                   }
+
+                  setState(() => _isLoading = true);
+
+                  await authController.sendOtp(phone);
+
+                  setState(() => _isLoading = false);
                 },
               ),
             ],
@@ -57,3 +73,4 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 }
+

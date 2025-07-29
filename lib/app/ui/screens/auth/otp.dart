@@ -6,9 +6,18 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 
-class OTPVerificationScreen extends StatelessWidget {
+class OTPVerificationScreen extends StatefulWidget {
+  const OTPVerificationScreen({super.key}); // also fix constructor
+
+  @override
+  State<OTPVerificationScreen> createState() => _OTPVerificationScreenState();
+}
+
+class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   final TextEditingController otpController = TextEditingController();
   final AuthController authController = Get.find();
+
+  bool _isVerifying = false; // ✅ move it here
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +39,25 @@ class OTPVerificationScreen extends StatelessWidget {
             const SizedBox(height: 32),
             PrimaryButton(
               text: "Verify OTP",
-              onPressed: () {
+              isLoading: _isVerifying,
+              onPressed: _isVerifying
+                  ? () {}
+                  : () async {
                 final code = otpController.text.trim();
-                if (code.length == 6) {
-                  authController.verifyOtp(code);
-                } else {
+                if (code.length != 6) {
                   Get.snackbar("Error", "Enter valid 6-digit OTP");
+                  return;
                 }
+
+                setState(() => _isVerifying = true);
+
+                try {
+                  await authController.verifyOtp(code);
+                } catch (_) {
+                  // error already handled inside controller
+                }
+
+                setState(() => _isVerifying = false);
               },
             ),
           ],
@@ -45,3 +66,4 @@ class OTPVerificationScreen extends StatelessWidget {
     );
   }
 }
+
