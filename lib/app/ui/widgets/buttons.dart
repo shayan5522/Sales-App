@@ -1,4 +1,4 @@
-
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../../themes/colors.dart';
 import '../../themes/styles.dart';
@@ -11,6 +11,7 @@ class PrimaryButton extends StatelessWidget {
   final Color color;
   final double borderRadius;
   final TextStyle? textStyle;
+  final bool isLoading;
 
   const PrimaryButton({super.key,
     required this.text,
@@ -20,20 +21,17 @@ class PrimaryButton extends StatelessWidget {
     this.color = AppColors.primary,
     this.borderRadius = 10.0,
     this.textStyle,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width and height
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    // Calculate the button width and height based on the screen size
     final buttonWidth = screenWidth-30;
     final buttonHeight = screenHeight * heightFactor;
-
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isLoading ? null : onPressed,
       child: Container(
         width: buttonWidth,
         height: buttonHeight,
@@ -42,13 +40,25 @@ class PrimaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Center(
-          child: Text(
+          child: isLoading
+              ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2,
+            ),
+          )
+              : Text(
             text,
             style: textStyle ??
-                AppTextStyles.subheading
-                    .copyWith(color: AppColors.secondary,fontWeight: FontWeight.w100),
+                AppTextStyles.subheading.copyWith(
+                  color: AppColors.secondary,
+                  fontWeight: FontWeight.w100,
+                ),
           ),
         ),
+
       ),
     );
   }

@@ -17,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxlines;
   final int? maxWords;
   final VoidCallback? suffixIconPressed;
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -34,6 +35,7 @@ class CustomTextField extends StatelessWidget {
     this.maxlines = 1,
     this.maxWords,
     this.suffixIconPressed,
+    this.onChanged,
 
   });
 
@@ -46,6 +48,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText,
         labelText: labelText,

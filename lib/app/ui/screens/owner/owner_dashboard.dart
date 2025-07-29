@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart' show Get;
 import 'package:salesapp/app/ui/screens/auth/signup_as.dart';
 
 import '../../widgets/buttons.dart';
+import '../auth/owner_signup.dart';
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
 
