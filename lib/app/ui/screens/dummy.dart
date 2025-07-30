@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart' show AppColors;
+import 'package:salesapp/app/ui/widgets/Admindashboard/earning_card.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expensecard.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
@@ -43,6 +44,16 @@ class DummyTestScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          EarningsCard(
+            income: 5000,
+            profit: 2000,
+            imagePath: 'assets/images/earning.png',
+            onSeeAll: () {
+              // Handle see all action
+            },
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
