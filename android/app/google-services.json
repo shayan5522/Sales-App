@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "110369730358",
-    "project_id": "saleapp-4df13",
-    "storage_bucket": "saleapp-4df13.firebasestorage.app"
+    "project_number": "318791658916",
+    "project_id": "shop-main-12dfc",
+    "storage_bucket": "shop-main-12dfc.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:110369730358:android:06939ad850958019e74d97",
+        "mobilesdk_app_id": "1:318791658916:android:8e9834382fd0e1715da531",
         "android_client_info": {
           "package_name": "com.xavics.salesapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC8O8GAFNw9iKS9XXwNxHgMfjBBb-sm2Qw"
+          "current_key": "AIzaSyAY87rwro3QUVmKZdOnOQfXz59bYqDYAEI"
         }
       ],
       "services": {

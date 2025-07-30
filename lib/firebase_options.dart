@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -47,30 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC8O8GAFNw9iKS9XXwNxHgMfjBBb-sm2Qw',
-    appId: '1:110369730358:android:06939ad850958019e74d97',
-    messagingSenderId: '110369730358',
-    projectId: 'saleapp-4df13',
-    storageBucket: 'saleapp-4df13.firebasestorage.app',
+    apiKey: 'AIzaSyAY87rwro3QUVmKZdOnOQfXz59bYqDYAEI',
+    appId: '1:318791658916:android:8e9834382fd0e1715da531',
+    messagingSenderId: '318791658916',
+    projectId: 'shop-main-12dfc',
+    storageBucket: 'shop-main-12dfc.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCFehAsVzP2OnZy7YYcbIRSAgBVc3J9tNY',
-    appId: '1:110369730358:ios:332e08bd62e02069e74d97',
-    messagingSenderId: '110369730358',
-    projectId: 'saleapp-4df13',
-    storageBucket: 'saleapp-4df13.firebasestorage.app',
+    apiKey: 'AIzaSyCTG_U612IV4TEG7ERqYz2RSpv7PnCS3pY',
+    appId: '1:318791658916:ios:1601dcf3878e46125da531',
+    messagingSenderId: '318791658916',
+    projectId: 'shop-main-12dfc',
+    storageBucket: 'shop-main-12dfc.firebasestorage.app',
     iosBundleId: 'com.xavics.salesapp',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCrsbJeVSx4HQT-YkThBMqFgezru6lwEcI',
-    appId: '1:110369730358:web:9bd011ab96473b4fe74d97',
-    messagingSenderId: '110369730358',
-    projectId: 'saleapp-4df13',
-    authDomain: 'saleapp-4df13.firebaseapp.com',
-    storageBucket: 'saleapp-4df13.firebasestorage.app',
-    measurementId: 'G-7LX166YPLP',
+    apiKey: 'AIzaSyCSj-tSqV91aMKvTOYjp8FYAgMgjICFjis',
+    appId: '1:318791658916:web:4bf181b59eefcc5a5da531',
+    messagingSenderId: '318791658916',
+    projectId: 'shop-main-12dfc',
+    authDomain: 'shop-main-12dfc.firebaseapp.com',
+    storageBucket: 'shop-main-12dfc.firebasestorage.app',
+    measurementId: 'G-L6Z9ZZ6FZL',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCTG_U612IV4TEG7ERqYz2RSpv7PnCS3pY',
+    appId: '1:318791658916:ios:1601dcf3878e46125da531',
+    messagingSenderId: '318791658916',
+    projectId: 'shop-main-12dfc',
+    storageBucket: 'shop-main-12dfc.firebasestorage.app',
+    iosBundleId: 'com.xavics.salesapp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCSj-tSqV91aMKvTOYjp8FYAgMgjICFjis',
+    appId: '1:318791658916:web:9cbca6f86369ff355da531',
+    messagingSenderId: '318791658916',
+    projectId: 'shop-main-12dfc',
+    authDomain: 'shop-main-12dfc.firebaseapp.com',
+    storageBucket: 'shop-main-12dfc.firebasestorage.app',
+    measurementId: 'G-6FJX1BVN34',
   );
 
 }

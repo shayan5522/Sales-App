@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,19 +10,44 @@ class OwnerSignupController extends GetxController {
   final shopName = ''.obs;
   final referralCode = ''.obs;
 
+  // Generate secure random invite codes
   List<String> generateInviteCodes(int count) {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    final random = Random.secure();
+
     return List.generate(count, (_) {
-      return List.generate(6, (i) => chars[(DateTime.now().microsecondsSinceEpoch + i) % chars.length]).join();
+      return List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
     });
   }
 
+  // Save invite code under user's subcollection
+  Future<void> createInviteCode(String code, String shopDocId, String ownerUid) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(shopDocId)
+        .collection('invites')
+        .doc(code);
+
+    final doc = await docRef.get();
+    if (doc.exists) return;
+
+    await docRef.set({
+      'code': code,
+      'ownerId': ownerUid,
+      'used': false,
+      'usedBy': null,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // Register the owner with shopName as document ID
   Future<void> registerOwner() async {
-    final name = shopName.value.trim();
+    final rawName = shopName.value.trim();
+    final sanitizedShopName = rawName.replaceAll(RegExp(r'[^\w\s]'), '').replaceAll(' ', '_');
     final referral = referralCode.value.trim();
     final user = FirebaseAuth.instance.currentUser;
 
-    if (name.isEmpty || user == null) {
+    if (rawName.isEmpty || user == null) {
       Get.snackbar("Error", "Shop name required or user not logged in");
       return;
     }
@@ -30,27 +57,37 @@ class OwnerSignupController extends GetxController {
     final phone = user.phoneNumber ?? '';
     final shopCode = uid.substring(0, 6).toUpperCase();
 
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'uid': uid,
-      'phone': phone,
-      'role': 'owner',
-      'shopName': name,
-      'shopCode': shopCode,
-      'referralCode': referral,
-    });
+    try {
+      // Check for existing shop name
+      final shopDoc = await FirebaseFirestore.instance.collection('users').doc(sanitizedShopName).get();
+      if (shopDoc.exists) {
+        Get.snackbar("Error", "This shop name is already registered. Please use a different name.");
+        isLoading.value = false;
+        return;
+      }
 
-    final inviteCodes = generateInviteCodes(3);
-    for (String code in inviteCodes) {
-      await FirebaseFirestore.instance.collection('invites').doc(code).set({
-        'code': code,
-        'ownerId': uid,
-        'used': false,
-        'usedBy': null,
-        'createdAt': FieldValue.serverTimestamp(),
+      // Save user with shopName as document ID
+      await FirebaseFirestore.instance.collection('users').doc(sanitizedShopName).set({
+        'uid': uid,
+        'phone': phone,
+        'role': 'owner',
+        'shopName': rawName,
+        'shopCode': shopCode,
+        'referralCode': referral,
       });
-    }
 
-    isLoading.value = false;
-    Get.offAll(() => OwnerDashboard());
+      // Save invite codes under subcollection
+      final inviteCodes = generateInviteCodes(3);
+      for (String code in inviteCodes) {
+        await createInviteCode(code, sanitizedShopName, uid);
+      }
+
+      Get.offAll(() => OwnerDashboard());
+    } catch (e) {
+      print('Error during registration: $e');
+      Get.snackbar("Error", "Failed to register the shop");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

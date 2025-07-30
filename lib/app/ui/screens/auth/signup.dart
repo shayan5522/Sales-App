@@ -52,7 +52,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onPressed: _isLoading
                     ? () {}
                     : () async {
-                  print(_isLoading);
                   final phone = phoneController.text.trim();
                   if (phone.isEmpty) {
                     Get.snackbar("Error", "Enter phone number");

@@ -22,7 +22,6 @@ class AuthController extends GetxController {
         Get.to(() => OTPVerificationScreen());
       },
       onError: (e) {
-        print(e.toString());
         Get.snackbar("Error", e.message ?? "OTP failed");
       },
     );
@@ -42,7 +41,7 @@ class AuthController extends GetxController {
       if (doc.exists) {
         final role = doc['role'];
         if (role == 'owner') {
-          Get.offAll(() => OwnerDashboard());
+          Get.offAll(() => OwnerSignUpScreen());
         } else if (role == 'labour') {
           Get.offAll(() => LabourDashboard());
         } else {
