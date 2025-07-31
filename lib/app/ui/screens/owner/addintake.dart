@@ -3,7 +3,6 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/grid_container.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
-
 class IntakeScreen extends StatefulWidget {
   const IntakeScreen({super.key});
 
