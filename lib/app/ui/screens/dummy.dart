@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart' show AppColors;
+import 'package:salesapp/app/ui/screens/owner/addintake.dart';
+
+import 'package:salesapp/app/ui/screens/owner/products.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/earning_card.dart';
-import 'package:salesapp/app/ui/widgets/Expense/expensecard.dart';
-import 'package:salesapp/app/ui/widgets/chart.dart';
-import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
+import 'package:salesapp/app/ui/widgets/buttons.dart';
+import 'package:get/get.dart';
 
 class DummyTestScreen extends StatelessWidget {
   const DummyTestScreen({super.key});
@@ -16,6 +17,12 @@ class DummyTestScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Dummy Test Screen')),
       body: Column(
         children: [
+          PrimaryButton(
+            text: 'Intake',
+            onPressed: () {
+              Get.to(() => IntakeScreen());
+            },
+          ),
           Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -30,18 +37,11 @@ class DummyTestScreen extends StatelessWidget {
           Container(
             width: double.infinity,
             height: 200,
-            child: ResponsiveBarChart(
-              maxYValue: 8000,
-              yAxisSteps: [0, 2, 4, 6, 8],
-              data: [
-                BarData(label: 'Product 1', value: 4000),
-                BarData(label: 'Product 2', value: 7000),
-                BarData(label: 'Product 3', value: 5000),
-                BarData(label: 'Product 4', value: 1000),
-                BarData(label: 'Product 4', value: 2000),
-                BarData(label: 'Product 4', value: 3000),
-                BarData(label: 'Product 4', value: 4000),
-              ],
+            child: PrimaryButton(
+              text: 'Products',
+              onPressed: () {
+                Get.to(() => ProductScreen());
+              },
             ),
           ),
           const SizedBox(height: 16),
