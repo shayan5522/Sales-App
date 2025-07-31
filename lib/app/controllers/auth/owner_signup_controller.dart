@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:salesapp/app/ui/screens/owner_panel.dart';
 import '../../ui/screens/owner/owner_dashboard.dart';
 
 class OwnerSignupController extends GetxController {
@@ -82,9 +83,9 @@ class OwnerSignupController extends GetxController {
         await createInviteCode(code, sanitizedShopName, uid);
       }
 
-      Get.offAll(() => OwnerDashboard());
+      Get.offAll(() => OwnerPanel());
     } catch (e) {
-      print('Error during registration: $e');
+      // print('Error during registration: $e');
       Get.snackbar("Error", "Failed to register the shop");
     } finally {
       isLoading.value = false;

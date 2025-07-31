@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/screens/auth/splash.dart';
 import 'package:salesapp/app/ui/screens/dummy.dart';
+import 'package:salesapp/app/ui/screens/labour_panel.dart';
+import 'package:salesapp/app/ui/screens/owner_panel.dart';
 
 import 'firebase_options.dart';
 

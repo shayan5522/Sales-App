@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
+import 'package:salesapp/app/ui/screens/labour_panel.dart';
 import '../../services/auth_service.dart';
 import '../../ui/screens/auth/labour_signup.dart';
 import '../../ui/screens/auth/otp.dart';
@@ -43,7 +44,7 @@ class AuthController extends GetxController {
         if (role == 'owner') {
           Get.offAll(() => OwnerSignUpScreen());
         } else if (role == 'labour') {
-          Get.offAll(() => LabourDashboard());
+          Get.offAll(() => LaborPanel());
         } else {
           Get.snackbar("Error", "Unknown role");
         }
