@@ -16,49 +16,59 @@ class GridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final double cardWidth =
-        (screenWidth - 64) / 3; // 3 cards with 16px margin between
-
-    return Container(
-      width: cardWidth,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.secondary,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            imagePath,
-            width: cardWidth * 0.4,
-            height: cardWidth * 0.4,
-            fit: BoxFit.contain,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          decoration: BoxDecoration(
+            color: AppColors.secondary,
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: AppTextStyles.heading.copyWith(fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
             children: [
-              const Icon(Icons.currency_rupee, size: 16, color: Colors.blue),
-              Text(
-                price.toString(),
-                style: AppTextStyles.subtitle.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              // Image section
+              SizedBox(
+                height: constraints.maxHeight * 0.4,
+                child: Image.asset(imagePath, fit: BoxFit.contain),
+              ),
+              const SizedBox(height: 8),
+
+              // Title
+              Flexible(
+                child: Text(
+                  title,
+                  style: AppTextStyles.heading.copyWith(fontSize: 13),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
+
+              const SizedBox(height: 6),
+
+              // Price
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.currency_rupee,
+                    size: 16,
+                    color: Colors.blue,
+                  ),
+                  Text(
+                    price.toString(),
+                    style: AppTextStyles.subtitle.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
