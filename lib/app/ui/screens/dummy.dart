@@ -30,7 +30,7 @@ class DummyTestScreen extends StatelessWidget {
           PrimaryButton(
             text: 'intake',
             onPressed: () {
-              Get.to(() => Intake());
+              Get.to(() => AddIntake());
             },
           ),
           const SizedBox(height: 8),

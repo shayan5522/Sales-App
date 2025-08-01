@@ -20,7 +20,7 @@ class CustomExpenseListTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

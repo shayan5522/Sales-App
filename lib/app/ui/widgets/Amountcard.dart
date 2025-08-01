@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-
 class CenteredAmountCard extends StatelessWidget {
   final String title;
   final String subtitle;

@@ -3,13 +3,14 @@ import 'package:get/get.dart';
 import '../../controllers/shop_nav_controller.dart';
 import '../../themes/colors.dart';
 import 'owner/owner_dashboard.dart';
+import 'owner/report_page.dart';
 
 class OwnerPanel extends StatelessWidget {
   final controller = Get.put(ShopNavController());
 
   final pages = [
     OwnerDashboard(), // Home
-    OwnerDashboard(), // Reports
+    ReportsMainPage(), // Reports
     OwnerDashboard(), // Products
     OwnerDashboard(), // Settings
   ];

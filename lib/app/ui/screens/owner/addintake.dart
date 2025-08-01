@@ -5,18 +5,18 @@ import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/grid_container.dart';
 import 'package:salesapp/app/ui/widgets/transactionlist.dart';
 
-class Intake extends StatefulWidget {
-  const Intake({super.key});
+class AddIntake extends StatefulWidget {
+  const AddIntake({super.key});
 
   @override
-  State<Intake> createState() => _IntakeState();
+  State<AddIntake> createState() => _IntakeState();
 }
 
-class _IntakeState extends State<Intake> {
+class _IntakeState extends State<AddIntake> {
   final List<Map<String, dynamic>> products = List.generate(10, (index) {
     return {
       'title': 'Product $index',
-      'imagePath': 'assets/images/products.png',
+      'imagePath': 'assets/images/Apple.jpg',
       'price': (index + 1) * 100,
     };
   });
@@ -31,7 +31,7 @@ class _IntakeState extends State<Intake> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return IntakePopover(
+        return Intakepopover(
           cart: cart,
           product: product,
           onAddProduct: (newProduct) {
@@ -54,7 +54,7 @@ class _IntakeState extends State<Intake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Products'),
+      appBar: CustomAppbar(title: 'Add Intake'),
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
@@ -108,12 +108,12 @@ class _IntakeState extends State<Intake> {
   }
 }
 
-class IntakePopover extends StatefulWidget {
+class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
 
-  const IntakePopover({
+  const Intakepopover({
     super.key,
     required this.cart,
     required this.product,
@@ -121,10 +121,10 @@ class IntakePopover extends StatefulWidget {
   });
 
   @override
-  State<IntakePopover> createState() => _IntakePopoverState();
+  State<Intakepopover> createState() => _IntakePopoverState();
 }
 
-class _IntakePopoverState extends State<IntakePopover> {
+class _IntakePopoverState extends State<Intakepopover> {
   int quantity = 1;
 
   @override

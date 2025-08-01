@@ -76,17 +76,17 @@ class IntakeProduct extends StatelessWidget {
                 const SizedBox(height: 2),
                 stockCount == null
                     ? Text(
-                        'Total: $totalexpense',
-                        style: AppTextStyles.subtitleSmall.copyWith(
-                          color: AppColors.textseconadry,
-                        ),
-                      )
+                  'Total: $totalexpense',
+                  style: AppTextStyles.subtitleSmall.copyWith(
+                    color: AppColors.textseconadry,
+                  ),
+                )
                     : Text(
-                        'Stock Count: $stockCount',
-                        style: AppTextStyles.subtitleSmall.copyWith(
-                          color: AppColors.textseconadry,
-                        ),
-                      ),
+                  'Stock Count: $stockCount',
+                  style: AppTextStyles.subtitleSmall.copyWith(
+                    color: AppColors.textseconadry,
+                  ),
+                ),
                 if (stockCount != null) ...[
                   const SizedBox(height: 6),
                   Align(

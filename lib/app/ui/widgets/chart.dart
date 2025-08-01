@@ -22,7 +22,7 @@ class ResponsiveBarChart extends StatelessWidget {
           double chartHeight = fullHeight - 40; // leave space for bottom labels
 
           return Padding(
-            padding: const EdgeInsets.only(left: 34, right: 8),
+            padding: const EdgeInsets.only(left: 8, right: 8),
             child: Stack(
               children: [
                 // Y-Axis Grid Lines + Labels (Reversed)
