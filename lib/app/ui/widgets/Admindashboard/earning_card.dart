@@ -59,7 +59,7 @@ class EarningsCard extends StatelessWidget {
             child: GestureDetector(
               onTap: onSeeAll,
               child: Text(
-                'see all',
+                'See All',
                 style: AppTextStyles.subtitleSmall2.copyWith(
                   decoration: TextDecoration.underline,
                   fontWeight: FontWeight.w700,

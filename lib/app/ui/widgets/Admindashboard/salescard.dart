@@ -16,39 +16,36 @@ class SalesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final double iconSize = screenWidth * 0.2;
-
     return Container(
-      height: 160.0,
-      width: 120.0,
-      padding: const EdgeInsets.all(10),
+      height: 160,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.secondary,
-        borderRadius: BorderRadius.circular(3),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(child: Image.asset(imagePath, fit: BoxFit.contain)),
-          const SizedBox(height: 16),
-
+          Image.asset(imagePath, width: 40, height: 40),
           Text(
             label,
-            style: AppTextStyles.heading,
+            style: AppTextStyles.subtitleSmall,
             textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
-          const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.currency_rupee,
-                color: AppColors.primary,
-                size: 22,
+              const Icon(Icons.currency_rupee, color: AppColors.primary, size: 18),
+              Text(
+                value.toString(),
+                style: AppTextStyles.heading.copyWith(fontSize: 18),
               ),
-              Text(value.toString(), style: AppTextStyles.heading),
             ],
           ),
         ],

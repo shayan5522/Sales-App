@@ -6,9 +6,16 @@ import 'package:salesapp/app/ui/screens/auth/splash.dart';
 import 'package:salesapp/app/ui/screens/dummy.dart';
 import 'package:salesapp/app/ui/screens/labour_panel.dart';
 import 'package:salesapp/app/ui/screens/owner_panel.dart';
-
+import 'app/ui/screens/labour/labour_dashboard.dart';
+import 'app/ui/screens/owner/Credit_Debit_Page.dart';
+import 'app/ui/screens/owner/add_category_page.dart';
+import 'app/ui/screens/owner/expense_report_page.dart';
+import 'app/ui/screens/owner/intake_report.dart';
+import 'app/ui/screens/owner/owner_dashboard.dart';
+import 'app/ui/screens/owner/report_page.dart';
+import 'app/ui/screens/owner/sales_report_page.dart';
+import 'app/ui/screens/owner/stock_report.dart';
 import 'firebase_options.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // ✅ THIS LINE IS REQUIRED
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -26,7 +33,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
-      home: SplashScreen(),
+      // home: SplashScreen(),
+
+     home:AddCategoryPage(),
       initialRoute: '/',
     );
   }

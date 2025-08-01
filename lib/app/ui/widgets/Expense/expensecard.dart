@@ -16,62 +16,50 @@ class ExpenseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 320), // Set desired width
-        child: Card(
-          elevation: 3,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: AppColors.secondary,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Heading
-                Text(title, style: AppTextStyles.title),
-
-                const SizedBox(height: 6),
-
-                // Description
-                Text(
-                  description,
-                  style: AppTextStyles.subtitleSmall.copyWith(
-                    color: AppColors.textseconadry,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Bottom right price
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'INR :',
-                        style: AppTextStyles.subtitleSmall.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      Text(
-                        '$price',
-                        style: AppTextStyles.subtitleSmall.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: AppColors.secondary,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: AppTextStyles.title),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: AppTextStyles.subtitleSmall.copyWith(
+                color: AppColors.textseconadry,
+              ),
             ),
-          ),
+            const Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'INR :',
+                    style: AppTextStyles.subtitleSmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    '$price',
+                    style: AppTextStyles.subtitleSmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
