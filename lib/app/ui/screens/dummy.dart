@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart' show AppColors;
+import 'package:salesapp/app/ui/screens/owner/Reports/offlinereport.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/onlinereport.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/returnreport.dart';
 import 'package:salesapp/app/ui/screens/owner/addintake.dart';
+import 'package:salesapp/app/ui/screens/owner/amountcrediet.dart';
+import 'package:salesapp/app/ui/screens/owner/expense.dart';
 
-import 'package:salesapp/app/ui/screens/owner/products.dart';
-import 'package:salesapp/app/ui/widgets/Admindashboard/earning_card.dart';
+import 'package:salesapp/app/ui/screens/owner/return.dart';
+import 'package:salesapp/app/ui/screens/owner/sales.dart';
+import 'package:salesapp/app/ui/screens/owner/setting.dart';
+import 'package:salesapp/app/ui/screens/owner/usermanagement.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:get/get.dart';
+import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
+import 'package:salesapp/app/ui/widgets/sale/salereportlist.dart';
+import 'package:salesapp/app/ui/widgets/sale/salesstat.dart';
 
 class DummyTestScreen extends StatelessWidget {
   const DummyTestScreen({super.key});
@@ -18,42 +28,70 @@ class DummyTestScreen extends StatelessWidget {
       body: Column(
         children: [
           PrimaryButton(
-            text: 'Intake',
+            text: 'intake',
             onPressed: () {
               Get.to(() => Intake());
             },
           ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [Row(children: [
-                    
-                  ],
-                )],
-            ), // Capitalized here ✅
-          ),
-
           const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            height: 200,
-            child: PrimaryButton(
-              text: 'Products',
-              onPressed: () {
-                Get.to(() => ProductScreen());
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          EarningsCard(
-            income: 5000,
-            profit: 2000,
-            imagePath: 'assets/images/earning.png',
-            onSeeAll: () {
-              // Handle see all action
+          PrimaryButton(
+            text: 'Sales',
+            onPressed: () {
+              Get.to(() => Sales());
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          PrimaryButton(
+            text: 'Product Return',
+            onPressed: () {
+              Get.to(() => ReturnProduct());
+            },
+          ),
+          SizedBox(height: 8),
+          PrimaryButton(
+            text: 'ADD EXPENSE',
+            onPressed: () {
+              Get.to(() => AddExpenseScreen());
+            },
+          ),
+          PrimaryButton(
+            text: 'online report',
+            onPressed: () {
+              Get.to(() => OnlineReportScreen());
+            },
+          ),
+          PrimaryButton(
+            text: 'Offline report',
+            onPressed: () {
+              Get.to(() => OfflineReport());
+            },
+          ),
+          PrimaryButton(
+            text: 'return report',
+            onPressed: () {
+              Get.to(() => RetunReport());
+            },
+          ),
+          PrimaryButton(
+            text: 'return report',
+            onPressed: () {
+              Get.to(() => SettingsScreen());
+            },
+          ),
+          const SizedBox(height: 8),
+          PrimaryButton(
+            text: 'Amount Credit',
+            onPressed: () {
+              Get.to(() => AmountCreditScreen());
+            },
+          ),
+          const SizedBox(height: 8),
+          PrimaryButton(
+            text: 'User Management',
+            onPressed: () {
+              Get.to(() => UserManagementScreen());
+            },
+          ),
         ],
       ),
     );

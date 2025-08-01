@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
+import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/grid_container.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
 
-class Intake extends StatefulWidget {
-  const Intake({super.key});
+class ReturnProduct extends StatefulWidget {
+  const ReturnProduct({super.key});
 
   @override
-  State<Intake> createState() => _IntakeState();
+  State<ReturnProduct> createState() => _IntakeState();
 }
 
-class _IntakeState extends State<Intake> {
+class _IntakeState extends State<ReturnProduct> {
   final List<Map<String, dynamic>> products = List.generate(10, (index) {
     return {
       'title': 'Product $index',
-      'imagePath': 'assets/images/products.png',
+      'imagePath': 'assets/images/Apple.jpg',
       'price': (index + 1) * 100,
     };
   });
@@ -31,7 +31,7 @@ class _IntakeState extends State<Intake> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return IntakePopover(
+        return Returnpopover(
           cart: cart,
           product: product,
           onAddProduct: (newProduct) {
@@ -54,7 +54,7 @@ class _IntakeState extends State<Intake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Products'),
+      appBar: CustomAppbar(title: 'Return Product'),
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
@@ -68,7 +68,7 @@ class _IntakeState extends State<Intake> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Add Intake',
+                    'Return Product',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -108,12 +108,12 @@ class _IntakeState extends State<Intake> {
   }
 }
 
-class IntakePopover extends StatefulWidget {
+class Returnpopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
 
-  const IntakePopover({
+  const Returnpopover({
     super.key,
     required this.cart,
     required this.product,
@@ -121,10 +121,10 @@ class IntakePopover extends StatefulWidget {
   });
 
   @override
-  State<IntakePopover> createState() => _IntakePopoverState();
+  State<Returnpopover> createState() => _IntakePopoverState();
 }
 
-class _IntakePopoverState extends State<IntakePopover> {
+class _IntakePopoverState extends State<Returnpopover> {
   int quantity = 1;
 
   @override
@@ -154,7 +154,7 @@ class _IntakePopoverState extends State<IntakePopover> {
                 ), // Change 16 to your desired radius
               ),
               child: CustomAppbar(
-                title: 'Add Intake',
+                title: 'Return Product',
                 backgroundColor:
                     Colors.transparent, // So the Container's color shows
               ),
@@ -245,10 +245,6 @@ class _IntakePopoverState extends State<IntakePopover> {
             ),
             const SizedBox(height: 18),
 
-            // Total Amount Box
-            TransactionTextRow(product: 'Total Amount', amount: grandTotal),
-            const SizedBox(height: 16),
-
             Align(
               alignment: Alignment.centerRight,
               child: Text(
@@ -282,9 +278,12 @@ class _IntakePopoverState extends State<IntakePopover> {
                       });
                       Navigator.pop(context);
                     },
-                    child: const Text(
+                    child: Text(
                       'Add Product',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: AppTextStyles.title.copyWith(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
