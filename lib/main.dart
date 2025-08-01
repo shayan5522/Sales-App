@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/screens/auth/splash.dart';
-import 'package:salesapp/app/ui/screens/dummy.dart';
 import 'package:salesapp/app/ui/screens/labour_panel.dart';
 import 'package:salesapp/app/ui/screens/owner_panel.dart';
 import 'app/ui/screens/labour/labour_dashboard.dart';
 import 'app/ui/screens/owner/Credit_Debit_Page.dart';
 import 'app/ui/screens/owner/add_category_page.dart';
+import 'app/ui/screens/owner/addintake.dart';
 import 'app/ui/screens/owner/expense_report_page.dart';
 import 'app/ui/screens/owner/intake_report.dart';
 import 'app/ui/screens/owner/owner_dashboard.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       // home: SplashScreen(),
 
-     home:AddCategoryPage(),
+     home:IntakeScreen(),
       initialRoute: '/',
     );
   }
