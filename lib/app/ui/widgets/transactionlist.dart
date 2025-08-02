@@ -26,14 +26,14 @@ class TransactionTextRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Product name
-          Text(product, style: AppTextStyles.subtitleSmall),
+          Text(product, style: AppTextStyles.subtitle),
           // Amount with ₹
           Row(
             children: [
               const Icon(Icons.currency_rupee, size: 14, color: Colors.blue),
               Text(
                 amount.toString(),
-                style: AppTextStyles.subtitleSmall.copyWith(
+                style: AppTextStyles.subtitle.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),

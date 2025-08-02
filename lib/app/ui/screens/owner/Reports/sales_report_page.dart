@@ -6,8 +6,8 @@ import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
 
-import '../../widgets/appbar.dart';
-import '../../widgets/sale/salereportlist.dart';
+import '../../../widgets/appbar.dart';
+import '../../../widgets/sale/salereportlist.dart';
 
 class SalesReportPage extends StatelessWidget {
   const SalesReportPage({super.key});
