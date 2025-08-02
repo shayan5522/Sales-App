@@ -8,8 +8,8 @@ import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 
-import '../../widgets/Amountcard.dart';
-import '../../widgets/buttons.dart';
+import '../../../widgets/Amountcard.dart';
+import '../../../widgets/buttons.dart';
 
 class CreditDebitPage extends StatelessWidget {
   const CreditDebitPage({super.key});

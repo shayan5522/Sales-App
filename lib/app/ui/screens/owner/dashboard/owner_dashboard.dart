@@ -4,11 +4,11 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
-import '../../widgets/Admindashboard/dashboard_main-container.dart';
-import '../../widgets/Admindashboard/earning_card.dart';
-import '../../widgets/Admindashboard/gradient_action_card.dart';
-import '../../widgets/Admindashboard/salescard.dart';
-import '../../widgets/custom_dashboard_appbar.dart'; // ✅ Import SalesCard widget
+import '../../../widgets/Admindashboard/dashboard_main-container.dart';
+import '../../../widgets/Admindashboard/earning_card.dart';
+import '../../../widgets/Admindashboard/gradient_action_card.dart';
+import '../../../widgets/Admindashboard/salescard.dart';
+import '../../../widgets/custom_dashboard_appbar.dart'; // ✅ Import SalesCard widget
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -27,7 +27,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       backgroundColor: const Color(0xFFF6F6F9),
       appBar: const CustomDashboardAppBar(
         title: "Sportify",
-        logoPath: "assets/images/sales.png", // Replace with your logo
+        logoPath: "assets/images/Add_Sales.png", // Replace with your logo
       ),
 
       body: SingleChildScrollView(
@@ -59,7 +59,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               children: const [
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Total Sales",
                     value: 112,
                   ),
@@ -67,7 +67,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(width: 8),
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Total Income",
                     value: 112,
                   ),
@@ -75,7 +75,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(width: 8),
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Total Profit",
                     value: 112,
                   ),

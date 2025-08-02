@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 
-class Salereportcard extends StatelessWidget {
+class ProductExpenseCard extends StatelessWidget {
   final String imagePath;
-  final String totalSold;
-  final String income;
-  final String profit;
+  final String productName;
+  final String inTaken;
+  final String totalExpense;
+  final String amount;
 
-  const Salereportcard({
+  const ProductExpenseCard({
     super.key,
     required this.imagePath,
-    required this.totalSold,
-    required this.income,
-    required this.profit,
+    required this.productName,
+    required this.inTaken,
+    required this.totalExpense,
+    required this.amount,
   });
 
   @override
@@ -27,7 +29,7 @@ class Salereportcard extends StatelessWidget {
           margin: EdgeInsets.all(cellWidth * 0.03),
           padding: EdgeInsets.symmetric(
             vertical: cellHeight * 0.08,
-            horizontal: cellWidth * 0.02,
+            horizontal: cellWidth * 0.03,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -43,6 +45,7 @@ class Salereportcard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Event image
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
@@ -53,33 +56,54 @@ class Salereportcard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: cellWidth * 0.04),
+              // Text info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      totalSold,
-                      style: AppTextStyles.title.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: cellWidth * 0.11,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // Top row: product name and amount
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            productName,
+                            style: AppTextStyles.title.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: cellWidth * 0.11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'INR. $amount',
+                          style: AppTextStyles.subtitleSmall.copyWith(
+                            fontSize: cellWidth * 0.09,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                     SizedBox(height: cellHeight * 0.02),
                     Text(
-                      'Income: $income',
+                      'In-taken: $inTaken',
                       style: AppTextStyles.subtitleSmall.copyWith(
                         fontSize: cellWidth * 0.08,
+                        color: Colors.black87,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Profit: $profit',
+                      'Total Expense:$totalExpense',
                       style: AppTextStyles.subtitleSmall.copyWith(
                         fontSize: cellWidth * 0.08,
+                        color: Colors.black87,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

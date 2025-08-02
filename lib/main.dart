@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/screens/dummy.dart';
+import 'app/ui/screens/owner/Reports/Credit_Debit_Page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // ✅ THIS LINE IS REQUIRED
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
 
       // home: SplashScreen(),
       home: DummyTestScreen(),
+      //  home: SalesReportPage(),
       initialRoute: '/',
     );
   }

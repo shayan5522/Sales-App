@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/labour_nav_controller.dart';
-import '../../themes/colors.dart';
-import 'labour/labour_dashboard.dart';
+import '../../../../controllers/shop_nav_controller.dart';
+import '../../../../themes/colors.dart';
+import '../dashboard/owner_dashboard.dart';
+import '../dashboard/products/products.dart';
+import '../Reports/report_page.dart';
+import '../settings/setting.dart';
 
-class LaborPanel extends StatelessWidget {
-  final controller = Get.put(LaborNavController());
+class OwnerPanel extends StatelessWidget {
+  final controller = Get.put(ShopNavController());
 
   final pages = [
-    LabourDashboard(),
-    LabourDashboard(),
-    LabourDashboard(),
-    LabourDashboard(),
-    // ReportPage(),
-    // ProductPage(),
-    // SettingPage(),
+    OwnerDashboard(), // Home
+    ReportsMainPage(), // Reports
+    ProductScreen(), // Products
+    SettingsScreen(), // Settings
   ];
 
-   LaborPanel({super.key});
+  OwnerPanel({super.key});
 
   @override
   Widget build(BuildContext context) {

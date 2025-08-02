@@ -36,7 +36,7 @@ class ReportsMainPage extends StatelessWidget {
               children: const [
                 Expanded(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Sale Amount",
                     value: 112,
                   ),
@@ -44,7 +44,7 @@ class ReportsMainPage extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Intake Amount",
                     value: 100,
                   ),
@@ -52,7 +52,7 @@ class ReportsMainPage extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: SalesCard(
-                    imagePath: "assets/images/sales.png",
+                    imagePath: "assets/images/Add_Sales.png",
                     label: "Expense Amount",
                     value: 112,
                   ),
