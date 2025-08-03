@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'app/ui/screens/auth/splash.dart';
-import 'app/ui/screens/owner/dashboard/owner_dashboard.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -15,6 +14,7 @@ Future<void> main() async {
 
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
       home: SplashScreen(),
-   //  home: SalesReportPage(),
       initialRoute: '/',
     );
   }
