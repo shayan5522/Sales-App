@@ -4,20 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
-import 'app/ui/screens/owner/Reports/Credit_Debit_Page.dart';
+import 'app/ui/screens/auth/splash.dart';
+import 'app/ui/screens/owner/dashboard/owner_dashboard.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // ✅ THIS LINE IS REQUIRED
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(
-    DevicePreview(
-      enabled: !kReleaseMode, // Only enable in debug mode
-      builder: (context) => const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -33,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
-      home: CreditDebitPage(),
+      home: SplashScreen(),
    //  home: SalesReportPage(),
       initialRoute: '/',
     );

@@ -2,23 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/return_screen/return.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import '../../../widgets/Admindashboard/dashboard_main-container.dart';
 import '../../../widgets/Admindashboard/earning_card.dart';
 import '../../../widgets/Admindashboard/gradient_action_card.dart';
 import '../../../widgets/Admindashboard/salescard.dart';
-import '../../../widgets/custom_dashboard_appbar.dart'; // ✅ Import SalesCard widget
-
+import '../../../widgets/custom_dashboard_appbar.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/products/products.dart';
+import '../Reports/report_main_page.dart';
+import 'Add_Sales/sales.dart';
+import 'add_category/add_category_page.dart';
+import 'credit_amount _due/amountcrediet.dart';
+import 'expenses/expense.dart';
+import 'intake/addintake.dart';
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
   @override
   State<OwnerDashboard> createState() => _OwnerDashboardState();
 }
-
 class _OwnerDashboardState extends State<OwnerDashboard> {
   DateTime selectedDate = DateTime.now();
-
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
@@ -27,21 +32,19 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       backgroundColor: const Color(0xFFF6F6F9),
       appBar: const CustomDashboardAppBar(
         title: "Sportify",
-        logoPath: "assets/images/Add_Sales.png", // Replace with your logo
+        logoPath: "assets/images/sales.png",
       ),
-
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Total Summary and Date Picker
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Total Summary", style: AppTextStyles.heading),
                 SizedBox(
-                  width: 150,
+                  width: 140,
                   child: CustomDatePicker(
                     label: '',
                     initialDate: selectedDate,
@@ -59,7 +62,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               children: const [
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
+                    imagePath: "assets/images/sales.png",
                     label: "Total Sales",
                     value: 112,
                   ),
@@ -67,7 +70,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(width: 8),
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
+                    imagePath: "assets/images/sales1111.png",
                     label: "Total Income",
                     value: 112,
                   ),
@@ -75,7 +78,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 SizedBox(width: 8),
                 Flexible(
                   child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
+                    imagePath: "assets/images/earning.png",
                     label: "Total Profit",
                     value: 112,
                   ),
@@ -83,9 +86,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               ],
             ),
 
-
             const SizedBox(height: 16),
-// ✅ Earnings Cards Row
+// ✅ Earnings Cards Row Here
             Row(
               children: [
                 Flexible(
@@ -109,10 +111,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
             ),
 
             const SizedBox(height: 16),
-            //Quick Action Section
+            //Quick Action Section Heree...
             Text("Quick Actions", style: AppTextStyles.heading),
             const SizedBox(height: 16),
-
             LayoutBuilder(
               builder: (context, constraints) {
                 int crossAxisCount = 2;
@@ -121,7 +122,6 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                 } else if (constraints.maxWidth >= 600) {
                   crossAxisCount = 3;
                 }
-
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -134,37 +134,65 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   ),
                   itemBuilder: (context, index) {
                     final items = [
-                      {"label": "Products", "icon": "assets/images/products.png"},
-                      {"label": "Add Intake", "icon": "assets/images/products.png"},
-                      {"label": "Add Sale", "icon": "assets/images/products.png"},
-                      {"label": "Add Expense", "icon": "assets/images/products.png"},
-                      {"label": "Return", "icon": "assets/images/products.png"},
-                      {"label": "Add Category", "icon": "assets/images/products.png"},
-                      {"label": "Credit & amount due", "icon": "assets/images/products.png"},
+                      {
+                        "label": "Products",
+                        "icon": "assets/images/products.png",
+                        "screen":ProductScreen(),
+                      },
+                      {
+                        "label": "Add Intake",
+                        "icon": "assets/images/products.png",
+                        "screen":AddIntake(),
+                      },
+                      {
+                        "label": "Add Sale",
+                        "icon": "assets/images/products.png",
+                        "screen":Sales(),
+                      },
+                      {
+                        "label": "Add Expense",
+                        "icon": "assets/images/products.png",
+                        "screen":AddExpenseScreen(),
+                      },
+                      {
+                        "label": "Return",
+                        "icon": "assets/images/products.png",
+                        "screen":ReturnProduct(),
+                      },
+                      {
+                        "label": "Add Category",
+                        "icon": "assets/images/products.png",
+                        "screen": AddCategoryPage(),
+                      },
+                      {
+                        "label": "Credit & amount due",
+                        "icon": "assets/images/products.png",
+                        "screen":AmountCreditScreen(),
+                      },
                     ];
-
                     final item = items[index];
-
                     return MainContainer(
-                      imagePath: item["icon"]!,
-                      label: item["label"]!,
-                      onTap: () {}, // Add actions later if needed
+                      imagePath: item["icon"] as String,
+                      label: item["label"] as String,
+                      onTap: () => Get.to(() => item["screen"] as Widget),
                     );
                   },
+
                 );
               },
             ),
 
             const SizedBox(height: 32),
-            // Management Section
+            // Management Section Heree
             Text("Management", style: AppTextStyles.heading),
             const SizedBox(height: 12),
             GradientActionCard(
               label: "Generate Report",
               iconPath: "assets/images/earning.png",
               onTap: () {
-                // TODO: Navigate to report generation screen
+                Get.to(() => const ReportsMainPage());
               },
+
             ),
 
             const SizedBox(height: 30),

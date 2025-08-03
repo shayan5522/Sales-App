@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-
 class CustomDatePicker extends StatefulWidget {
-  final String? label; // now nullable
+  final String? label;
   final Function(DateTime) onDateSelected;
   final DateTime? initialDate;
 
@@ -45,7 +44,6 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   @override
   Widget build(BuildContext context) {
     final formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate!);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,12 +51,12 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
           Text(
             widget.label!,
             style: AppTextStyles.subtitle.copyWith(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 6),
+          // const SizedBox(height: 2),
         ],
         GestureDetector(
           onTap: _pickDate,

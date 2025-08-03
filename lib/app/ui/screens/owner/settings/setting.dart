@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
+
+import '../../../widgets/logout_dialog.dart';
+import '../../auth/signup_as.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -143,7 +148,21 @@ class SettingsScreen extends StatelessWidget {
             PrimaryButton(
               text: 'Logout',
               onPressed: () {
-                // Logout logic
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return LogoutDialog(
+                      onConfirm: () {
+                        Get.back(); // Close the dialog
+                        // TODO: Clear session/local storage if needed
+                        Get.offAll(() => const SignUpAsScreen());
+                      },
+                      onCancel: () {
+                        Get.back(); // Close the dialog
+                      },
+                    );
+                  },
+                );
               },
               widthFactor: 1.0,
               heightFactor: 0.06,
@@ -154,6 +173,10 @@ class SettingsScreen extends StatelessWidget {
                 fontSize: screenWidth * 0.045,
               ),
             ),
+
+
+
+
           ],
         ),
       ),
