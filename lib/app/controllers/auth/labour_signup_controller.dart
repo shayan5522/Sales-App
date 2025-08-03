@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:salesapp/app/ui/screens/labour_panel.dart';
 import '../../ui/screens/labour/labour_dashboard.dart';
 
 class LabourSignupController extends GetxController {
@@ -62,7 +61,7 @@ class LabourSignupController extends GetxController {
       });
 
       print('✅ Code "$inputCode" used successfully.');
-      Get.offAll(() => LaborPanel());
+      Get.offAll(() => LabourDashboard());
     } catch (e) {
       print('❌ Error during labour registration: $e');
       Get.snackbar("Error", "Something went wrong during registration.");

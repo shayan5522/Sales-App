@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/shop_nav_controller.dart';
-import '../../themes/colors.dart';
-import 'owner/owner_dashboard.dart';
+import '../../../../controllers/shop_nav_controller.dart';
+import '../../../../themes/colors.dart';
+import '../dashboard/owner_dashboard.dart';
+import '../dashboard/products/products.dart';
+import '../Reports/report_main_page.dart';
+import '../settings/setting.dart';
 
 class OwnerPanel extends StatelessWidget {
   final controller = Get.put(ShopNavController());
 
   final pages = [
     OwnerDashboard(), // Home
-    OwnerDashboard(), // Reports
-    OwnerDashboard(), // Products
-    OwnerDashboard(), // Settings
+    ReportsMainPage(), // Reports
+    ProductScreen(), // Products
+    SettingsScreen(), // Settings
   ];
 
   OwnerPanel({super.key});

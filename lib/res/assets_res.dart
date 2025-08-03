@@ -8,4 +8,14 @@ class AssetsRes {
 
   static const String PROJECT_NAME = 'salesapp';
   static const String PROJECT_VERSION = '1.0.0+1';
+  static const String APPLE = 'assets/images/Apple.jpg';
+  static const String CD_REPORT = 'assets/images/CD_report.png';
+  static const String EXPENSE = 'assets/images/Expense.png';
+  static const String ADD_CATEGORY = 'assets/images/add_category.png';
+  static const String EARNINGS = 'assets/images/earnings.jpeg';
+  static const String INTAKE = 'assets/images/intake.png';
+  static const String REPORT = 'assets/images/report.png';
+  static const String RETURN_REPORT = 'assets/images/return_report.png';
+  static const String SALES1111 = 'assets/images/sales1111.png';
+  static const String STOCK = 'assets/images/stock.png';
 }

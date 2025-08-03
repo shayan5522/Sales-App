@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/labour_nav_controller.dart';
-import '../../themes/colors.dart';
-import 'labour/labour_dashboard.dart';
+import '../../../../controllers/labour_nav_controller.dart';
+import '../../../../themes/colors.dart';
+import '../labour_dashboard.dart';
 
 class LaborPanel extends StatelessWidget {
   final controller = Get.put(LaborNavController());

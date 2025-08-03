@@ -5,9 +5,7 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 import 'package:salesapp/app/themes/colors.dart';
-
 import '../../../controllers/auth/owner_signup_controller.dart';
-
 class OwnerSignUpScreen extends StatelessWidget {
   OwnerSignUpScreen({super.key});
   final controller = Get.put(OwnerSignupController());
@@ -59,7 +57,8 @@ class OwnerSignUpScreen extends StatelessWidget {
                 children: [
                   Text("Already have an account? ", style: AppTextStyles.subtitle),
                   GestureDetector(
-                    onTap: () {}, // You can navigate to login screen here
+                    onTap: (
+                        ) {}, // You can navigate to login screen here
                     child: Text("Sign In", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
                   ),
                 ],

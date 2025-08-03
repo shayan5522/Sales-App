@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-
 class CustomDatePicker extends StatefulWidget {
-  final String label;
+  final String? label;
   final Function(DateTime) onDateSelected;
   final DateTime? initialDate;
 
   const CustomDatePicker({
     super.key,
-    required this.label,
+    this.label,
     required this.onDateSelected,
     this.initialDate,
   });
@@ -25,14 +24,13 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   @override
   void initState() {
     super.initState();
-    selectedDate = widget.initialDate;
+    selectedDate = widget.initialDate ?? DateTime.now();
   }
 
   Future<void> _pickDate() async {
-    final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? now,
+      initialDate: selectedDate!,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -45,50 +43,52 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = selectedDate != null
-        ? DateFormat('dd/MM/yyyy').format(selectedDate!)
-        : 'dd/mm/yyyy';
-
-    return GestureDetector(
-      onTap: _pickDate,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.secondary,
-          border: Border.all(color: AppColors.primary),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.label,
-              style: AppTextStyles.subtitle.copyWith(
-                color: AppColors.textseconadry,
-              ),
+    final formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate!);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.label != null) ...[
+          Text(
+            widget.label!,
+            style: AppTextStyles.subtitle.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
             ),
-            const SizedBox(height: 8),
-            Row(
+          ),
+          // const SizedBox(height: 2),
+        ],
+        GestureDetector(
+          onTap: _pickDate,
+          child: Container(
+            height: 40,
+            width: 140,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              border: Border.all(color: AppColors.primary),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.calendar_today_outlined,
-                  size: 22,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 10),
                 Text(
                   formattedDate,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: selectedDate != null ? Colors.black : Colors.grey,
+                  style: AppTextStyles.subtitle.copyWith(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
                   ),
+                ),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: AppColors.primary,
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

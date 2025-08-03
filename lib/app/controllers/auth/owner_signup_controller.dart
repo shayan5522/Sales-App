@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../ui/screens/owner_panel.dart';
+import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
 
 class OwnerSignupController extends GetxController {
   final isLoading = false.obs;

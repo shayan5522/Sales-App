@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
-import 'package:salesapp/app/ui/screens/labour_panel.dart';
+import 'package:salesapp/app/ui/screens/labour/panel/labour_panel.dart';
 import '../../services/auth_service.dart';
 import '../../ui/screens/auth/labour_signup.dart';
 import '../../ui/screens/auth/otp.dart';
@@ -9,7 +9,7 @@ import '../../ui/screens/auth/owner_signup.dart';
 import '../../ui/screens/auth/signup_as.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../ui/screens/owner/owner_dashboard.dart';
+import '../../ui/screens/owner/dashboard/owner_dashboard.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
