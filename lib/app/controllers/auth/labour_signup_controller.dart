@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import '../../ui/screens/labour/labour_dashboard.dart';
+import '../../ui/screens/labour/panel/labour_panel.dart';
 
 class LabourSignupController extends GetxController {
   final isLoading = false.obs;
@@ -9,62 +9,65 @@ class LabourSignupController extends GetxController {
 
   Future<void> registerLabour() async {
     final inputCode = shopCodeController.value.trim().toUpperCase();
-    final user = FirebaseAuth.instance.currentUser;
 
-    if (inputCode.isEmpty || user == null) {
-      Get.snackbar("Error", "Invite code required or user not logged in");
+    if (inputCode.isEmpty) {
+      Get.snackbar("Error", "Invite code is required.");
       return;
     }
 
     isLoading.value = true;
 
     try {
-      final inviteDoc = await FirebaseFirestore.instance
-          .collection('invites')
-          .doc(inputCode)
-          .get();
+      final inviteDoc = await FirebaseFirestore.instance.collection('invites').doc(inputCode).get();
 
       if (!inviteDoc.exists) {
-        print('❌ Code "$inputCode" not found.');
-        Get.snackbar("Error", "Invalid invite code");
+        Get.snackbar("Error", "Invalid invite code.");
         isLoading.value = false;
         return;
       }
 
       final invite = inviteDoc.data()!;
       if (invite['used'] == true) {
-        print('⚠️ Code "$inputCode" already used.');
-        Get.snackbar("Error", "This invite code has already been used");
+        Get.snackbar("Error", "This code has already been used.");
         isLoading.value = false;
         return;
       }
 
-      final uid = user.uid;
-      final phone = user.phoneNumber ?? '';
       final shopName = invite['shopName'];
       final ownerId = invite['ownerId'];
 
-      // Register labour
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'uid': uid,
-        'phone': phone,
+      // Check how many labours already exist for this shop
+      final labourSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'labour')
+          .where('shopName', isEqualTo: shopName)
+          .get();
+
+      if (labourSnapshot.docs.length >= 3) {
+        Get.snackbar("Error", "This shop already has 3 labours.");
+        isLoading.value = false;
+        return;
+      }
+
+      // Register labour manually (no FirebaseAuth)
+      final newLabourDoc = await FirebaseFirestore.instance.collection('users').add({
         'role': 'labour',
+        'code': inputCode,
         'shopName': shopName,
-        'shopCode': inputCode,
         'ownerId': ownerId,
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Mark invite code as used
+      // Mark invite as used
       await FirebaseFirestore.instance.collection('invites').doc(inputCode).update({
         'used': true,
-        'usedBy': uid,
+        'usedBy': newLabourDoc.id,
       });
 
-      print('✅ Code "$inputCode" used successfully.');
-      Get.offAll(() => LabourDashboard());
+      print('✅ Labour added with ID: ${newLabourDoc.id}');
+      Get.offAll(() => LaborPanel());
     } catch (e) {
-      print('❌ Error during labour registration: $e');
-      Get.snackbar("Error", "Something went wrong during registration.");
+      Get.snackbar("Error", "Something went wrong: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

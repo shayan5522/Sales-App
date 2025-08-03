@@ -31,7 +31,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F9),
       appBar: const CustomDashboardAppBar(
-        title: "Sportify",
+        title: "Owner Pannel",
         logoPath: "assets/images/sales.png",
       ),
       body: SingleChildScrollView(

@@ -10,6 +10,7 @@ import '../../ui/screens/auth/signup_as.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../ui/screens/owner/dashboard/owner_dashboard.dart';
+import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
@@ -40,23 +41,32 @@ class AuthController extends GetxController {
       final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (doc.exists) {
-        final role = doc['role'];
-        if (role == 'owner') {
-          Get.offAll(() => OwnerSignUpScreen());
-        } else if (role == 'labour') {
+        final data = doc.data()!;
+        final role = data['role'];
+
+        if (role == 'labour') {
           Get.offAll(() => LaborPanel());
+        } else if (role == 'owner') {
+          final shopName = data['shopName'];
+          if (shopName != null && shopName.toString().isNotEmpty) {
+            Get.offAll(() => OwnerPanel());
+          } else {
+            Get.offAll(() => OwnerSignUpScreen());
+          }
         } else {
-          Get.snackbar("Error", "Unknown role");
+          Get.snackbar("Error", "Unknown role assigned to user.");
         }
       } else {
+        // No user doc found — assume new owner
         Get.offAll(() => OwnerSignUpScreen());
       }
-
     } catch (e) {
       Get.snackbar("Verification Failed", e.toString());
       rethrow;
     }
   }
+
+
 
 
 }
