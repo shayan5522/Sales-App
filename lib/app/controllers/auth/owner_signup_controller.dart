@@ -3,8 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:salesapp/app/ui/screens/owner_panel.dart';
-import '../../ui/screens/owner/owner_dashboard.dart';
+import '../../ui/screens/owner_panel.dart';
 
 class OwnerSignupController extends GetxController {
   final isLoading = false.obs;
@@ -21,27 +20,26 @@ class OwnerSignupController extends GetxController {
     });
   }
 
-  // Save invite code under user's subcollection
-  Future<void> createInviteCode(String code, String shopDocId, String ownerUid) async {
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(shopDocId)
-        .collection('invites')
-        .doc(code);
+  // Save invite code as a document in invites/<code>
+  Future<void> createInviteCode(String code, String shopName, String ownerUid) async {
+    final codeRef = FirebaseFirestore.instance.collection('invites').doc(code);
 
-    final doc = await docRef.get();
-    if (doc.exists) return;
+    final existing = await codeRef.get();
+    if (existing.exists) return;
 
-    await docRef.set({
+    await codeRef.set({
       'code': code,
+      'shopName': shopName,
       'ownerId': ownerUid,
       'used': false,
       'usedBy': null,
       'createdAt': FieldValue.serverTimestamp(),
     });
+
+    print('✅ Created invite code $code under invites/');
   }
 
-  // Register the owner with shopName as document ID
+  // Register owner under users/<shopName>
   Future<void> registerOwner() async {
     final rawName = shopName.value.trim();
     final sanitizedShopName = rawName.replaceAll(RegExp(r'[^\w\s]'), '').replaceAll(' ', '_');
@@ -54,12 +52,13 @@ class OwnerSignupController extends GetxController {
     }
 
     isLoading.value = true;
+
     final uid = user.uid;
     final phone = user.phoneNumber ?? '';
     final shopCode = uid.substring(0, 6).toUpperCase();
 
     try {
-      // Check for existing shop name
+      // Check if shop already exists
       final shopDoc = await FirebaseFirestore.instance.collection('users').doc(sanitizedShopName).get();
       if (shopDoc.exists) {
         Get.snackbar("Error", "This shop name is already registered. Please use a different name.");
@@ -67,7 +66,7 @@ class OwnerSignupController extends GetxController {
         return;
       }
 
-      // Save user with shopName as document ID
+      // Register owner
       await FirebaseFirestore.instance.collection('users').doc(sanitizedShopName).set({
         'uid': uid,
         'phone': phone,
@@ -77,15 +76,15 @@ class OwnerSignupController extends GetxController {
         'referralCode': referral,
       });
 
-      // Save invite codes under subcollection
+      // Generate and store invite codes under invites/<code>
       final inviteCodes = generateInviteCodes(3);
-      for (String code in inviteCodes) {
+      for (final code in inviteCodes) {
         await createInviteCode(code, sanitizedShopName, uid);
       }
 
       Get.offAll(() => OwnerPanel());
     } catch (e) {
-      // print('Error during registration: $e');
+      print('❌ Error during registration: $e');
       Get.snackbar("Error", "Failed to register the shop");
     } finally {
       isLoading.value = false;
