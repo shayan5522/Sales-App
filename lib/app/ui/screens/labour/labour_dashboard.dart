@@ -6,9 +6,7 @@ import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../widgets/logout_dialog.dart';
-
 class LabourDashboard extends StatelessWidget {
   const LabourDashboard({super.key});
 
@@ -34,7 +32,7 @@ class LabourDashboard extends StatelessWidget {
                     Navigator.pop(context);
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.clear();
-                    Get.offAllNamed('/login');
+                    Get.offAllNamed('/SignUpAsScreen');
                   },
 
                 ),
@@ -51,14 +49,12 @@ class LabourDashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 Welcome Text
             Text(
               "Welcome",
               style: AppTextStyles.heading.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 16),
 
-            /// 🔹 Main Container Section
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

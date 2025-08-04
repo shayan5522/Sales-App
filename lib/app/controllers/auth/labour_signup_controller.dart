@@ -74,11 +74,4 @@ class LabourSignupController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  // /// Optional reusable logout method
-  // static Future<void> logout() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.clear();
-  //   Get.offAllNamed('/login'); // or Get.offAll(() => SignUpAsScreen());
-  // }
 }
