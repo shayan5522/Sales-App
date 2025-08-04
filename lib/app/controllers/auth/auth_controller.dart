@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
 import 'package:salesapp/app/ui/screens/labour/panel/labour_panel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
 import '../../ui/screens/auth/labour_signup.dart';
 import '../../ui/screens/auth/otp.dart';
@@ -44,6 +45,12 @@ class AuthController extends GetxController {
         final data = doc.data()!;
         final role = data['role'];
 
+        // ✅ Save login data locally
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('uid', uid);
+        await prefs.setString('role', role);
+
         if (role == 'labour') {
           Get.offAll(() => LaborPanel());
         } else if (role == 'owner') {
@@ -65,8 +72,4 @@ class AuthController extends GetxController {
       rethrow;
     }
   }
-
-
-
-
 }

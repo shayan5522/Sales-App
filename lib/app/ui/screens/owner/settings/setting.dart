@@ -5,9 +5,9 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
-
+import '../../../../controllers/auth/logout_helper.dart';
 import '../../../widgets/logout_dialog.dart';
-import '../../auth/signup_as.dart';
+
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -76,13 +76,12 @@ class SettingsScreen extends StatelessWidget {
                     child: PrimaryButton(
                       text: 'Copy Code',
                       onPressed: () {
-                        // Copy code logic
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Code copied!')),
                         );
                       },
-                      widthFactor: 1.0, // Full width
-                      heightFactor: 0.055, // Responsive height
+                      widthFactor: 1.0,
+                      heightFactor: 0.055,
                       borderRadius: 8,
                       textStyle: AppTextStyles.title.copyWith(
                         color: Colors.white,
@@ -130,20 +129,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
 
-            // Airplane icon (centered)
-            // Padding(
-            //   padding: EdgeInsets.symmetric(vertical: screenHeight * 0.04),
-            //   child: Align(
-            //     alignment: Alignment.centerRight,
-            //     child: Icon(
-            //       Icons.send_outlined,
-            //       size: screenWidth * 0.08,
-            //       color: AppColors.primary,
-            //     ),
-            //   ),
-            // ),
-
-            // Logout Button (use your custom button if you want)
+            // Logout Button (same UI, new logic)
             SizedBox(height: screenHeight * 0.09),
             PrimaryButton(
               text: 'Logout',
@@ -152,10 +138,9 @@ class SettingsScreen extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return LogoutDialog(
-                      onConfirm: () {
+                      onConfirm: () async {
                         Get.back(); // Close the dialog
-                        // TODO: Clear session/local storage if needed
-                        Get.offAll(() => const SignUpAsScreen());
+                        await logoutUser(); // ✅ Call reusable logout function
                       },
                       onCancel: () {
                         Get.back(); // Close the dialog
@@ -173,10 +158,6 @@ class SettingsScreen extends StatelessWidget {
                 fontSize: screenWidth * 0.045,
               ),
             ),
-
-
-
-
           ],
         ),
       ),
