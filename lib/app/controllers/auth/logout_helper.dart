@@ -4,7 +4,7 @@ import '../../ui/screens/auth/signup_as.dart';
 
 Future<void> logoutUser() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.clear(); // Clears all saved data like isLoggedIn, uid, etc.
+  await prefs.clear();
 
-  Get.offAll(() => const SignUpAsScreen()); // Navigate to login/signup screen
+  Get.offAll(() => const SignUpAsScreen());
 }

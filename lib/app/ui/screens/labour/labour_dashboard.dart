@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/logout_dialog.dart';
 
@@ -27,12 +30,13 @@ class LabourDashboard extends StatelessWidget {
                 barrierDismissible: false,
                 builder: (_) => LogoutDialog(
                   onCancel: () => Navigator.pop(context),
-                  onConfirm: () {
-                    Navigator.pop(context); // Close dialog
-                    // Perform actual logout logic here:
-                    // e.g. AuthController.to.logout();
-                    Navigator.pushReplacementNamed(context, '/login');
+                  onConfirm: () async {
+                    Navigator.pop(context);
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    Get.offAllNamed('/login');
                   },
+
                 ),
               );
             },

@@ -5,7 +5,6 @@ import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
-
 import '../../../controllers/auth/labour_signup_controller.dart';
 
 class LabourSignUpScreen extends StatelessWidget {
