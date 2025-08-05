@@ -79,8 +79,8 @@ class SecondaryButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.widthFactor = 0.24, // smaller width (~28% of screen)
-    this.heightFactor = 0.035, // smaller height (~4.2% of screen height)
+    this.widthFactor = 0.24,
+    this.heightFactor = 0.035,
     this.color = AppColors.primary,
     this.borderRadius = 6.0,
     this.textStyle,
@@ -90,30 +90,29 @@ class SecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    final double buttonWidth = screenSize.width * widthFactor;
-    final double buttonHeight = screenSize.height * heightFactor;
-
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: buttonWidth,
-        height: buttonHeight,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style:
-                textStyle ??
-                AppTextStyles.title.copyWith(
-                  color: AppColors.backgroundColor,
-                  fontSize: screenSize.width < 360 ? 11 : 13,
-                ),
+    return SizedBox(
+      width: screenSize.width * widthFactor,
+      height: screenSize.height * heightFactor,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
+          padding: EdgeInsets.zero,
+          elevation: 0,
+        ),
+        child: Text(
+          text,
+          style: textStyle ??
+              AppTextStyles.title.copyWith(
+                color: AppColors.backgroundColor,
+                fontSize: screenSize.width < 360 ? 11 : 13,
+              ),
         ),
       ),
     );
   }
 }
+

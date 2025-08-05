@@ -1,7 +1,10 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:salesapp/app/themes/colors.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/products/productController.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/grid_container.dart';
@@ -14,20 +17,18 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-  List<Map<String, dynamic>> products = List.generate(10, (index) {
-    return {
-      'title': 'Product $index',
-      'imagePath': 'assets/images/products.png',
-      'price': (index + 1) * 100,
-    };
-  });
+  final ProductController controller = Get.put(ProductController());
 
-  File? _selectedImage;
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchProducts();
+  }
 
   Future<void> _showAddProductDialog() async {
     final formKey = GlobalKey<FormState>();
     String title = '';
-    String price = '';
+    double price = 0.0;
     File? imageFile;
 
     await showDialog(
@@ -61,23 +62,22 @@ class _ProductScreenState extends State<ProductScreen> {
                           backgroundImage: imageFile != null
                               ? FileImage(imageFile!)
                               : const AssetImage('assets/images/products.png')
-                                    as ImageProvider,
+                          as ImageProvider,
                           backgroundColor: Colors.grey[300],
                           child: imageFile == null
                               ? const Icon(
-                                  Icons.camera_alt,
-                                  color: AppColors.secondary,
-                                )
+                            Icons.camera_alt,
+                            color: AppColors.secondary,
+                          )
                               : null,
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Product Name',
-                        ),
+                        decoration:
+                        const InputDecoration(labelText: 'Product Name'),
                         validator: (value) =>
-                            value == null || value.isEmpty ? 'Required' : null,
+                        value == null || value.isEmpty ? 'Required' : null,
                         onSaved: (value) => title = value!,
                       ),
                       const SizedBox(height: 12),
@@ -85,10 +85,10 @@ class _ProductScreenState extends State<ProductScreen> {
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(labelText: 'Price'),
                         validator: (value) =>
-                            value == null || double.tryParse(value) == null
+                        value == null || double.tryParse(value) == null
                             ? 'Enter valid price'
                             : null,
-                        onSaved: (value) => price = value!,
+                        onSaved: (value) => price = double.tryParse(value ?? '0') ?? 0.0,
                       ),
                     ],
                   ),
@@ -109,17 +109,14 @@ class _ProductScreenState extends State<ProductScreen> {
                 const SizedBox(width: 12),
                 SecondaryButton(
                   text: "Add",
-                  onPressed: () {
+                  onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState!.save();
-                      setState(() {
-                        products.add({
-                          'title': title,
-                          'price': double.parse(price),
-                          'imagePath':
-                              imageFile?.path ?? 'assets/images/products.png',
-                        });
-                      });
+                      await controller.addProduct(
+                        title: title,
+                        price: price,
+                        imageFile: imageFile,
+                      );
                       Navigator.pop(context);
                     }
                   },
@@ -142,39 +139,43 @@ class _ProductScreenState extends State<ProductScreen> {
       floatingActionButton: SecondaryButton(
         text: "Add Product",
         onPressed: _showAddProductDialog,
-        widthFactor: 0.35, // Adjust as needed for FAB area
+        widthFactor: 0.35,
         heightFactor: 0.06,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double screenWidth = constraints.maxWidth;
             final int crossAxisCount = screenWidth ~/ 160;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: GridView.builder(
-                itemCount: products.length,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount.clamp(1, 6),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.9,
+            return Obx(() {
+              final products = controller.products;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: GridView.builder(
+                  itemCount: products.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount.clamp(1, 6),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                  ),
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return GridCard(
+                      title: product['title'],
+                      imagePath: product['imagePath'],
+                      price: product['price'],
+                      onDelete: () => controller.deleteProduct(product['id']),
+                    );
+                  },
                 ),
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return GridCard(
-                    title: product['title'],
-                    imagePath: product['imagePath'],
-                    price: product['price'],
-                  );
-                },
-              ),
-            );
+              );
+            });
           },
         ),
       ),

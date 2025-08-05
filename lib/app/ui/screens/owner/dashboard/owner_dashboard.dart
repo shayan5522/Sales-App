@@ -158,7 +158,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                         "screen":ReturnProduct(),
                       },
                       {
-                        "label": "Add Category",
+                        "label": "Add Expense Category",
                         "icon": "assets/images/products.png",
                         "screen": AddCategoryPage(),
                       },
