@@ -40,7 +40,7 @@ class IntakeProduct extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

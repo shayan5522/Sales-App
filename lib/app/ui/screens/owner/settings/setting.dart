@@ -45,73 +45,85 @@ class SettingsScreen extends StatelessWidget {
                 color: AppColors.secondary,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Obx(() {
-                final codes = inviteController.invites;
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: inviteController.inviteStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (codes.isEmpty) {
-                  return Text("No invite codes found");
-                }
+                  if (snapshot.hasError) {
+                    return const Text("Something went wrong");
+                  }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Labour Invite Codes',
-                      style: AppTextStyles.title.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: screenWidth * 0.045,
+                  final codes = snapshot.data ?? [];
+
+                  if (codes.isEmpty) {
+                    return const Text("No invite codes found");
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Labour Invite Codes',
+                        style: AppTextStyles.title.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.045,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    ...codes.map((codeData) {
-                      final code = codeData['code'];
-                      final used = codeData['used'] == true;
+                      const SizedBox(height: 12),
+                      ...codes.map((codeData) {
+                        final code = codeData['code'];
+                        final used = codeData['used'] == true;
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: used ? Colors.grey[300] : Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.primary, width: 1),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  code ?? 'Unknown',
-                                  style: AppTextStyles.title.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.042,
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: used ? Colors.grey[300] : Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.primary, width: 1),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    code ?? 'Unknown',
+                                    style: AppTextStyles.title.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.042,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  used ? 'Used' : 'Not Used',
-                                  style: AppTextStyles.subtitle.copyWith(
-                                    color: used ? Colors.red : Colors.green,
-                                    fontSize: screenWidth * 0.035,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    used ? 'Used' : 'Not Used',
+                                    style: AppTextStyles.subtitle.copyWith(
+                                      color: used ? Colors.red : Colors.green,
+                                      fontSize: screenWidth * 0.035,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.copy),
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: code));
-                                Get.snackbar("Copied", "Invite code copied!");
-                              },
-                            )
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ],
-                );
-              }),
+                                ],
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: code));
+                                  Get.snackbar("Copied", "Invite code copied!");
+                                },
+                              )
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                },
+              ),
+
             ),
 
             /// 🔹 Subscription Info Card

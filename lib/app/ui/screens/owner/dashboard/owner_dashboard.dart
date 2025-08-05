@@ -10,6 +10,7 @@ import '../../../widgets/Admindashboard/salescard.dart';
 import '../../../widgets/custom_dashboard_appbar.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/products/products.dart';
 import '../Reports/report_main_page.dart';
+import '../user_management/usermanagement.dart';
 import 'Add_Sales/sales.dart';
 import 'add_category/add_category_page.dart';
 import 'credit_amount _due/amountcrediet.dart';
@@ -28,9 +29,11 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F9),
-      appBar: const CustomDashboardAppBar(
+      appBar:  CustomDashboardAppBar(
         title: "Owner Pannel",
         logoPath: "assets/images/sales.png",
+        onProfileTap: (){Get.to(()=>UserManagementScreen());},
+
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

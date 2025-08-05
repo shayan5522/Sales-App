@@ -3,24 +3,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class OwnerInviteController extends GetxController {
-  final RxList<Map<String, dynamic>> invites = <Map<String, dynamic>>[].obs;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
-  void onInit() {
-    fetchInvites();
-    super.onInit();
-  }
+  Stream<List<Map<String, dynamic>>> inviteStream() {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
 
-  void fetchInvites() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-
-    final query = await FirebaseFirestore.instance
+    return _firestore
         .collection('invites')
         .where('ownerId', isEqualTo: uid)
-        .get();
-
-    // ✅ Explicit cast to Map<String, dynamic>
-    invites.value = query.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'code': data['code'] ?? '',
+          'used': data['used'] ?? false,
+          'image': 'assets/images/laboursignin.png',
+        };
+      }).toList();
+    });
   }
 }
+
