@@ -10,6 +10,7 @@ import 'package:salesapp/app/ui/widgets/Admindashboard/salescard.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 
+import '../../../widgets/summarycard.dart';
 import 'Credit_Debit_Page.dart';
 import 'expense_report_page.dart';
 import 'intake_report.dart';
@@ -44,31 +45,20 @@ class ReportsMainPage extends StatelessWidget {
             Row(
               children: const [
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/sales.png",
-                    label: "Sale Amount",
-                    value: 112,
-                  ),
+                  child: SummaryCard(amount: "1122322", label: "Sale Amount"),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/sales.png",
-                    label: "Intake Amount",
-                    value: 100,
-                  ),
+                  child: SummaryCard(amount: "1001212", label: "Intake Amount"),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/sales.png",
-                    label: "Expense Amount",
-                    value: 112,
-                  ),
+                  child: SummaryCard(amount: "1121212", label: "Expense Amount"),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+
+            SizedBox(height: 16),
 
             // Total Profit Box (Custom design)
             Container(

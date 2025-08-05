@@ -139,11 +139,11 @@ class SettingsScreen extends StatelessWidget {
                   builder: (BuildContext context) {
                     return LogoutDialog(
                       onConfirm: () async {
-                        Get.back(); // Close the dialog
-                        await logoutUser(); // ✅ Call reusable logout function
+                        Get.back();
+                        await logoutUser();
                       },
                       onCancel: () {
-                        Get.back(); // Close the dialog
+                        Get.back();
                       },
                     );
                   },

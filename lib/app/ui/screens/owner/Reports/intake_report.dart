@@ -65,24 +65,24 @@ class IntakeReportPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             /// 🔹 SUMMARY CARDS (2 per row)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 4,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 childAspectRatio: 2.8,
-                children: List.generate(4, (index) {
-                  return IntakeProduct(
-                    imagePath: "assets/images/products.png",
-                    productName: "Product ${index + 1}",
-                    intaken: 20,
-                    totalexpense: 100,
-                  );
-                }),
               ),
+              itemBuilder: (context, index) {
+                return IntakeProduct(
+                  imagePath: "assets/images/products.png",
+                  productName: "Product ${index + 1}",
+                  intaken: 20 * (index + 1),
+                  totalexpense: 100 * (index + 1),
+                );
+              },
             ),
             const SizedBox(height: 24),
 

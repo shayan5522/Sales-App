@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../controllers/auth/logout_helper.dart';
 import '../../widgets/logout_dialog.dart';
 class LabourDashboard extends StatelessWidget {
   const LabourDashboard({super.key});
@@ -30,16 +28,12 @@ class LabourDashboard extends StatelessWidget {
                   onCancel: () => Navigator.pop(context),
                   onConfirm: () async {
                     Navigator.pop(context);
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.clear();
-                    Get.offAllNamed('/SignUpAsScreen');
+                    await logoutUser(); // 👈 This handles logout & navigation
                   },
-
                 ),
               );
             },
-          ),
-          const SizedBox(width: 12),
+          )
         ],
       ),
 
