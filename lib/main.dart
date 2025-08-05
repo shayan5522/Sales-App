@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/screens/dummy.dart';
-import 'app/ui/screens/owner/Reports/Credit_Debit_Page.dart';
+import 'package:salesapp/app/ui/screens/auth/splash.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -36,8 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
 
-      // home: SplashScreen(),
-      home: DummyTestScreen(),
+      home: SplashScreen(),
       //  home: SalesReportPage(),
       initialRoute: '/',
     );
