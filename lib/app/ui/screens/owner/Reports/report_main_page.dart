@@ -4,7 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/ReturnReport/returnreport.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/sales_report_page.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/SalesReport/sales_report_page.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/salescard.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
@@ -183,7 +183,7 @@ class ReportsMainPage extends StatelessWidget {
                 MainContainer(
                   imagePath: "assets/images/sales1111.png",
                   label: "Sales",
-                  onTap: () => Get.to(() => const SalesReportPage()),
+                  onTap: () => Get.to(() =>  SalesReportPage()),
                 ),
                 MainContainer(
                   imagePath: "assets/images/Expense.png",

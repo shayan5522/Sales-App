@@ -58,15 +58,6 @@ class _ReturnReportState extends State<ReturnReport> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  'Return & Profit Report',
-                  style: AppTextStyles.title.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenWidth * 0.055,
-                  ),
-                ),
-              ),
               SizedBox(height: screenHeight * 0.025),
 
               /// Date pickers
@@ -118,8 +109,6 @@ class _ReturnReportState extends State<ReturnReport> {
                   ),
                 ],
               ),
-
-              SizedBox(height: screenHeight * 0.025),
 
               /// Income & Profit cards
               Row(
