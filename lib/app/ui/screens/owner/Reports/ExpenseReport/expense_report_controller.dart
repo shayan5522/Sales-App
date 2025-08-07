@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 class ExpenseReportController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+  RxBool isLoading = true.obs;
 
   RxList<Map<String, dynamic>> allExpenses = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> filteredExpenses = <Map<String, dynamic>>[].obs;
@@ -14,6 +15,7 @@ class ExpenseReportController extends GetxController {
 
   Future<void> fetchExpenses() async {
     try {
+      isLoading.value = true;
       final uid = _auth.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
 
@@ -46,6 +48,9 @@ class ExpenseReportController extends GetxController {
     } catch (e) {
       Get.snackbar("Error", "Failed to fetch expenses: $e");
       print(e);
+    }
+    finally{
+      isLoading.value=false;
     }
   }
 
