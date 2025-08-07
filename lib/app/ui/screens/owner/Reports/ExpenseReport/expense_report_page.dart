@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/expense_report_controller.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/ExpenseReport/expense_report_controller.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expensecard.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';

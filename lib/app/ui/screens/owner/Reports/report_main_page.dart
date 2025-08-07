@@ -12,8 +12,8 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 
 import '../../../widgets/summarycard.dart';
 import 'Credit_Debit_Page.dart';
-import 'expense_report_page.dart';
-import 'intake_report.dart';
+import 'ExpenseReport/expense_report_page.dart';
+import 'IntakeReport/intake_report.dart';
 
 class ReportsMainPage extends StatelessWidget {
   const ReportsMainPage({super.key});
@@ -178,7 +178,7 @@ class ReportsMainPage extends StatelessWidget {
                 MainContainer(
                   imagePath: "assets/images/intake.png",
                   label: "Intake",
-                  onTap: () => Get.to(() => const IntakeReportPage()),
+                  onTap: () => Get.to(() =>  IntakeReportPage()),
                 ),
                 MainContainer(
                   imagePath: "assets/images/sales1111.png",
