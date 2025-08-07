@@ -17,25 +17,30 @@ class IntakeController extends GetxController {
           .collection('intakes')
           .doc(); // auto-generated ID
 
-      final totalAmount = cart.fold<double>(
-        0.0,
-            (sum, item) => sum + ((item['price'] ?? 0) * (item['quantity'] ?? 0)),
-      );
-    print(totalAmount);
+      double totalAmount = 0.0;
+
+      // Build and sanitize items list
+      final List<Map<String, dynamic>> items = cart.map((item) {
+        final double price = (item['price'] as num).toDouble();
+        final int quantity = (item['quantity'] as num).toInt();
+
+        totalAmount += price * quantity;
+
+        return {
+          'title': item['title'],
+          'price': price,
+          'quantity': quantity,
+          'imagePath': item['imagePath'],
+        };
+      }).toList();
+
       final intakeData = {
         'id': intakeRef.id,
         'totalAmount': totalAmount,
         'createdAt': FieldValue.serverTimestamp(),
-        'items': cart.map((item) {
-          return {
-            'title': item['title'],
-            'price': item['price'],
-            'quantity': item['quantity'],
-            'imagePath': item['imagePath'],
-          };
-        }).toList(),
+        'items': items,
       };
-print(intakeData);
+
       await intakeRef.set(intakeData);
       Get.snackbar('Success', 'Intake saved successfully');
     } catch (e) {

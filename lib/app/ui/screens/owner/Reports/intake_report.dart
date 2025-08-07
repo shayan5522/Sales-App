@@ -6,10 +6,8 @@ import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
 import 'package:salesapp/app/ui/widgets/sale/salereportlist.dart';
-
 class IntakeReportPage extends StatelessWidget {
   const IntakeReportPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +40,6 @@ class IntakeReportPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
             /// 🔹 CHART
             const Text("Total Intake Per Product", style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -85,14 +82,12 @@ class IntakeReportPage extends StatelessWidget {
               },
             ),
             const SizedBox(height: 24),
-
             /// 🔹 DATE SECTION HEADING
             Text(
               DateFormat("dd, MMMM yyyy").format(DateTime.now()),
               style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
-
             /// 🔹 PRODUCT HISTORY (List)
             const Salereportlist(
               imagePath: "assets/images/products.png",
