@@ -134,18 +134,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               ),
 
               SizedBox(height: screenHeight * 0.06),
-              PrimaryButton(
-                text: 'Logout',
-                onPressed: () {},
-                widthFactor: 1.0,
-                heightFactor: 0.065,
-                borderRadius: 8,
-                textStyle: AppTextStyles.title.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: screenWidth * 0.045,
-                ),
-              ),
             ],
           ),
         ),

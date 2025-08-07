@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/returnreport.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/ReturnReport/returnreport.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/sales_report_page.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/stock_report.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/salescard.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
@@ -193,7 +193,7 @@ class ReportsMainPage extends StatelessWidget {
                 MainContainer(
                   imagePath: "assets/images/return_report.png",
                   label: "Return Report",
-                  onTap: () => Get.to(() => const RetunReport()),
+                  onTap: () => Get.to(() => const ReturnReport()),
                 ),
                 MainContainer(
                   imagePath: "assets/images/CD_report.png",

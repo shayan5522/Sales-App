@@ -253,7 +253,7 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 18),
 
-            TransactionTextRow(product: 'Total Amount', amount: grandTotal),
+            TransactionTextRow(product: 'Total Amount', amount: grandTotal.toDouble()),
             const SizedBox(height: 16),
 
             Align(

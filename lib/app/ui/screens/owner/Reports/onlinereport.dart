@@ -167,7 +167,7 @@ class _OnlineReportScreenState extends State<OnlineReportScreen> {
                           final item = transactions[index];
                           return TransactionTextRow(
                             product: item['product'] as String,
-                            amount: item['amount'] as int,
+                            amount: item['amount'] ,
                           );
                         },
                       ),
