@@ -1,51 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/grid_container.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
+import 'package:get/get.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
+import '../../../../../themes/colors.dart';
+import '../../../../widgets/appbar.dart';
+import '../../../../widgets/buttons.dart';
+import '../../../../widgets/grid_container.dart';
+import '../../../../widgets/transactionlist.dart';
+import '../products/productController.dart';
+
 
 class Sales extends StatefulWidget {
   const Sales({super.key});
 
   @override
-  State<Sales> createState() => _IntakeState();
+  State<Sales> createState() => _SalesState();
 }
 
-class _IntakeState extends State<Sales> {
-  final List<Map<String, dynamic>> products = List.generate(10, (index) {
-    return {
-      'title': 'Product $index',
-      'imagePath': 'assets/images/Apple.jpg',
-      'price': (index + 1) * 100,
-    };
-  });
-
+class _SalesState extends State<Sales> {
+  final ProductController controller = Get.put(ProductController());
+  final SalesController saleController = Get.put(SalesController());
   List<Map<String, dynamic>> cart = [];
 
-  void _showProductPopover(BuildContext context, Map<String, dynamic> product) {
-    showModalBottomSheet(
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchProducts();
+  }
+
+  void _openIntakeDialog(Map<String, dynamic> product) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      barrierDismissible: true,
       builder: (context) {
-        return Salespopover(
-          cart: cart,
-          product: product,
-          onAddProduct: (newProduct) {
-            setState(() {
-              int existingIndex = cart.indexWhere(
-                (item) => item['title'] == newProduct['title'],
-              );
-              if (existingIndex != -1) {
-                cart[existingIndex]['quantity'] += newProduct['quantity'];
-              } else {
-                cart.add(newProduct);
-              }
-            });
-          },
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+              maxWidth: MediaQuery.of(context).size.width * 0.95,
+            ),
+            child: Intakepopover(
+              cart: cart,
+              product: product,
+              onAddProduct: (newProduct) {
+                setState(() {
+                  cart.add(newProduct);
+                });
+              },
+              onSaveIntake: () async {
+                final cartCopy = List<Map<String, dynamic>>.from(cart); // ✅ copy
+                await saleController.saveIntake(cartCopy);
+                setState(() {
+                  cart.clear();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
         );
       },
     );
@@ -54,7 +68,7 @@ class _IntakeState extends State<Sales> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Sales'),
+      appBar: CustomAppbar(title: 'Add Sales'),
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
@@ -62,45 +76,35 @@ class _IntakeState extends State<Sales> {
             final double screenWidth = constraints.maxWidth;
             final int crossAxisCount = screenWidth ~/ 160;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Add Sales',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+            return Obx(() {
+              final products = controller.products;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: GridView.builder(
+                  itemCount: products.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount.clamp(1, 6),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
                   ),
-                  const SizedBox(height: 16), // Space between text and grid
-                  GridView.builder(
-                    itemCount: products.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount.clamp(1, 6),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.9,
-                    ),
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return GestureDetector(
-                        onTap: () => _showProductPopover(context, product),
-                        child: GridCard(
-                          title: product['title'],
-                          imagePath: product['imagePath'],
-                          price: product['price'],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            );
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return GestureDetector(
+                      onTap: () => _openIntakeDialog(product),
+                      child: GridCard(
+                        title: product['title'],
+                        imagePath: product['imagePath'],
+                        price: product['price'],
+                      ),
+                    );
+                  },
+                ),
+              );
+            });
           },
         ),
       ),
@@ -108,33 +112,34 @@ class _IntakeState extends State<Sales> {
   }
 }
 
-class Salespopover extends StatefulWidget {
+class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
+  final VoidCallback onSaveIntake;
 
-  const Salespopover({
+  const Intakepopover({
     super.key,
     required this.cart,
     required this.product,
     required this.onAddProduct,
+    required this.onSaveIntake,
   });
 
   @override
-  State<Salespopover> createState() => _IntakePopoverState();
+  State<Intakepopover> createState() => _IntakePopoverState();
 }
 
-class _IntakePopoverState extends State<Salespopover> {
+class _IntakePopoverState extends State<Intakepopover> {
   int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
     double price = widget.product['price'].toDouble();
 
-    // Calculate totals
     int cartTotal = widget.cart.fold<int>(
       0,
-      (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
+          (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
     );
     int currentProductTotal = (quantity * price).toInt();
     int grandTotal = cartTotal + currentProductTotal;
@@ -149,22 +154,18 @@ class _IntakePopoverState extends State<Salespopover> {
             Container(
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ), // Change 16 to your desired radius
+                borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
-                title: 'Add Intake',
-                backgroundColor:
-                    Colors.transparent, // So the Container's color shows
+                title: 'Add Sales',
+                backgroundColor: Colors.transparent,
               ),
             ),
             const SizedBox(height: 12),
 
-            // Cart items
             if (widget.cart.isNotEmpty)
               ...widget.cart.map(
-                (item) => Container(
+                    (item) => Container(
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -190,7 +191,6 @@ class _IntakePopoverState extends State<Salespopover> {
                 ),
               ),
 
-            // Current product
             Container(
               margin: const EdgeInsets.symmetric(vertical: 6),
               padding: const EdgeInsets.all(10),
@@ -222,20 +222,14 @@ class _IntakePopoverState extends State<Salespopover> {
                           icon: const Icon(Icons.remove, size: 18),
                           onPressed: () {
                             if (quantity > 1) {
-                              setState(() {
-                                quantity--;
-                              });
+                              setState(() => quantity--);
                             }
                           },
                         ),
                         Text('$quantity', style: const TextStyle(fontSize: 16)),
                         IconButton(
                           icon: const Icon(Icons.add, size: 18),
-                          onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
-                          },
+                          onPressed: () => setState(() => quantity++),
                         ),
                       ],
                     ),
@@ -245,14 +239,13 @@ class _IntakePopoverState extends State<Salespopover> {
             ),
             const SizedBox(height: 18),
 
-            // Total Amount Box
             TransactionTextRow(product: 'Total Amount', amount: grandTotal),
             const SizedBox(height: 16),
 
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Total:  ₹$grandTotal',
+                'Total: ₹$grandTotal',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -261,7 +254,6 @@ class _IntakePopoverState extends State<Salespopover> {
             ),
             const SizedBox(height: 16),
 
-            // Add Product Button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -292,15 +284,12 @@ class _IntakePopoverState extends State<Salespopover> {
             ),
             const SizedBox(height: 18),
 
-            // Save & Close Buttons
             Row(
               children: [
                 Expanded(
                   child: SecondaryButton(
                     text: 'Save',
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: widget.onSaveIntake,
                     borderRadius: 8.0,
                     heightFactor: 0.07,
                   ),
