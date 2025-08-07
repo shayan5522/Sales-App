@@ -127,6 +127,7 @@ class _AddIntakeState extends State<AddIntake> {
   }
 }
 
+
 class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
@@ -147,16 +148,32 @@ class Intakepopover extends StatefulWidget {
 
 class _IntakePopoverState extends State<Intakepopover> {
   int quantity = 1;
+  final TextEditingController _priceController = TextEditingController();
+  double originalPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    originalPrice = widget.product['price'].toDouble();
+    _priceController.text = originalPrice.toStringAsFixed(2);
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    double price = widget.product['price'].toDouble();
+    double currentPrice = double.tryParse(_priceController.text) ?? originalPrice;
+    int currentProductTotal = (quantity * currentPrice).toInt();
 
     int cartTotal = widget.cart.fold<int>(
       0,
           (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
     );
-    int currentProductTotal = (quantity * price).toInt();
+
     int grandTotal = cartTotal + currentProductTotal;
 
     return Padding(
@@ -172,7 +189,7 @@ class _IntakePopoverState extends State<Intakepopover> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
-                title: 'Add Intake',
+                title: 'Add Sales',
                 backgroundColor: Colors.transparent,
               ),
             ),
@@ -191,15 +208,17 @@ class _IntakePopoverState extends State<Intakepopover> {
                     children: [
                       Image.asset(item['imagePath'], width: 40, height: 40),
                       const SizedBox(width: 10),
-                      Text(
-                        item['title'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          item['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 10),
                       Text('x${item['quantity']}'),
                       const SizedBox(width: 10),
                       Text(
-                        'Rs. ${(item['price'] * item['quantity']).toString()}',
+                        '₹${(item['price'] * item['quantity']).toStringAsFixed(2)}',
                       ),
                     ],
                   ),
@@ -213,54 +232,103 @@ class _IntakePopoverState extends State<Intakepopover> {
                 border: Border.all(color: AppColors.primary),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Image.asset(
-                    widget.product['imagePath'],
-                    width: 40,
-                    height: 40,
+                  Row(
+                    children: [
+                      Image.asset(
+                        widget.product['imagePath'],
+                        width: 40,
+                        height: 40,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          widget.product['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    widget.product['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Spacer(),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 18),
-                          onPressed: () {
-                            if (quantity > 1) {
-                              setState(() => quantity--);
-                            }
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _priceController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Price',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            prefixText: '₹',
+                          ),
+                          onChanged: (value) {
+                            setState(() {});
                           },
                         ),
-                        Text('$quantity', style: const TextStyle(fontSize: 16)),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 18),
-                          onPressed: () => setState(() => quantity++),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade400),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove, size: 18),
+                              onPressed: () {
+                                if (quantity > 1) {
+                                  setState(() => quantity--);
+                                }
+                              },
+                            ),
+                            Text('$quantity', style: const TextStyle(fontSize: 16)),
+                            IconButton(
+                              icon: const Icon(Icons.add, size: 18),
+                              onPressed: () => setState(() => quantity++),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Original: ₹${originalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        'Total: ₹${(currentPrice * quantity).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 18),
 
-            TransactionTextRow(product: 'Total Amount', amount: grandTotal.toDouble()),
+            TransactionTextRow(
+              product: 'Total Amount',
+              amount: grandTotal.toDouble(),
+            ),
             const SizedBox(height: 16),
 
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Total: ₹$grandTotal',
+                'Grand Total: ₹${grandTotal.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -286,6 +354,8 @@ class _IntakePopoverState extends State<Intakepopover> {
                       widget.onAddProduct({
                         ...widget.product,
                         'quantity': quantity,
+                        'price': currentPrice,
+                        'originalPrice': originalPrice,
                       });
                       Navigator.pop(context);
                     },
@@ -308,6 +378,8 @@ class _IntakePopoverState extends State<Intakepopover> {
                       widget.onAddProduct({
                         ...widget.product,
                         'quantity': quantity,
+                        'price': currentPrice,
+                        'originalPrice': originalPrice,
                       });
                       await widget.onSaveIntake();
                     },

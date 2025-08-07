@@ -6,7 +6,6 @@ class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Add a new sales
   Future<void> saveSale(List<Map<String, dynamic>> cart) async {
     try {
       final uid = _auth.currentUser!.uid;
@@ -31,6 +30,8 @@ class SalesController extends GetxController {
           'price': price,
           'quantity': quantity,
           'imagePath': item['imagePath'],
+          'originalPrice': item['originalPrice'], // Store original price
+          'discount': item.containsKey('discount') ? item['discount'] : 0.0,
         };
       }).toList();
 

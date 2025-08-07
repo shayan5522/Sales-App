@@ -6,6 +6,7 @@ import '../../../../widgets/appbar.dart';
 import '../../../../widgets/buttons.dart';
 import '../../../../widgets/grid_container.dart';
 import '../../../../widgets/transactionlist.dart';
+import '../intake/addintake.dart';
 import '../products/productController.dart';
 
 class Sales extends StatefulWidget {
@@ -47,13 +48,12 @@ class _SalesState extends State<Sales> {
               onAddProduct: (newProduct) {
                 setState(() {
                   final existingIndex = cart.indexWhere((item) =>
-                  item['title'] == newProduct['title'] &&
-                      item['price'] == newProduct['price']
-                  );
+                  item['title'] == newProduct['title']);
                   if (existingIndex == -1) {
                     cart.add(newProduct);
                   } else {
                     cart[existingIndex]['quantity'] += newProduct['quantity'];
+                    cart[existingIndex]['price'] = newProduct['price'];
                   }
                 });
               },
@@ -85,7 +85,7 @@ class _SalesState extends State<Sales> {
 
             return Obx(() {
               if (controller.isLoading.value) {
-                return  Center(
+                return Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primary,
                   ),
@@ -93,30 +93,54 @@ class _SalesState extends State<Sales> {
               }
               final products = controller.products;
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(12),
-                child: GridView.builder(
-                  itemCount: products.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount.clamp(1, 6),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return GestureDetector(
-                      onTap: () => _openIntakeDialog(product),
-                      child: GridCard(
-                        title: product['title'],
-                        imagePath: product['imagePath'],
-                        price: product['price'],
+              return Column(
+                children: [
+                  if (cart.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      color: Colors.grey[100],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Items in Cart: ${cart.length}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Total: ₹${_calculateCartTotal()}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(12),
+                      child: GridView.builder(
+                        itemCount: products.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount.clamp(1, 6),
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.9,
+                        ),
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return GestureDetector(
+                            onTap: () => _openIntakeDialog(product),
+                            child: GridCard(
+                              title: product['title'],
+                              imagePath: product['imagePath'],
+                              price: product['price'],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               );
             });
           },
@@ -124,210 +148,9 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
-}
 
-class Intakepopover extends StatefulWidget {
-  final List<Map<String, dynamic>> cart;
-  final Map<String, dynamic> product;
-  final Function(Map<String, dynamic> newProduct) onAddProduct;
-  final Future<void> Function() onSaveIntake;
-
-  const Intakepopover({
-    super.key,
-    required this.cart,
-    required this.product,
-    required this.onAddProduct,
-    required this.onSaveIntake,
-  });
-
-  @override
-  State<Intakepopover> createState() => _IntakePopoverState();
-}
-
-class _IntakePopoverState extends State<Intakepopover> {
-  int quantity = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    double price = widget.product['price'].toDouble();
-
-    int cartTotal = widget.cart.fold<int>(
-      0,
-          (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
-    );
-    int currentProductTotal = (quantity * price).toInt();
-    int grandTotal = cartTotal + currentProductTotal;
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: CustomAppbar(
-                title: 'Add Sales',
-                backgroundColor: Colors.transparent,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            if (widget.cart.isNotEmpty)
-              ...widget.cart.map(
-                    (item) => Container(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.primary),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(item['imagePath'], width: 40, height: 40),
-                      const SizedBox(width: 10),
-                      Text(
-                        item['title'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const Spacer(),
-                      Text('x${item['quantity']}'),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Rs. ${(item['price'] * item['quantity']).toString()}',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primary),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    widget.product['imagePath'],
-                    width: 40,
-                    height: 40,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    widget.product['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Spacer(),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 18),
-                          onPressed: () {
-                            if (quantity > 1) {
-                              setState(() => quantity--);
-                            }
-                          },
-                        ),
-                        Text('$quantity', style: const TextStyle(fontSize: 16)),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 18),
-                          onPressed: () => setState(() => quantity++),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            TransactionTextRow(product: 'Total Amount', amount: grandTotal.toDouble()),
-            const SizedBox(height: 16),
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                'Total: ₹$grandTotal',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: 56,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      widget.onAddProduct({
-                        ...widget.product,
-                        'quantity': quantity,
-                      });
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      'Add Product',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-
-            Row(
-              children: [
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Save',
-                    onPressed: () async {
-                      widget.onAddProduct({
-                        ...widget.product,
-                        'quantity': quantity,
-                      });
-                      await widget.onSaveIntake();
-                    },
-                    borderRadius: 8.0,
-                    heightFactor: 0.07,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Close',
-                    onPressed: () => Navigator.pop(context),
-                    borderRadius: 8.0,
-                    heightFactor: 0.07,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  double _calculateCartTotal() {
+    return cart.fold(0.0, (sum, item) =>
+    sum + (item['price'] * (item['quantity'] ?? 1)));
   }
 }
