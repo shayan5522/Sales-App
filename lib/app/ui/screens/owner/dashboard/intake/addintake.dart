@@ -1,51 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/grid_container.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
+import 'package:get/get.dart';
+import '../../../../../themes/colors.dart';
+import '../../../../widgets/appbar.dart';
+import '../../../../widgets/buttons.dart';
+import '../../../../widgets/grid_container.dart';
+import '../../../../widgets/transactionlist.dart';
+import '../products/productController.dart';
+import 'IntakeController.dart';
 
 class AddIntake extends StatefulWidget {
   const AddIntake({super.key});
 
   @override
-  State<AddIntake> createState() => _IntakeState();
+  State<AddIntake> createState() => _AddIntakeState();
 }
 
-class _IntakeState extends State<AddIntake> {
-  final List<Map<String, dynamic>> products = List.generate(10, (index) {
-    return {
-      'title': 'Product $index',
-      'imagePath': 'assets/images/Apple.jpg',
-      'price': (index + 1) * 100,
-    };
-  });
-
+class _AddIntakeState extends State<AddIntake> {
+  final ProductController controller = Get.put(ProductController());
+  final IntakeController intakeController = Get.put(IntakeController());
   List<Map<String, dynamic>> cart = [];
 
-  void _showProductPopover(BuildContext context, Map<String, dynamic> product) {
-    showModalBottomSheet(
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchProducts();
+  }
+
+  void _openIntakeDialog(Map<String, dynamic> product) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      barrierDismissible: true,
       builder: (context) {
-        return Intakepopover(
-          cart: cart,
-          product: product,
-          onAddProduct: (newProduct) {
-            setState(() {
-              int existingIndex = cart.indexWhere(
-                (item) => item['title'] == newProduct['title'],
-              );
-              if (existingIndex != -1) {
-                cart[existingIndex]['quantity'] += newProduct['quantity'];
-              } else {
-                cart.add(newProduct);
-              }
-            });
-          },
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+              maxWidth: MediaQuery.of(context).size.width * 0.95,
+            ),
+            child: Intakepopover(
+              cart: cart,
+              product: product,
+              onAddProduct: (newProduct) {
+                setState(() {
+                  cart.add(newProduct);
+                });
+              },
+              onSaveIntake: () async {
+                final cartCopy = List<Map<String, dynamic>>.from(cart); // ✅ copy
+                await intakeController.saveIntake(cartCopy);
+                setState(() {
+                  cart.clear();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
         );
       },
     );
@@ -62,45 +75,35 @@ class _IntakeState extends State<AddIntake> {
             final double screenWidth = constraints.maxWidth;
             final int crossAxisCount = screenWidth ~/ 160;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Add Intake',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+            return Obx(() {
+              final products = controller.products;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: GridView.builder(
+                  itemCount: products.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount.clamp(1, 6),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
                   ),
-                  const SizedBox(height: 16), // Space between text and grid
-                  GridView.builder(
-                    itemCount: products.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount.clamp(1, 6),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.9,
-                    ),
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return GestureDetector(
-                        onTap: () => _showProductPopover(context, product),
-                        child: GridCard(
-                          title: product['title'],
-                          imagePath: product['imagePath'],
-                          price: product['price'],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            );
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return GestureDetector(
+                      onTap: () => _openIntakeDialog(product),
+                      child: GridCard(
+                        title: product['title'],
+                        imagePath: product['imagePath'],
+                        price: product['price'],
+                      ),
+                    );
+                  },
+                ),
+              );
+            });
           },
         ),
       ),
@@ -112,12 +115,14 @@ class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
+  final VoidCallback onSaveIntake;
 
   const Intakepopover({
     super.key,
     required this.cart,
     required this.product,
     required this.onAddProduct,
+    required this.onSaveIntake,
   });
 
   @override
@@ -131,10 +136,9 @@ class _IntakePopoverState extends State<Intakepopover> {
   Widget build(BuildContext context) {
     double price = widget.product['price'].toDouble();
 
-    // Calculate totals
     int cartTotal = widget.cart.fold<int>(
       0,
-      (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
+          (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
     );
     int currentProductTotal = (quantity * price).toInt();
     int grandTotal = cartTotal + currentProductTotal;
@@ -149,22 +153,18 @@ class _IntakePopoverState extends State<Intakepopover> {
             Container(
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ), // Change 16 to your desired radius
+                borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
                 title: 'Add Intake',
-                backgroundColor:
-                    Colors.transparent, // So the Container's color shows
+                backgroundColor: Colors.transparent,
               ),
             ),
             const SizedBox(height: 12),
 
-            // Cart items
             if (widget.cart.isNotEmpty)
               ...widget.cart.map(
-                (item) => Container(
+                    (item) => Container(
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -190,7 +190,6 @@ class _IntakePopoverState extends State<Intakepopover> {
                 ),
               ),
 
-            // Current product
             Container(
               margin: const EdgeInsets.symmetric(vertical: 6),
               padding: const EdgeInsets.all(10),
@@ -222,20 +221,14 @@ class _IntakePopoverState extends State<Intakepopover> {
                           icon: const Icon(Icons.remove, size: 18),
                           onPressed: () {
                             if (quantity > 1) {
-                              setState(() {
-                                quantity--;
-                              });
+                              setState(() => quantity--);
                             }
                           },
                         ),
                         Text('$quantity', style: const TextStyle(fontSize: 16)),
                         IconButton(
                           icon: const Icon(Icons.add, size: 18),
-                          onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
-                          },
+                          onPressed: () => setState(() => quantity++),
                         ),
                       ],
                     ),
@@ -245,14 +238,13 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 18),
 
-            // Total Amount Box
             TransactionTextRow(product: 'Total Amount', amount: grandTotal),
             const SizedBox(height: 16),
 
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Total:  ₹$grandTotal',
+                'Total: ₹$grandTotal',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -261,7 +253,6 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 16),
 
-            // Add Product Button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -292,15 +283,12 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 18),
 
-            // Save & Close Buttons
             Row(
               children: [
                 Expanded(
                   child: SecondaryButton(
                     text: 'Save',
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: widget.onSaveIntake,
                     borderRadius: 8.0,
                     heightFactor: 0.07,
                   ),
