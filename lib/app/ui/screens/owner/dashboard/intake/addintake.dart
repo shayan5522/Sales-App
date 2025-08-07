@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/intake/IntakeController.dart';
 import '../../../../../themes/colors.dart';
 import '../../../../widgets/appbar.dart';
 import '../../../../widgets/buttons.dart';
 import '../../../../widgets/grid_container.dart';
 import '../../../../widgets/transactionlist.dart';
 import '../products/productController.dart';
-import 'IntakeController.dart';
 
 class AddIntake extends StatefulWidget {
   const AddIntake({super.key});
@@ -46,11 +47,19 @@ class _AddIntakeState extends State<AddIntake> {
               product: product,
               onAddProduct: (newProduct) {
                 setState(() {
-                  cart.add(newProduct);
+                  final existingIndex = cart.indexWhere((item) =>
+                  item['title'] == newProduct['title'] &&
+                      item['price'] == newProduct['price']
+                  );
+                  if (existingIndex == -1) {
+                    cart.add(newProduct);
+                  } else {
+                    cart[existingIndex]['quantity'] += newProduct['quantity'];
+                  }
                 });
               },
               onSaveIntake: () async {
-                final cartCopy = List<Map<String, dynamic>>.from(cart); // ✅ copy
+                final cartCopy = List<Map<String, dynamic>>.from(cart);
                 await intakeController.saveIntake(cartCopy);
                 setState(() {
                   cart.clear();
@@ -67,7 +76,7 @@ class _AddIntakeState extends State<AddIntake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Add Intake'),
+      appBar: CustomAppbar(title: 'Add Sales'),
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
@@ -115,7 +124,7 @@ class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
-  final VoidCallback onSaveIntake;
+  final Future<void> Function() onSaveIntake;
 
   const Intakepopover({
     super.key,
@@ -156,7 +165,7 @@ class _IntakePopoverState extends State<Intakepopover> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
-                title: 'Add Intake',
+                title: 'Add Sales',
                 backgroundColor: Colors.transparent,
               ),
             ),
@@ -288,7 +297,13 @@ class _IntakePopoverState extends State<Intakepopover> {
                 Expanded(
                   child: SecondaryButton(
                     text: 'Save',
-                    onPressed: widget.onSaveIntake,
+                    onPressed: () async {
+                      widget.onAddProduct({
+                        ...widget.product,
+                        'quantity': quantity,
+                      });
+                      await widget.onSaveIntake();
+                    },
                     borderRadius: 8.0,
                     heightFactor: 0.07,
                   ),

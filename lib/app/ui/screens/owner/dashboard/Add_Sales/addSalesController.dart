@@ -6,12 +6,12 @@ class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Add a new intake
-  Future<void> saveIntake(List<Map<String, dynamic>> cart) async {
+  /// Add a new sales
+  Future<void> saveSale(List<Map<String, dynamic>> cart) async {
     try {
       final uid = _auth.currentUser!.uid;
 
-      final intakeRef = _firestore
+      final salesRef = _firestore
           .collection('users')
           .doc(uid)
           .collection('sales')
@@ -34,14 +34,14 @@ class SalesController extends GetxController {
         };
       }).toList();
 
-      final intakeData = {
-        'id': intakeRef.id,
+      final salesData = {
+        'id': salesRef.id,
         'totalAmount': totalAmount,
         'createdAt': FieldValue.serverTimestamp(),
         'items': items,
       };
 
-      await intakeRef.set(intakeData);
+      await salesRef.set(salesData);
       Get.snackbar('Success', 'Sales saved successfully');
     } catch (e) {
       Get.snackbar('Error', 'Failed to save Sales: $e');

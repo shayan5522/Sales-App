@@ -8,7 +8,6 @@ import '../../../../widgets/grid_container.dart';
 import '../../../../widgets/transactionlist.dart';
 import '../products/productController.dart';
 
-
 class Sales extends StatefulWidget {
   const Sales({super.key});
 
@@ -47,12 +46,20 @@ class _SalesState extends State<Sales> {
               product: product,
               onAddProduct: (newProduct) {
                 setState(() {
-                  cart.add(newProduct);
+                  final existingIndex = cart.indexWhere((item) =>
+                  item['title'] == newProduct['title'] &&
+                      item['price'] == newProduct['price']
+                  );
+                  if (existingIndex == -1) {
+                    cart.add(newProduct);
+                  } else {
+                    cart[existingIndex]['quantity'] += newProduct['quantity'];
+                  }
                 });
               },
               onSaveIntake: () async {
-                final cartCopy = List<Map<String, dynamic>>.from(cart); // ✅ copy
-                await saleController.saveIntake(cartCopy);
+                final cartCopy = List<Map<String, dynamic>>.from(cart);
+                await saleController.saveSale(cartCopy);
                 setState(() {
                   cart.clear();
                 });
@@ -116,7 +123,7 @@ class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
-  final VoidCallback onSaveIntake;
+  final Future<void> Function() onSaveIntake;
 
   const Intakepopover({
     super.key,
@@ -289,7 +296,13 @@ class _IntakePopoverState extends State<Intakepopover> {
                 Expanded(
                   child: SecondaryButton(
                     text: 'Save',
-                    onPressed: widget.onSaveIntake,
+                    onPressed: () async {
+                      widget.onAddProduct({
+                        ...widget.product,
+                        'quantity': quantity,
+                      });
+                      await widget.onSaveIntake();
+                    },
                     borderRadius: 8.0,
                     heightFactor: 0.07,
                   ),
