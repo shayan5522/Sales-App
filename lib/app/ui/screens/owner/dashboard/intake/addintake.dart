@@ -76,7 +76,7 @@ class _AddIntakeState extends State<AddIntake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Add Sales'),
+      appBar: CustomAppbar(title: 'Add Intake'),
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
@@ -85,6 +85,13 @@ class _AddIntakeState extends State<AddIntake> {
             final int crossAxisCount = screenWidth ~/ 160;
 
             return Obx(() {
+              if (controller.isLoading.value) {
+                return  Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                );
+              }
               final products = controller.products;
 
               return SingleChildScrollView(
@@ -165,7 +172,7 @@ class _IntakePopoverState extends State<Intakepopover> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
-                title: 'Add Sales',
+                title: 'Add Intake',
                 backgroundColor: Colors.transparent,
               ),
             ),

@@ -84,6 +84,13 @@ class _SalesState extends State<Sales> {
             final int crossAxisCount = screenWidth ~/ 160;
 
             return Obx(() {
+              if (controller.isLoading.value) {
+                return  Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                );
+              }
               final products = controller.products;
 
               return SingleChildScrollView(

@@ -8,6 +8,7 @@ class ProductController extends GetxController {
   RxList<Map<String, dynamic>> products = <Map<String, dynamic>>[].obs;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final isLoading = true.obs;
 
   /// 🔹 Add a new product to Firestore
   Future<void> addProduct({
@@ -57,6 +58,7 @@ class ProductController extends GetxController {
   /// 🔹 Fetch all products for the current user
   Future<void> fetchProducts() async {
     try {
+      isLoading.value = true;
       final uid = _auth.currentUser!.uid;
 
       final snapshot = await _firestore
@@ -79,6 +81,8 @@ class ProductController extends GetxController {
       products.assignAll(productList);
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch products: $e');
+    }finally {
+      isLoading.value = false;
     }
   }
 
