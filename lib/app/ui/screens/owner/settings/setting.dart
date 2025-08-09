@@ -8,6 +8,7 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import '../../../../controllers/auth/logout_helper.dart';
+import '../../../../controllers/owner/owner_invite_controller.dart';
 import '../../../widgets/logout_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -109,19 +110,91 @@ class SettingsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.copy),
-                                onPressed: () {
-                                  Clipboard.setData(ClipboardData(text: code));
-                                CustomSnackbar.show(
-                                  title: "Copied",
-                                  message: "Invite code copied!",
-                                  isError: false,
-                                );
-                                },
-                              )
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.copy),
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(text: code));
+                                      CustomSnackbar.show(
+                                        title: "Copied",
+                                        message: "Invite code copied!",
+                                        isError: false,
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      Get.defaultDialog(
+                                        title: "",
+                                        titlePadding: EdgeInsets.zero,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                                        backgroundColor: Colors.white,
+                                        radius: 15,
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.delete_forever, color: Colors.red, size: 50),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              "Delete Invite",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red[700],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            const Text(
+                                              "Are you sure you want to delete this code?",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(fontSize: 16, color: Colors.black87),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.grey[300],
+                                                    foregroundColor: Colors.black87,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                                  ),
+                                                  onPressed: () => Get.back(),
+                                                  child: const Text("Cancel"),
+                                                ),
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.red,
+                                                    foregroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                                  ),
+                                                  onPressed: () async {
+                                                    await inviteController.deleteInvite(codeData['id']);
+                                                    Get.back();
+                                                  },
+                                                  child: const Text("Yes, Delete"),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                    },
+                                  ),
+                                ],
+                              ),
                             ],
-                          ),
+                          )
+
                         );
                       }).toList(),
                     ],
