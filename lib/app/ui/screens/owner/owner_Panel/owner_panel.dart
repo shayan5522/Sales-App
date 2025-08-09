@@ -4,7 +4,7 @@ import '../../../../controllers/shop_nav_controller.dart';
 import '../../../../themes/colors.dart';
 import '../dashboard/owner_dashboard.dart';
 import '../dashboard/products/products.dart';
-import '../Reports/report_main_page.dart';
+import '../Reports/ReportMainPage/report_main_page.dart';
 import '../settings/setting.dart';
 
 class OwnerPanel extends StatelessWidget {

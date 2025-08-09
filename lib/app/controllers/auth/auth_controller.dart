@@ -2,17 +2,13 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
 import 'package:salesapp/app/ui/screens/labour/panel/labour_panel.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
-import '../../ui/screens/auth/labour_signup.dart';
 import '../../ui/screens/auth/otp.dart';
 import '../../ui/screens/auth/owner_signup.dart';
-import '../../ui/screens/auth/signup_as.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../../ui/screens/owner/dashboard/owner_dashboard.dart';
 import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
-
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   var verificationId = ''.obs;
@@ -25,7 +21,12 @@ class AuthController extends GetxController {
         Get.to(() => OTPVerificationScreen());
       },
       onError: (e) {
-        Get.snackbar("Error", e.message ?? "OTP failed");
+        CustomSnackbar.show(
+          title: "Error",
+          message: e.message ?? "OTP failed",
+          isError: true,
+        );
+
       },
     );
   }
@@ -61,14 +62,24 @@ class AuthController extends GetxController {
             Get.offAll(() => OwnerSignUpScreen());
           }
         } else {
-          Get.snackbar("Error", "Unknown role assigned to user.");
+          CustomSnackbar.show(
+            title: "Error",
+            message: "Unknown role assigned to user.",
+            isError: true,
+          );
+         // Get.snackbar("Error", "Unknown role assigned to user.");
         }
       } else {
         // No user doc found — assume new owner
         Get.offAll(() => OwnerSignUpScreen());
       }
     } catch (e) {
-      Get.snackbar("Verification Failed", e.toString());
+      CustomSnackbar.show(
+        title: "Verification Failed",
+        message: e.toString(),
+        isError: true,
+      );
+    //  Get.snackbar("Verification Failed", e.toString());
       rethrow;
     }
   }

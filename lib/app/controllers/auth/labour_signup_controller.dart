@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../ui/screens/labour/panel/labour_panel.dart';
+import '../../ui/widgets/custom_snackbar.dart';
 
 class LabourSignupController extends GetxController {
   final isLoading = false.obs;
@@ -11,8 +12,11 @@ class LabourSignupController extends GetxController {
     final inputCode = shopCodeController.value.trim().toUpperCase();
 
     if (inputCode.isEmpty) {
-      Get.snackbar("Error", "Invite code is required.");
-      return;
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Invite code is required.",
+        isError: true,
+      );
     }
 
     isLoading.value = true;
@@ -21,14 +25,20 @@ class LabourSignupController extends GetxController {
       final inviteDoc = await FirebaseFirestore.instance.collection('invites').doc(inputCode).get();
 
       if (!inviteDoc.exists) {
-        Get.snackbar("Error", "Invalid invite code.");
-        return;
+        CustomSnackbar.show(
+          title: "Error",
+          message: "Invalid invite code.",
+          isError: true,
+        );
       }
 
       final invite = inviteDoc.data()!;
       if (invite['used'] == true) {
-        Get.snackbar("Error", "This code has already been used.");
-        return;
+        CustomSnackbar.show(
+          title: "Error",
+          message: "This code has already been used.",
+          isError: true,
+        );
       }
 
       final shopName = invite['shopName'];
@@ -42,8 +52,11 @@ class LabourSignupController extends GetxController {
           .get();
 
       if (labourSnapshot.docs.length >= 3) {
-        Get.snackbar("Error", "This shop already has 3 labours.");
-        return;
+        CustomSnackbar.show(
+          title: "Error",
+          message: "This shop already has 3 labours.",
+          isError: true,
+        );
       }
 
       // Register new labour
@@ -69,7 +82,11 @@ class LabourSignupController extends GetxController {
       print('✅ Labour added with ID: ${newLabourDoc.id}');
       Get.offAll(() => LaborPanel());
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong: ${e.toString()}");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Something went wrong: ${e.toString()}",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

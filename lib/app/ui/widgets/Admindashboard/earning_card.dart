@@ -3,8 +3,8 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 
 class EarningsCard extends StatelessWidget {
-  final int income;
-  final int profit;
+  final double income;
+  final double profit;
   final String imagePath;
   final VoidCallback onSeeAll;
 
@@ -74,7 +74,7 @@ class EarningsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEarningRow({required String label, required int amount}) {
+  Widget _buildEarningRow({required String label, required double amount}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

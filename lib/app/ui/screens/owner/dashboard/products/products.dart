@@ -150,6 +150,13 @@ class _ProductScreenState extends State<ProductScreen> {
             final int crossAxisCount = screenWidth ~/ 160;
 
             return Obx(() {
+              if (controller.isLoading.value) {
+                return  Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                );
+              }
               final products = controller.products;
 
               return SingleChildScrollView(

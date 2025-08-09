@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -31,9 +33,9 @@ class SalesController extends GetxController {
         'items': items,
       };
       await saleRef.set(saleData);
-      Get.snackbar('Success', 'Sale saved successfully');
+      CustomSnackbar.show(title: "Success", message: "Sale saved successfully");
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save sale: $e');
+      CustomSnackbar.show(title: "Error", message: "Failed to save sale: $e", isError: true);
     }
   }
 }

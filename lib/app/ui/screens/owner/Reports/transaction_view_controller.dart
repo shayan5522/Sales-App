@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../widgets/custom_snackbar.dart';
+
 class TransactionViewController extends GetxController {
   RxList<Map<String, dynamic>> allTransactions = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> filteredTransactions = <Map<String, dynamic>>[].obs;
+  RxBool isLoading = true.obs;
 
   RxDouble totalCredit = 0.0.obs;
   RxDouble totalDebit = 0.0.obs;
@@ -17,6 +20,7 @@ class TransactionViewController extends GetxController {
 
   Future<void> fetchTransactions() async {
     try {
+      isLoading.value = true;
       final uid = _auth.currentUser!.uid;
 
       final creditSnap = await _firestore.collection('users').doc(uid).collection('credits').get();
@@ -50,7 +54,10 @@ class TransactionViewController extends GetxController {
       totalCredit.value = creditList.fold(0.0, (sum, item) => sum + (item['price'] ?? 0));
       totalDebit.value = debitList.fold(0.0, (sum, item) => sum + (item['price'] ?? 0));
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load transactions: $e');
+      CustomSnackbar.show(title: 'Error', message: 'Failed to load transactions: $e');
+    }
+    finally{
+      isLoading.value = false;
     }
   }
 

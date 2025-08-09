@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../widgets/custom_snackbar.dart';
+
 class UserManagementController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -32,8 +34,13 @@ class UserManagementController extends GetxController {
         };
       }).toList());
     } catch (e) {
-      Get.snackbar("Error", "Failed to load invites: $e");
-      print("Fetch Error: $e");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to fetch invites: $e",
+        isError: true,
+      );
+      // Get.snackbar("Error", "Failed to load invites: $e");
+      // print("Fetch Error: $e");
     }
   }
 
@@ -52,9 +59,19 @@ class UserManagementController extends GetxController {
       });
 
       await fetchInvites();
-      Get.snackbar("Success", "Invite code reset successfully");
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Invite code reset successfully",
+        isError: false,
+      );
+      // Get.snackbar("Success", "Invite code reset successfully");
     } catch (e) {
-      Get.snackbar("Error", "Failed to reset code: $e");
+        CustomSnackbar.show(
+          title: "Error",
+          message: "Failed to reset code: $e",
+          isError: true,
+        );
+      // Get.snackbar("Error", "Failed to reset code: $e");
     }
   }
 
@@ -66,9 +83,19 @@ class UserManagementController extends GetxController {
       await _firestore.collection('invites').doc(inviteId).delete();
 
       invites.removeWhere((invite) => invite['id'] == inviteId);
-      Get.snackbar("Deleted", "Invite removed successfully");
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Invite removed successfully",
+        isError: false,
+      );
+      // Get.snackbar("Deleted", "Invite removed successfully");
     } catch (e) {
-      Get.snackbar("Error", "Failed to delete invite: $e");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to delete invite: $e",
+        isError: true,
+      );
+      // Get.snackbar("Error", "Failed to delete invite: $e");
     }
   }
 

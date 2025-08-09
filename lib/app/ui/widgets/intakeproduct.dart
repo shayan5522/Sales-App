@@ -34,16 +34,18 @@ class IntakeProduct extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               imagePath,
-              width: 50,
-              height: 50,
+              width: 30,
+              height: 30,
               fit: BoxFit.cover,
             ),
           ),
           const SizedBox(width: 12),
-          SingleChildScrollView(
+          // Wrap in Expanded to prevent overflow
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Top-right expense info if no stockCount
                 if (stockCount == null)
                   Align(
                     alignment: Alignment.topRight,
@@ -51,7 +53,7 @@ class IntakeProduct extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'INR :',
+                          'INR:',
                           style: AppTextStyles.subtitleSmall.copyWith(
                             color: AppColors.primary,
                           ),
@@ -74,15 +76,10 @@ class IntakeProduct extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                stockCount == null
-                    ? Text(
-                  'Total: $totalexpense',
-                  style: AppTextStyles.subtitleSmall.copyWith(
-                    color: AppColors.textseconadry,
-                  ),
-                )
-                    : Text(
-                  'Stock Count: $stockCount',
+                Text(
+                  stockCount == null
+                      ? 'Total: $totalexpense'
+                      : 'Stock Count: $stockCount',
                   style: AppTextStyles.subtitleSmall.copyWith(
                     color: AppColors.textseconadry,
                   ),
@@ -95,7 +92,7 @@ class IntakeProduct extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'INR :',
+                          'INR:',
                           style: AppTextStyles.subtitleSmall.copyWith(
                             color: AppColors.primary,
                           ),

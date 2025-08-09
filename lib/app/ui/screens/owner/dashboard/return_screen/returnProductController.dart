@@ -3,18 +3,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 import '../../../../widgets/custom_snackbar.dart';
-class IntakeController extends GetxController {
+
+class ReturnProductController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   /// Add a new intake
-  Future<void> saveIntake(List<Map<String, dynamic>> cart) async {
+  Future<void> returnProduct(List<Map<String, dynamic>> cart) async {
     try {
       final uid = _auth.currentUser!.uid;
 
-      final intakeRef = _firestore
+      final returnRef = _firestore
           .collection('users')
           .doc(uid)
-          .collection('intakes')
+          .collection('returns')
           .doc(); // auto-generated ID
 
       double totalAmount = 0.0;
@@ -34,26 +36,17 @@ class IntakeController extends GetxController {
         };
       }).toList();
 
-      final intakeData = {
-        'id': intakeRef.id,
+      final returnData = {
+        'id': returnRef.id,
         'totalAmount': totalAmount,
         'createdAt': FieldValue.serverTimestamp(),
         'items': items,
       };
 
-      await intakeRef.set(intakeData);
-      CustomSnackbar.show(
-        title: "Success",
-        message: "Intake saved successfully",
-        isError: false,
-      );
+      await returnRef.set(returnData);
+      CustomSnackbar.show(title: "Success", message: "Return product saved successfully");
     } catch (e) {
-
-      CustomSnackbar.show(
-        title: "Error",
-        message: "Failed to save intake: $e",
-        isError: true,
-      );
+      CustomSnackbar.show(title: "Error", message: "Failed to save Return product: $e", isError: true);
     }
   }
 }

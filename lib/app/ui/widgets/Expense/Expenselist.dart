@@ -17,7 +17,7 @@ class CustomExpenseListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,

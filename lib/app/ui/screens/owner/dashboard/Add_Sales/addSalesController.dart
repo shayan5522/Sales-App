@@ -3,18 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 import '../../../../widgets/custom_snackbar.dart';
-class IntakeController extends GetxController {
+
+class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  /// Add a new intake
-  Future<void> saveIntake(List<Map<String, dynamic>> cart) async {
+
+  Future<void> saveSale(List<Map<String, dynamic>> cart) async {
     try {
       final uid = _auth.currentUser!.uid;
 
-      final intakeRef = _firestore
+      final salesRef = _firestore
           .collection('users')
           .doc(uid)
-          .collection('intakes')
+          .collection('sales')
           .doc(); // auto-generated ID
 
       double totalAmount = 0.0;
@@ -31,29 +32,32 @@ class IntakeController extends GetxController {
           'price': price,
           'quantity': quantity,
           'imagePath': item['imagePath'],
+          'originalPrice': item['originalPrice'], // Store original price
+          'discount': item.containsKey('discount') ? item['discount'] : 0.0,
         };
       }).toList();
 
-      final intakeData = {
-        'id': intakeRef.id,
+      final salesData = {
+        'id': salesRef.id,
         'totalAmount': totalAmount,
         'createdAt': FieldValue.serverTimestamp(),
         'items': items,
       };
 
-      await intakeRef.set(intakeData);
-      CustomSnackbar.show(
-        title: "Success",
-        message: "Intake saved successfully",
-        isError: false,
-      );
+      await salesRef.set(salesData);
+        CustomSnackbar.show(
+          title: "Success",
+          message: "Sales saved successfully",
+          isError: false,
+        );
+      // Get.snackbar('Success', 'Sales saved successfully');
     } catch (e) {
-
       CustomSnackbar.show(
         title: "Error",
-        message: "Failed to save intake: $e",
+        message: "Failed to save Sales: $e",
         isError: true,
       );
+      // Get.snackbar('Error', 'Failed to save Sales: $e');
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
+import '../../widgets/custom_snackbar.dart';
 import 'otp.dart';
 import '../../../controllers/auth/auth_controller.dart';
 
@@ -54,7 +55,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     : () async {
                   final phone = phoneController.text.trim();
                   if (phone.isEmpty) {
-                    Get.snackbar("Error", "Enter phone number");
+                    CustomSnackbar.show(
+                      title: "Error",
+                      message: "Enter phone number",
+                      isError: true,
+                    );
                     return;
                   }
 

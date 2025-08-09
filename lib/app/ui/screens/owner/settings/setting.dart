@@ -6,6 +6,7 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import '../../../../controllers/auth/logout_helper.dart';
 import '../../../widgets/logout_dialog.dart';
 
@@ -112,7 +113,11 @@ class SettingsScreen extends StatelessWidget {
                                 icon: const Icon(Icons.copy),
                                 onPressed: () {
                                   Clipboard.setData(ClipboardData(text: code));
-                                  Get.snackbar("Copied", "Invite code copied!");
+                                CustomSnackbar.show(
+                                  title: "Copied",
+                                  message: "Invite code copied!",
+                                  isError: false,
+                                );
                                 },
                               )
                             ],

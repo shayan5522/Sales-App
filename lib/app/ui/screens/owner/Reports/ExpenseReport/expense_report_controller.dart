@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class ExpenseReportController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+  RxBool isLoading = true.obs;
 
   RxList<Map<String, dynamic>> allExpenses = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> filteredExpenses = <Map<String, dynamic>>[].obs;
@@ -14,6 +17,7 @@ class ExpenseReportController extends GetxController {
 
   Future<void> fetchExpenses() async {
     try {
+      isLoading.value = true;
       final uid = _auth.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
 
@@ -44,8 +48,11 @@ class ExpenseReportController extends GetxController {
       allExpenses.assignAll(expenses);
       filteredExpenses.assignAll(expenses);
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch expenses: $e");
+      CustomSnackbar.show(title: "Error", message: "Failed to fetch expenses: $e", isError: true);
       print(e);
+    }
+    finally{
+      isLoading.value=false;
     }
   }
 
