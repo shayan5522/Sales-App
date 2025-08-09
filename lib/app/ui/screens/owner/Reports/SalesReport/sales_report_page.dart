@@ -7,7 +7,6 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import '../../../../widgets/sale/salereportlist.dart';
-
 class SalesReportPage extends StatelessWidget {
   SalesReportPage({super.key}) {
     Get.put(SalesReportController());
@@ -47,7 +46,6 @@ class SalesReportPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
               /// 🔹 CHART
               const Text("Total Sales Per Product", style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
@@ -65,13 +63,10 @@ class SalesReportPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              /// 🔹 SUMMARY CARDS GRID (Responsive)
+              /// 🔹 SUMMARY CARDS GRID (Always 2 per row)
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final isWide = constraints.maxWidth >= 400;
-                  final itemWidth = isWide
-                      ? (constraints.maxWidth - 12) / 2
-                      : constraints.maxWidth;
+                  final itemWidth = (constraints.maxWidth - 12) / 2;
 
                   return Wrap(
                     spacing: 12,
@@ -103,7 +98,6 @@ class SalesReportPage extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 24),
 
               /// 🔹 SALES LIST
