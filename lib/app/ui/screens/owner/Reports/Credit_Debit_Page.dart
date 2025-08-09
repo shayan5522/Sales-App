@@ -92,9 +92,9 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CenteredAmountCard(
-                      title: "Total Value",
+                      title: "Debit Amount",
                       subtitle:
-                      "INR ${(controller.totalCredit.value + controller.totalDebit.value).toStringAsFixed(0)}",
+                      "INR ${controller.totalDebit.value.toStringAsFixed(0)}",
                     ),
                   ),
                 ],
