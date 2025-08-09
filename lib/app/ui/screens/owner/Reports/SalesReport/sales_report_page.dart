@@ -7,6 +7,7 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import '../../../../widgets/sale/salereportlist.dart';
+
 class SalesReportPage extends StatelessWidget {
   SalesReportPage({super.key}) {
     Get.put(SalesReportController());
@@ -46,6 +47,7 @@ class SalesReportPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
+
               /// 🔹 CHART
               const Text("Total Sales Per Product", style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
@@ -85,14 +87,14 @@ class SalesReportPage extends StatelessWidget {
                       saleSummaryCard(
                         width: itemWidth,
                         title: "Total Income",
-                        value: "\$${controller.totalAmount.value.toStringAsFixed(2)}",
+                        value: "₹${controller.totalAmount.value.toStringAsFixed(2)}",
                       ),
                       saleSummaryCard(
                         width: itemWidth,
                         title: "Average Sale",
                         value: controller.salesData.isEmpty
-                            ? "\$0.00"
-                            : "\$${(controller.totalAmount.value / controller.salesData.length).toStringAsFixed(2)}",
+                            ? "₹0.00"
+                            : "₹${(controller.totalAmount.value / controller.salesData.length).toStringAsFixed(2)}",
                       ),
                     ],
                   );
@@ -149,7 +151,7 @@ class SalesReportPage extends StatelessWidget {
               imagePath: item['imagePath'] ?? "assets/images/products.png",
               name: item['title'] ?? "Unknown Product",
               Quantity: "${item['quantity']}",
-              amount: "\$${(item['price'] * item['quantity']).toStringAsFixed(2)}",
+              amount: "${(item['price'] * item['quantity']).toStringAsFixed(2)}",
             ));
           }),
         ],

@@ -148,7 +148,6 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
-
   double _calculateCartTotal() {
     return cart.fold(0.0, (sum, item) =>
     sum + (item['price'] * (item['quantity'] ?? 1)));
