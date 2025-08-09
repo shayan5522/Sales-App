@@ -9,9 +9,11 @@ import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.d
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/summarycard.dart';
+import '../../../../widgets/datepicker.dart';
 import '../Credit_Debit_Page.dart';
 import '../ExpenseReport/expense_report_page.dart';
 import '../IntakeReport/intake_report.dart';
+
 class ReportsMainPage extends StatelessWidget {
   ReportsMainPage({super.key}) {
     Get.put(ReportsController());
@@ -44,7 +46,14 @@ class ReportsMainPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Total Summary", style: AppTextStyles.heading),
-                  // const Icon(Icons.tune, color: AppColors.primary),
+                  SizedBox(
+                    width: 140,
+                    child: CustomDatePicker(
+                      label: '',
+                      initialDate: controller.selectedDate.value,
+                      onDateSelected: controller.updateSelectedDate,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
