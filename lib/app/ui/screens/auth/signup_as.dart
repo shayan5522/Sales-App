@@ -7,14 +7,6 @@ import 'package:salesapp/app/ui/screens/auth/signup.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/auth/labour_signup.dart';
-import 'package:salesapp/app/ui/screens/auth/signup.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
 
 class SignUpAsScreen extends StatefulWidget {
   const SignUpAsScreen({super.key});

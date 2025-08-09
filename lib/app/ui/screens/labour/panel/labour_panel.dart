@@ -42,14 +42,6 @@ class LaborPanel extends StatelessWidget {
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Reports",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: "Products",
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "Setting",
           ),

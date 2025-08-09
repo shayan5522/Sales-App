@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 
 class AddCategoryPage extends StatelessWidget {
   AddCategoryPage({super.key});
-
   final TextEditingController _categoryController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

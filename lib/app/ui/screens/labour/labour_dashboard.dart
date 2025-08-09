@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 
+import '../../../controllers/auth/logout_helper.dart';
 import '../../widgets/logout_dialog.dart';
-
 class LabourDashboard extends StatelessWidget {
   const LabourDashboard({super.key});
 
@@ -27,17 +26,14 @@ class LabourDashboard extends StatelessWidget {
                 barrierDismissible: false,
                 builder: (_) => LogoutDialog(
                   onCancel: () => Navigator.pop(context),
-                  onConfirm: () {
-                    Navigator.pop(context); // Close dialog
-                    // Perform actual logout logic here:
-                    // e.g. AuthController.to.logout();
-                    Navigator.pushReplacementNamed(context, '/login');
+                  onConfirm: () async {
+                    Navigator.pop(context);
+                    await logoutUser(); // 👈 This handles logout & navigation
                   },
                 ),
               );
             },
-          ),
-          const SizedBox(width: 12),
+          )
         ],
       ),
 
@@ -47,14 +43,12 @@ class LabourDashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 Welcome Text
             Text(
               "Welcome",
               style: AppTextStyles.heading.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 16),
 
-            /// 🔹 Main Container Section
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

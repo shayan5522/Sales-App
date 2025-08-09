@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/returnreport.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/sales_report_page.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/stock_report.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/salescard.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
+
+import '../../../widgets/summarycard.dart';
+import 'Credit_Debit_Page.dart';
+import 'expense_report_page.dart';
+import 'intake_report.dart';
 
 class ReportsMainPage extends StatelessWidget {
   const ReportsMainPage({super.key});
@@ -35,31 +45,20 @@ class ReportsMainPage extends StatelessWidget {
             Row(
               children: const [
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
-                    label: "Sale Amount",
-                    value: 112,
-                  ),
+                  child: SummaryCard(amount: "1122322", label: "Sale Amount"),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
-                    label: "Intake Amount",
-                    value: 100,
-                  ),
+                  child: SummaryCard(amount: "1001212", label: "Intake Amount"),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Expanded(
-                  child: SalesCard(
-                    imagePath: "assets/images/Add_Sales.png",
-                    label: "Expense Amount",
-                    value: 112,
-                  ),
+                  child: SummaryCard(amount: "1121212", label: "Expense Amount"),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+
+            SizedBox(height: 16),
 
             // Total Profit Box (Custom design)
             Container(
@@ -129,7 +128,6 @@ class ReportsMainPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 10),
-
                       // Right vertical bar (blue rounded right edge)
                       Container(
                         width: 36,
@@ -172,14 +170,39 @@ class ReportsMainPage extends StatelessWidget {
               mainAxisSpacing: 12,
               childAspectRatio: 1,
               children: [
-                MainContainer(imagePath: "assets/images/stock.png", label: "Stock", onTap: () {}),
-                MainContainer(imagePath: "assets/images/intake.png", label: "Intake", onTap: () {}),
-                MainContainer(imagePath: "assets/images/sales1111.png", label: "Sales", onTap: () {}),
-                MainContainer(imagePath: "assets/images/Expense.png", label: "Expense", onTap: () {}),
-                MainContainer(imagePath: "assets/images/return_report.png", label: "Return Report", onTap: () {}),
-                MainContainer(imagePath: "assets/images/CD_report.png", label: "Credit & Due Report", onTap: () {}),
+                MainContainer(
+                  imagePath: "assets/images/stock.png",
+                  label: "Stock",
+                  onTap: () => Get.to(() => const StockReportPage()),
+                ),
+                MainContainer(
+                  imagePath: "assets/images/intake.png",
+                  label: "Intake",
+                  onTap: () => Get.to(() => const IntakeReportPage()),
+                ),
+                MainContainer(
+                  imagePath: "assets/images/sales1111.png",
+                  label: "Sales",
+                  onTap: () => Get.to(() => const SalesReportPage()),
+                ),
+                MainContainer(
+                  imagePath: "assets/images/Expense.png",
+                  label: "Expense",
+                  onTap: () => Get.to(() => const ExpenseReportPage()),
+                ),
+                MainContainer(
+                  imagePath: "assets/images/return_report.png",
+                  label: "Return Report",
+                  onTap: () => Get.to(() => const RetunReport()),
+                ),
+                MainContainer(
+                  imagePath: "assets/images/CD_report.png",
+                  label: "Credit & Due Report",
+                  onTap: () => Get.to(() => const CreditDebitPage()),
+                ),
               ],
             ),
+
             const SizedBox(height: 30),
           ],
         ),
