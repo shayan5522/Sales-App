@@ -72,6 +72,7 @@ class SecondaryButton extends StatelessWidget {
   final double widthFactor;
   final double heightFactor;
   final Color color;
+  final Color textColor; // ✅ Added
   final double borderRadius;
   final TextStyle? textStyle;
 
@@ -82,6 +83,7 @@ class SecondaryButton extends StatelessWidget {
     this.widthFactor = 0.24,
     this.heightFactor = 0.035,
     this.color = AppColors.primary,
+    this.textColor = Colors.white, // ✅ Default
     this.borderRadius = 6.0,
     this.textStyle,
   });
@@ -107,7 +109,7 @@ class SecondaryButton extends StatelessWidget {
           text,
           style: textStyle ??
               AppTextStyles.title.copyWith(
-                color: AppColors.backgroundColor,
+                color: textColor, // ✅ Use dynamic text color
                 fontSize: screenSize.width < 360 ? 11 : 13,
               ),
         ),
@@ -115,4 +117,3 @@ class SecondaryButton extends StatelessWidget {
     );
   }
 }
-

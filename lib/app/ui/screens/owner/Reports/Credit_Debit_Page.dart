@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
@@ -26,6 +25,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
 
   DateTime? _fromDate;
   DateTime? _toDate;
+  String _selectedFilter = ''; // 'credit', 'debit', or ''
 
   @override
   void initState() {
@@ -40,14 +40,15 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
       backgroundColor: AppColors.backgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// 🔹 DATE PICKERS
               Row(
                 children: [
@@ -57,8 +58,8 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                       initialDate: _fromDate ?? DateTime.now(),
                       onDateSelected: (date) {
                         setState(() => _fromDate = date);
-                        controller.filterByDateRange(from: _fromDate,
-                            to: _toDate);
+                        controller.filterByDateRange(
+                            from: _fromDate, to: _toDate);
                       },
                     ),
                   ),
@@ -69,8 +70,8 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                       initialDate: _toDate ?? DateTime.now(),
                       onDateSelected: (date) {
                         setState(() => _toDate = date);
-                        controller.filterByDateRange(from: _fromDate,
-                            to: _toDate);
+                        controller.filterByDateRange(
+                            from: _fromDate, to: _toDate);
                       },
                     ),
                   ),
@@ -84,16 +85,16 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   Expanded(
                     child: CenteredAmountCard(
                       title: "Credit Amount",
-                      subtitle: "INR ${controller.totalCredit.value
-                          .toStringAsFixed(0)}",
+                      subtitle:
+                      "INR ${controller.totalCredit.value.toStringAsFixed(0)}",
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CenteredAmountCard(
                       title: "Total Value",
-                      subtitle: "INR ${(controller.totalCredit.value +
-                          controller.totalDebit.value).toStringAsFixed(0)}",
+                      subtitle:
+                      "INR ${(controller.totalCredit.value + controller.totalDebit.value).toStringAsFixed(0)}",
                     ),
                   ),
                 ],
@@ -101,22 +102,42 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
 
               const SizedBox(height: 16),
 
-              /// 🔹 FILTER BUTTONS
+              /// 🔹 FILTER BUTTONS WITH SELECT HIGHLIGHT
               Row(
                 children: [
                   Expanded(
                     child: SecondaryButton(
                       text: 'Credited Only',
-                      onPressed: () =>
-                          controller.filterTransactions(type: 'credit'),
+                      color: _selectedFilter == 'credit'
+                          ? AppColors.primary
+                          : Colors.white,
+                      textColor: _selectedFilter == 'credit'
+                          ? Colors.white
+                          : Colors.black,
+                      onPressed: () {
+                        setState(() {
+                          _selectedFilter = 'credit';
+                        });
+                        controller.filterTransactions(type: 'credit');
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: SecondaryButton(
                       text: 'Debited Only',
-                      onPressed: () =>
-                          controller.filterTransactions(type: 'debit'),
+                      color: _selectedFilter == 'debit'
+                          ? AppColors.primary
+                          : Colors.white,
+                      textColor: _selectedFilter == 'debit'
+                          ? Colors.white
+                          : Colors.black,
+                      onPressed: () {
+                        setState(() {
+                          _selectedFilter = 'debit';
+                        });
+                        controller.filterTransactions(type: 'debit');
+                      },
                     ),
                   ),
                 ],
@@ -130,6 +151,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                     setState(() {
                       _fromDate = null;
                       _toDate = null;
+                      _selectedFilter = '';
                     });
                     controller.fromDate = null;
                     controller.toDate = null;
@@ -143,9 +165,11 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
               /// 🔹 TRANSACTIONS
               const Text(
                 "Transactions:",
-                style: TextStyle(fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(height: 12),
 
@@ -161,10 +185,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
             ],
           ),
         );
-      }
-      ),
+      }),
     );
   }
 }
-
-
