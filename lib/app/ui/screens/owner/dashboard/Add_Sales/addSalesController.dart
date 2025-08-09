@@ -8,7 +8,7 @@ class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> saveSale(List<Map<String, dynamic>> cart) async {
+  Future<void> saveSale(List<Map<String, dynamic>> cart, String paymentType) async {
     try {
       final uid = _auth.currentUser!.uid;
 
@@ -40,24 +40,23 @@ class SalesController extends GetxController {
       final salesData = {
         'id': salesRef.id,
         'totalAmount': totalAmount,
+        'paymentType': paymentType, // Added payment type
         'createdAt': FieldValue.serverTimestamp(),
         'items': items,
       };
 
       await salesRef.set(salesData);
-        CustomSnackbar.show(
-          title: "Success",
-          message: "Sales saved successfully",
-          isError: false,
-        );
-      // Get.snackbar('Success', 'Sales saved successfully');
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Sales saved successfully",
+        isError: false,
+      );
     } catch (e) {
       CustomSnackbar.show(
         title: "Error",
         message: "Failed to save Sales: $e",
         isError: true,
       );
-      // Get.snackbar('Error', 'Failed to save Sales: $e');
     }
   }
 }

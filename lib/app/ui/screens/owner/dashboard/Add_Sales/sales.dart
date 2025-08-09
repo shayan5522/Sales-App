@@ -3,9 +3,7 @@ import 'package:get/get.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
 import '../../../../../themes/colors.dart';
 import '../../../../widgets/appbar.dart';
-import '../../../../widgets/buttons.dart';
 import '../../../../widgets/grid_container.dart';
-import '../../../../widgets/transactionlist.dart';
 import '../intake/addintake.dart';
 import '../products/productController.dart';
 
@@ -20,6 +18,7 @@ class _SalesState extends State<Sales> {
   final ProductController controller = Get.put(ProductController());
   final SalesController saleController = Get.put(SalesController());
   List<Map<String, dynamic>> cart = [];
+  String paymentType = 'Cash'; // Default payment type
 
   @override
   void initState() {
@@ -32,41 +31,75 @@ class _SalesState extends State<Sales> {
       context: context,
       barrierDismissible: true,
       builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-              maxWidth: MediaQuery.of(context).size.width * 0.95,
-            ),
-            child: Intakepopover(
-              cart: cart,
-              product: product,
-              onAddProduct: (newProduct) {
-                setState(() {
-                  final existingIndex = cart.indexWhere((item) =>
-                  item['title'] == newProduct['title']);
-                  if (existingIndex == -1) {
-                    cart.add(newProduct);
-                  } else {
-                    cart[existingIndex]['quantity'] += newProduct['quantity'];
-                    cart[existingIndex]['price'] = newProduct['price'];
-                  }
-                });
-              },
-              onSaveIntake: () async {
-                final cartCopy = List<Map<String, dynamic>>.from(cart);
-                await saleController.saveSale(cartCopy);
-                setState(() {
-                  cart.clear();
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                  maxWidth: MediaQuery.of(context).size.width * 0.95,
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: DropdownButtonFormField<String>(
+                        value: paymentType,
+                        decoration: InputDecoration(
+                          labelText: 'Payment Type',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        items: ['Cash', 'Online'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            paymentType = newValue!;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Intakepopover(
+                        cart: cart,
+                        product: product,
+                        onAddProduct: (newProduct) {
+                          setState(() {
+                            final existingIndex = cart.indexWhere((item) =>
+                            item['title'] == newProduct['title']);
+                            if (existingIndex == -1) {
+                              cart.add(newProduct);
+                            } else {
+                              cart[existingIndex]['quantity'] += newProduct['quantity'];
+                              cart[existingIndex]['price'] = newProduct['price'];
+                            }
+                          });
+                        },
+                        onSaveIntake: () async {
+                          final cartCopy = List<Map<String, dynamic>>.from(cart);
+                          await saleController.saveSale(cartCopy, paymentType);
+                          setState(() {
+                            cart.clear();
+                            paymentType = 'Cash'; // Reset to default
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -148,6 +181,7 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
+
   double _calculateCartTotal() {
     return cart.fold(0.0, (sum, item) =>
     sum + (item['price'] * (item['quantity'] ?? 1)));

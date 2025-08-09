@@ -69,58 +69,89 @@ class OwnerDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Sales Cards Grid with StreamBuilders
+              // Sales Cards Grid
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  StreamBuilder<double>(
-                    stream: controller.getSalesStream(user.uid, startOfDay, endOfDay),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        controller.totalSales.value = snapshot.data!;
-                        return SalesCard(
-                          imagePath: "assets/images/sales.png",
-                          label: "Total Sales",
-                          value: snapshot.data!.toInt(),
-                        );
-                      }
-                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
-                    },
+                  SalesCard(
+                    imagePath: "assets/images/sales.png",
+                    label: "Total Sales",
+                    value: controller.totalSales.value.toInt(),
                   ),
-                  StreamBuilder<double>(
-                    stream: controller.getIntakeStream(user.uid, startOfDay, endOfDay),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        controller.totalIntake.value = snapshot.data!;
-                        return SalesCard(
-                          imagePath: "assets/images/sales1111.png",
-                          label: "Total Income",
-                          value: snapshot.data!.toInt(),
-                        );
-                      }
-                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
-                    },
+                  const SizedBox(width: 0),
+                  SalesCard(
+                    imagePath: "assets/images/sales1111.png",
+                    label: "Total Intake",
+                    value: controller.totalIntake.value.toInt(),
                   ),
-                  StreamBuilder<double>(
-                    stream: controller.getExpenseStream(user.uid, startOfDay, endOfDay),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        controller.totalExpense.value = snapshot.data!;
-                        controller.totalProfit.value = controller.totalSales.value -
-                            (controller.totalIntake.value + controller.totalExpense.value);
-                        return SalesCard(
-                          imagePath: "assets/images/earning.png",
-                          label: "Total Profit",
-                          value: controller.totalProfit.value.toInt(),
-                        );
-                      }
-                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
-                    },
+                  const SizedBox(width: 0),
+                  SalesCard(
+                    imagePath: "assets/images/earning.png",
+                    label: "Total Profit",
+                    value: controller.totalProfit.value.toInt(),
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
 
-
+              // Payment Breakdown Row
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text("Cash Sales", style: AppTextStyles.description),
+                          Text(
+                            controller.formatCurrency(controller.cashSales.value),
+                            style: AppTextStyles.heading.copyWith(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text("Online Sales", style: AppTextStyles.description),
+                          Text(
+                            controller.formatCurrency(controller.onlineSales.value),
+                            style: AppTextStyles.heading.copyWith(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
 
               // Earnings Cards Row
@@ -128,24 +159,25 @@ class OwnerDashboard extends StatelessWidget {
                 children: [
                   Flexible(
                     child: EarningsCard(
-                      income: controller.totalIntake.value,
-                      profit: controller.totalProfit.value,
-                      imagePath: "assets/images/earnings.jpeg",
+                      income: controller.cashSales.value,
+                      profit: controller.cashProfit.value,
+                      imagePath: "assets/images/cash_earning.png",
                       onSeeAll: () {},
+                      label: "Cash Earnings",
                     ),
                   ),
                   const SizedBox(width: 12),
                   Flexible(
                     child: EarningsCard(
-                      income: controller.totalIntake.value,
-                      profit: controller.totalProfit.value,
-                      imagePath: "assets/images/earnings.jpeg",
+                      income: controller.onlineSales.value,
+                      profit: controller.onlineProfit.value,
+                      imagePath: "assets/images/online_earning.png",
                       onSeeAll: () {},
+                      label: "Online Earnings",
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
 
               // Quick Actions Section

@@ -17,6 +17,8 @@ class ReportsController extends GetxController {
   var cashProfit = 0.0.obs;
   var onlineProfit = 0.0.obs;
   var selectedDate = DateTime.now().obs;
+  var cashSales = 0.0.obs;
+  var onlineSales = 0.0.obs;
 
   @override
   void onInit() {
@@ -54,8 +56,18 @@ class ReportsController extends GetxController {
 
       // Calculate profits
       profitAmount.value = salesAmount.value - (intakeAmount.value + expenseAmount.value);
-      cashProfit.value = profitAmount.value * 0.7; // 70% cash (example)
-      onlineProfit.value = profitAmount.value * 0.3; // 30% online (example)
+
+      // Calculate cash and online profits based on actual sales distribution
+      if (salesAmount.value > 0) {
+        final cashRatio = cashSales.value / salesAmount.value;
+        final onlineRatio = onlineSales.value / salesAmount.value;
+
+        cashProfit.value = profitAmount.value * cashRatio;
+        onlineProfit.value = profitAmount.value * onlineRatio;
+      } else {
+        cashProfit.value = 0.0;
+        onlineProfit.value = 0.0;
+      }
 
     } catch (e) {
       CustomSnackbar.show(
@@ -77,9 +89,25 @@ class ReportsController extends GetxController {
         .where('createdAt', isLessThanOrEqualTo: end)
         .get();
 
-    salesAmount.value = querySnapshot.docs.fold(0.0, (sum, doc) {
-      return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
-    });
+    double cashTotal = 0.0;
+    double onlineTotal = 0.0;
+    double total = 0.0;
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data();
+      final amount = (data['totalAmount'] ?? 0).toDouble();
+      total += amount;
+
+      if (data['paymentType'] == 'Cash') {
+        cashTotal += amount;
+      } else if (data['paymentType'] == 'Online') {
+        onlineTotal += amount;
+      }
+    }
+
+    cashSales.value = cashTotal;
+    onlineSales.value = onlineTotal;
+    salesAmount.value = total;
   }
 
   Future<void> _fetchIntakeTotal(String userId, DateTime start, DateTime end) async {

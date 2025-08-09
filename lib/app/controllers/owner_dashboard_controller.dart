@@ -15,13 +15,15 @@ class DashboardController extends GetxController {
   var totalIntake = 0.0.obs;
   var totalExpense = 0.0.obs;
   var totalProfit = 0.0.obs;
+  var cashSales = 0.0.obs;
+  var onlineSales = 0.0.obs;
+  var cashProfit = 0.0.obs;
+  var onlineProfit = 0.0.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Initialize with current date data
     fetchDashboardData();
-    // Set up listener for date changes
     ever(selectedDate, (_) => fetchDashboardData());
   }
 
@@ -38,9 +40,25 @@ class DashboardController extends GetxController {
         .where('createdAt', isLessThanOrEqualTo: end)
         .snapshots()
         .map((querySnapshot) {
-      return querySnapshot.docs.fold(0.0, (sum, doc) {
-        return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
-      });
+      double cashTotal = 0.0;
+      double onlineTotal = 0.0;
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+        final amount = (data['totalAmount'] ?? 0).toDouble();
+        if (data['paymentType'] == 'Cash') {
+          cashTotal += amount;
+        } else {
+          onlineTotal += amount;
+        }
+      }
+
+      cashSales.value = cashTotal;
+      onlineSales.value = onlineTotal;
+      final total = cashTotal + onlineTotal;
+      totalSales.value = total;
+      _calculateRealProfits(); // Update profits when sales data changes
+      return total;
     });
   }
 
@@ -53,9 +71,12 @@ class DashboardController extends GetxController {
         .where('createdAt', isLessThanOrEqualTo: end)
         .snapshots()
         .map((querySnapshot) {
-      return querySnapshot.docs.fold(0.0, (sum, doc) {
+      final total = querySnapshot.docs.fold(0.0, (sum, doc) {
         return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
       });
+      totalIntake.value = total;
+      _calculateRealProfits(); // Update profits when intake data changes
+      return total;
     });
   }
 
@@ -68,9 +89,12 @@ class DashboardController extends GetxController {
         .where('createdAt', isLessThanOrEqualTo: end)
         .snapshots()
         .map((querySnapshot) {
-      return querySnapshot.docs.fold(0.0, (sum, doc) {
+      final total = querySnapshot.docs.fold(0.0, (sum, doc) {
         return sum + (doc.data()['amount'] ?? 0).toDouble();
       });
+      totalExpense.value = total;
+      _calculateRealProfits(); // Update profits when expense data changes
+      return total;
     });
   }
 
@@ -89,15 +113,13 @@ class DashboardController extends GetxController {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-      // Fetch initial data
       await Future.wait([
         _fetchSalesData(userId, startOfDay, endOfDay),
         _fetchIntakeData(userId, startOfDay, endOfDay),
         _fetchExpenseData(userId, startOfDay, endOfDay),
       ]);
 
-      // Calculate profit
-      totalProfit.value = totalSales.value - (totalIntake.value + totalExpense.value);
+      _calculateRealProfits();
 
     } catch (e) {
       CustomSnackbar.show(
@@ -110,6 +132,23 @@ class DashboardController extends GetxController {
     }
   }
 
+  void _calculateRealProfits() {
+    // Calculate total profit (Sales - (Intake + Expenses))
+    totalProfit.value = totalSales.value - (totalIntake.value + totalExpense.value);
+
+    // Calculate payment type specific profits based on actual sales distribution
+    if (totalSales.value > 0) {
+      final cashRatio = cashSales.value / totalSales.value;
+      final onlineRatio = onlineSales.value / totalSales.value;
+
+      cashProfit.value = totalProfit.value * cashRatio;
+      onlineProfit.value = totalProfit.value * onlineRatio;
+    } else {
+      cashProfit.value = 0.0;
+      onlineProfit.value = 0.0;
+    }
+  }
+
   Future<void> _fetchSalesData(String userId, DateTime start, DateTime end) async {
     final querySnapshot = await _firestore
         .collection('users')
@@ -119,9 +158,23 @@ class DashboardController extends GetxController {
         .where('createdAt', isLessThanOrEqualTo: end)
         .get();
 
-    totalSales.value = querySnapshot.docs.fold(0.0, (sum, doc) {
-      return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
-    });
+    double cashTotal = 0.0;
+    double onlineTotal = 0.0;
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data();
+      final amount = (data['totalAmount'] ?? 0).toDouble();
+      if (data['paymentType'] == 'Cash') {
+        cashTotal += amount;
+      } else if (data['paymentType'] == 'Online') {
+        onlineTotal += amount;
+      }
+      // Default case: if paymentType is missing, it's not counted
+    }
+
+    cashSales.value = cashTotal;
+    onlineSales.value = onlineTotal;
+    totalSales.value = cashTotal + onlineTotal;
   }
 
   Future<void> _fetchIntakeData(String userId, DateTime start, DateTime end) async {
@@ -152,7 +205,6 @@ class DashboardController extends GetxController {
     });
   }
 
-  // Format currency with Indian Rupee symbol
   String formatCurrency(double amount) {
     return '₹${amount.toStringAsFixed(2)}';
   }

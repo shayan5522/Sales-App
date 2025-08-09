@@ -3,6 +3,7 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 
 class EarningsCard extends StatelessWidget {
+  final String label; // ✅ Added label
   final double income;
   final double profit;
   final String imagePath;
@@ -10,6 +11,7 @@ class EarningsCard extends StatelessWidget {
 
   const EarningsCard({
     super.key,
+    required this.label, // ✅ Required label
     required this.income,
     required this.profit,
     required this.imagePath,
@@ -20,7 +22,7 @@ class EarningsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final double padding = screenWidth * 0.04;
-    final double imageSize = screenWidth * 0.22;
+    final double imageSize = screenWidth * 0.28;
 
     return Container(
       width: double.infinity,
@@ -29,12 +31,19 @@ class EarningsCard extends StatelessWidget {
         color: AppColors.secondary,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Card Label
+          Text(
+            label,
+            style: AppTextStyles.heading.copyWith(fontSize: 16),
+          ),
+          const SizedBox(height: 0),
+
           // Icon/Image
           Center(
             child: Image.asset(
@@ -44,15 +53,15 @@ class EarningsCard extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 5),
 
           // Income
-          _buildEarningRow(label: 'Total Income online', amount: income),
-          const SizedBox(height: 10),
+          _buildEarningRow(label: 'Total Income', amount: income),
+          const SizedBox(height: 5),
 
           // Profit
-          _buildEarningRow(label: 'Total Profit online', amount: profit),
-          const SizedBox(height: 16),
+          _buildEarningRow(label: 'Total Profit', amount: profit),
+          const SizedBox(height: 10),
 
           // See all
           Center(
@@ -92,7 +101,10 @@ class EarningsCard extends StatelessWidget {
               color: AppColors.primary,
               size: 18,
             ),
-            Text(amount.toString(), style: AppTextStyles.subtitle),
+            Text(
+              amount.toStringAsFixed(2),
+              style: AppTextStyles.subtitle,
+            ),
           ],
         ),
       ],
