@@ -10,7 +10,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Color backgroundColor;
   final Color foregroundcolor;
   final TabBar? bottom;
-  final bool? automaticallyImplyLeading ;
+  final bool showBackButton; // new property
 
   // Define height as a class variable
   final double height;
@@ -25,8 +25,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor = AppColors.primary,
     this.foregroundcolor = Colors.white,
     this.bottom,
-    this.automaticallyImplyLeading,
-
+    this.showBackButton = true, // default: back button visible
   })  : height = 56.0,
         tabBarHeight = bottom != null ? 48.0 : 0.0;
 
@@ -38,16 +37,20 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
         style: AppTextStyles.subheading.copyWith(color: Colors.white),
       ),
       centerTitle: centerTitle,
-      leading: IconButton(icon: const Icon(Icons.arrow_back,color: Colors.white,),
-        onPressed: (){Navigator.pop(context);},
-      ),
+      leading: showBackButton
+          ? (leading ??
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ))
+          : null,
       actions: actions,
       backgroundColor: backgroundColor,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: showBackButton,
       bottom: bottom,
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(height);
+  Size get preferredSize => Size.fromHeight(height + tabBarHeight);
 }

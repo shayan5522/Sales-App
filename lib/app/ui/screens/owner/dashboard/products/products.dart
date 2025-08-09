@@ -134,7 +134,10 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Products'),
+      appBar: CustomAppbar(
+          title: 'Products',
+        showBackButton: false,
+      ),
       backgroundColor: AppColors.backgroundColor,
       floatingActionButton: SecondaryButton(
         text: "Add Product",

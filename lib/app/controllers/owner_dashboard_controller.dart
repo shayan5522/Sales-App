@@ -1,13 +1,12 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 
 import '../ui/widgets/custom_snackbar.dart';
 
 class DashboardController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   // Reactive variables
   var isLoading = false.obs;
@@ -20,19 +19,66 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Initialize with current date data
     fetchDashboardData();
+    // Set up listener for date changes
+    ever(selectedDate, (_) => fetchDashboardData());
   }
 
   void updateSelectedDate(DateTime newDate) {
     selectedDate.value = newDate;
-    fetchDashboardData();
+  }
+
+  Stream<double> getSalesStream(String userId, DateTime start, DateTime end) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('sales')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.fold(0.0, (sum, doc) {
+        return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
+      });
+    });
+  }
+
+  Stream<double> getIntakeStream(String userId, DateTime start, DateTime end) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('intakes')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.fold(0.0, (sum, doc) {
+        return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
+      });
+    });
+  }
+
+  Stream<double> getExpenseStream(String userId, DateTime start, DateTime end) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('expenses')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.fold(0.0, (sum, doc) {
+        return sum + (doc.data()['amount'] ?? 0).toDouble();
+      });
+    });
   }
 
   Future<void> fetchDashboardData() async {
     try {
       isLoading(true);
 
-      final user = _auth.currentUser;
+      final user = auth.currentUser;
       if (user == null) {
         CustomSnackbar.show(title: 'Error', message: 'User not authenticated');
         return;
@@ -43,18 +89,22 @@ class DashboardController extends GetxController {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-      // Fetch all data in parallel
+      // Fetch initial data
       await Future.wait([
         _fetchSalesData(userId, startOfDay, endOfDay),
         _fetchIntakeData(userId, startOfDay, endOfDay),
         _fetchExpenseData(userId, startOfDay, endOfDay),
       ]);
 
-      // Correct profit calculation
+      // Calculate profit
       totalProfit.value = totalSales.value - (totalIntake.value + totalExpense.value);
 
     } catch (e) {
-      CustomSnackbar.show(title: 'Error', message: 'Failed to fetch dashboard data: ${e.toString()}', isError: true);
+      CustomSnackbar.show(
+          title: 'Error',
+          message: 'Failed to fetch dashboard data: ${e.toString()}',
+          isError: true
+      );
     } finally {
       isLoading(false);
     }

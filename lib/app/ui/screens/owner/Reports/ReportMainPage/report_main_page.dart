@@ -26,6 +26,8 @@ class ReportsMainPage extends StatelessWidget {
       appBar: const CustomAppbar(
         title: 'Reports',
         centerTitle: true,
+        showBackButton: false,
+        leading: null,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

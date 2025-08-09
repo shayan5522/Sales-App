@@ -26,8 +26,11 @@ class OwnerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
     final controller = Get.find<DashboardController>();
+    final user = controller.auth.currentUser;
+    final date = controller.selectedDate.value;
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F9),
@@ -39,6 +42,10 @@ class OwnerDashboard extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
+        }
+
+        if (user == null) {
+          return const Center(child: Text("User not authenticated"));
         }
 
         return SingleChildScrollView(
@@ -62,35 +69,57 @@ class OwnerDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Sales Cards Grid
+              // Sales Cards Grid with StreamBuilders
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/sales.png",
-                      label: "Total Sales",
-                      value: controller.totalSales.value.toInt(),
-                    ),
+                  StreamBuilder<double>(
+                    stream: controller.getSalesStream(user.uid, startOfDay, endOfDay),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        controller.totalSales.value = snapshot.data!;
+                        return SalesCard(
+                          imagePath: "assets/images/sales.png",
+                          label: "Total Sales",
+                          value: snapshot.data!.toInt(),
+                        );
+                      }
+                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
+                    },
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/sales1111.png",
-                      label: "Total Income",
-                      value: controller.totalIntake.value.toInt(),
-                    ),
+                  StreamBuilder<double>(
+                    stream: controller.getIntakeStream(user.uid, startOfDay, endOfDay),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        controller.totalIntake.value = snapshot.data!;
+                        return SalesCard(
+                          imagePath: "assets/images/sales1111.png",
+                          label: "Total Income",
+                          value: snapshot.data!.toInt(),
+                        );
+                      }
+                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
+                    },
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/earning.png",
-                      label: "Total Profit",
-                      value: controller.totalProfit.value.toInt(),
-                    ),
+                  StreamBuilder<double>(
+                    stream: controller.getExpenseStream(user.uid, startOfDay, endOfDay),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        controller.totalExpense.value = snapshot.data!;
+                        controller.totalProfit.value = controller.totalSales.value -
+                            (controller.totalIntake.value + controller.totalExpense.value);
+                        return SalesCard(
+                          imagePath: "assets/images/earning.png",
+                          label: "Total Profit",
+                          value: controller.totalProfit.value.toInt(),
+                        );
+                      }
+                      return const SizedBox(width: 100, height: 100, child: CircularProgressIndicator());
+                    },
                   ),
                 ],
               ),
+
 
               const SizedBox(height: 16),
 
@@ -108,8 +137,8 @@ class OwnerDashboard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Flexible(
                     child: EarningsCard(
-                      income: controller.totalIntake.value , // Example cash income
-                      profit: controller.totalProfit.value , // Example cash profit
+                      income: controller.totalIntake.value,
+                      profit: controller.totalProfit.value,
                       imagePath: "assets/images/earnings.jpeg",
                       onSeeAll: () {},
                     ),
@@ -168,12 +197,12 @@ class OwnerDashboard extends StatelessWidget {
                         {
                           "label": "Add Expense Category",
                           "icon": "assets/images/products.png",
-                          "screen":  AddCategoryPage(),
+                          "screen": AddCategoryPage(),
                         },
                         {
                           "label": "Credit & amount due",
                           "icon": "assets/images/products.png",
-                          "screen":  AmountCreditScreen(),
+                          "screen": AmountCreditScreen(),
                         },
                       ];
                       final item = items[index];
@@ -195,7 +224,7 @@ class OwnerDashboard extends StatelessWidget {
               GradientActionCard(
                 label: "Generate Report",
                 iconPath: "assets/images/earning.png",
-                onTap: () => Get.to(() =>  ReportsMainPage()),
+                onTap: () => Get.to(() => ReportsMainPage()),
               ),
               const SizedBox(height: 30),
             ],
