@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/transaction_view_controller.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expensecard.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
@@ -11,107 +14,157 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import '../../../widgets/Amountcard.dart';
 import '../../../widgets/buttons.dart';
 
-class CreditDebitPage extends StatelessWidget {
+class CreditDebitPage extends StatefulWidget {
   const CreditDebitPage({super.key});
+
+  @override
+  State<CreditDebitPage> createState() => _CreditDebitPageState();
+}
+
+class _CreditDebitPageState extends State<CreditDebitPage> {
+  final controller = Get.put(TransactionViewController());
+
+  DateTime? _fromDate;
+  DateTime? _toDate;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchTransactions();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppbar(title: 'Credit & Debit Report'),
-      backgroundColor: const Color(0xFFD8EAED),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// 🔹 DATE PICKERS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: CustomDatePicker(
-                    label: "From Date",
-                    onDateSelected: (_) {},
-                    initialDate: DateTime.now(),
+      backgroundColor: AppColors.backgroundColor,
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
+        }
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              /// 🔹 DATE PICKERS
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomDatePicker(
+                      label: "From Date",
+                      initialDate: _fromDate ?? DateTime.now(),
+                      onDateSelected: (date) {
+                        setState(() => _fromDate = date);
+                        controller.filterByDateRange(from: _fromDate,
+                            to: _toDate);
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: CustomDatePicker(
-                    label: "To Date",
-                    onDateSelected: (_) {},
-                    initialDate: DateTime.now(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomDatePicker(
+                      label: "To Date",
+                      initialDate: _toDate ?? DateTime.now(),
+                      onDateSelected: (date) {
+                        setState(() => _toDate = date);
+                        controller.filterByDateRange(from: _fromDate,
+                            to: _toDate);
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            /// 🔹 CREDIT + TOTAL VALUE CARDS
-            Row(
-              children: const [
-                Expanded(
-                  child: CenteredAmountCard(title: "Credit Amount", subtitle: "5500pcs"),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: CenteredAmountCard(title: "Total Value", subtitle: "INR. 10,200"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            /// 🔹 ACTION BUTTONS BELOW CREDIT/TOTAL CARDS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Credited Only',
-                    onPressed: () {
-                      // TODO: Implement download functionality
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Debited Only',
-                    onPressed: () {
-                      // TODO: Implement share functionality
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            /// 🔹 TRANSACTION SECTION HEADER Rizu G
-            const Text(
-              "Transactions:",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            /// 🔹 EXPENSE LIST (DETAILED)
-            const CustomExpenseListTile(
-              title: 'Fuel Charges',
-              description: 'Vehicle refueling',
-              price: 2200,
-            ),
-            const CustomExpenseListTile(
-              title: 'Tea & Coffee',
-              description: 'Team break beverages',
-              price: 1300,
-            ),
-            const CustomExpenseListTile(
-              title: 'Team Dinner',
-              description: 'Monthly meetup expense',
-              price: 2000,
-            ),
-          ],
-        ),
+              const SizedBox(height: 16),
+
+              /// 🔹 CREDIT + TOTAL VALUE CARDS
+              Row(
+                children: [
+                  Expanded(
+                    child: CenteredAmountCard(
+                      title: "Credit Amount",
+                      subtitle: "INR ${controller.totalCredit.value
+                          .toStringAsFixed(0)}",
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CenteredAmountCard(
+                      title: "Total Value",
+                      subtitle: "INR ${(controller.totalCredit.value +
+                          controller.totalDebit.value).toStringAsFixed(0)}",
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              /// 🔹 FILTER BUTTONS
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      text: 'Credited Only',
+                      onPressed: () =>
+                          controller.filterTransactions(type: 'credit'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SecondaryButton(
+                      text: 'Debited Only',
+                      onPressed: () =>
+                          controller.filterTransactions(type: 'debit'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              /// 🔹 RESET FILTER
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _fromDate = null;
+                      _toDate = null;
+                    });
+                    controller.fromDate = null;
+                    controller.toDate = null;
+                    controller.filterTransactions(); // Show all
+                  },
+                  child: const Text('Show All'),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              /// 🔹 TRANSACTIONS
+              const Text(
+                "Transactions:",
+                style: TextStyle(fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary),
+              ),
+              const SizedBox(height: 12),
+
+              if (controller.filteredTransactions.isEmpty)
+                const Text("No transactions found."),
+              ...controller.filteredTransactions.map((tx) {
+                return CustomExpenseListTile(
+                  title: tx['name'],
+                  description: tx['detail'],
+                  price: (tx['price'] as double).toInt(),
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      }
       ),
     );
   }
 }
+
+

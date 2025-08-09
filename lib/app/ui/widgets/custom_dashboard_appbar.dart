@@ -4,11 +4,13 @@ import 'package:salesapp/app/themes/colors.dart';
 class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String logoPath;
+  final VoidCallback? onProfileTap; // Add this to handle the tap action
 
   const CustomDashboardAppBar({
     super.key,
     required this.title,
     required this.logoPath,
+    this.onProfileTap,
   });
 
   @override
@@ -40,6 +42,13 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          onPressed: onProfileTap ?? () {},
+          icon: const Icon(Icons.account_circle, size: 28,color: Colors.white,),
+        ),
+        const SizedBox(width: 8), // Optional spacing at end
+      ],
     );
   }
 }

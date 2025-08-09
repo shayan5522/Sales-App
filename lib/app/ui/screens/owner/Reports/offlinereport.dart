@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
@@ -167,7 +169,7 @@ class _OnlineReportScreenState extends State<OfflineReport> {
                           final item = transactions[index];
                           return TransactionTextRow(
                             product: item['product'] as String,
-                            amount: item['amount'] as int,
+                            amount: item['amount'],
                           );
                         },
                       ),

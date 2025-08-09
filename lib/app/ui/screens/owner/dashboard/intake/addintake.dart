@@ -1,51 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/grid_container.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
+import 'package:get/get.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/intake/IntakeController.dart';
+import '../../../../../themes/colors.dart';
+import '../../../../widgets/appbar.dart';
+import '../../../../widgets/buttons.dart';
+import '../../../../widgets/grid_container.dart';
+import '../../../../widgets/transactionlist.dart';
+import '../products/productController.dart';
 
 class AddIntake extends StatefulWidget {
   const AddIntake({super.key});
 
   @override
-  State<AddIntake> createState() => _IntakeState();
+  State<AddIntake> createState() => _AddIntakeState();
 }
 
-class _IntakeState extends State<AddIntake> {
-  final List<Map<String, dynamic>> products = List.generate(10, (index) {
-    return {
-      'title': 'Product $index',
-      'imagePath': 'assets/images/Apple.jpg',
-      'price': (index + 1) * 100,
-    };
-  });
-
+class _AddIntakeState extends State<AddIntake> {
+  final ProductController controller = Get.put(ProductController());
+  final IntakeController intakeController = Get.put(IntakeController());
   List<Map<String, dynamic>> cart = [];
 
-  void _showProductPopover(BuildContext context, Map<String, dynamic> product) {
-    showModalBottomSheet(
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchProducts();
+  }
+
+  void _openIntakeDialog(Map<String, dynamic> product) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      barrierDismissible: true,
       builder: (context) {
-        return Intakepopover(
-          cart: cart,
-          product: product,
-          onAddProduct: (newProduct) {
-            setState(() {
-              int existingIndex = cart.indexWhere(
-                (item) => item['title'] == newProduct['title'],
-              );
-              if (existingIndex != -1) {
-                cart[existingIndex]['quantity'] += newProduct['quantity'];
-              } else {
-                cart.add(newProduct);
-              }
-            });
-          },
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+              maxWidth: MediaQuery.of(context).size.width * 0.95,
+            ),
+            child: Intakepopover(
+              cart: cart,
+              product: product,
+              onAddProduct: (newProduct) {
+                setState(() {
+                  final existingIndex = cart.indexWhere((item) =>
+                  item['title'] == newProduct['title'] &&
+                      item['price'] == newProduct['price']
+                  );
+                  if (existingIndex == -1) {
+                    cart.add(newProduct);
+                  } else {
+                    cart[existingIndex]['quantity'] += newProduct['quantity'];
+                  }
+                });
+              },
+              onSaveIntake: () async {
+                final cartCopy = List<Map<String, dynamic>>.from(cart);
+                await intakeController.saveIntake(cartCopy);
+                setState(() {
+                  cart.clear();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
         );
       },
     );
@@ -62,45 +84,42 @@ class _IntakeState extends State<AddIntake> {
             final double screenWidth = constraints.maxWidth;
             final int crossAxisCount = screenWidth ~/ 160;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Add Intake',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+            return Obx(() {
+              if (controller.isLoading.value) {
+                return  Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(height: 16), // Space between text and grid
-                  GridView.builder(
-                    itemCount: products.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount.clamp(1, 6),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.9,
-                    ),
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return GestureDetector(
-                        onTap: () => _showProductPopover(context, product),
-                        child: GridCard(
-                          title: product['title'],
-                          imagePath: product['imagePath'],
-                          price: product['price'],
-                        ),
-                      );
-                    },
+                );
+              }
+              final products = controller.products;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: GridView.builder(
+                  itemCount: products.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount.clamp(1, 6),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
                   ),
-                ],
-              ),
-            );
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return GestureDetector(
+                      onTap: () => _openIntakeDialog(product),
+                      child: GridCard(
+                        title: product['title'],
+                        imagePath: product['imagePath'],
+                        price: product['price'],
+                      ),
+                    );
+                  },
+                ),
+              );
+            });
           },
         ),
       ),
@@ -108,16 +127,19 @@ class _IntakeState extends State<AddIntake> {
   }
 }
 
+
 class Intakepopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;
   final Map<String, dynamic> product;
   final Function(Map<String, dynamic> newProduct) onAddProduct;
+  final Future<void> Function() onSaveIntake;
 
   const Intakepopover({
     super.key,
     required this.cart,
     required this.product,
     required this.onAddProduct,
+    required this.onSaveIntake,
   });
 
   @override
@@ -126,17 +148,32 @@ class Intakepopover extends StatefulWidget {
 
 class _IntakePopoverState extends State<Intakepopover> {
   int quantity = 1;
+  final TextEditingController _priceController = TextEditingController();
+  double originalPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    originalPrice = widget.product['price'].toDouble();
+    _priceController.text = originalPrice.toStringAsFixed(2);
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    double price = widget.product['price'].toDouble();
+    double currentPrice = double.tryParse(_priceController.text) ?? originalPrice;
+    int currentProductTotal = (quantity * currentPrice).toInt();
 
-    // Calculate totals
     int cartTotal = widget.cart.fold<int>(
       0,
-      (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
+          (sum, item) => (sum + (item['price'] * (item['quantity'] ?? 1))).toInt(),
     );
-    int currentProductTotal = (quantity * price).toInt();
+
     int grandTotal = cartTotal + currentProductTotal;
 
     return Padding(
@@ -149,22 +186,18 @@ class _IntakePopoverState extends State<Intakepopover> {
             Container(
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ), // Change 16 to your desired radius
+                borderRadius: BorderRadius.circular(16),
               ),
               child: CustomAppbar(
-                title: 'Add Intake',
-                backgroundColor:
-                    Colors.transparent, // So the Container's color shows
+                title: 'Add Sales',
+                backgroundColor: Colors.transparent,
               ),
             ),
             const SizedBox(height: 12),
 
-            // Cart items
             if (widget.cart.isNotEmpty)
               ...widget.cart.map(
-                (item) => Container(
+                    (item) => Container(
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -175,22 +208,23 @@ class _IntakePopoverState extends State<Intakepopover> {
                     children: [
                       Image.asset(item['imagePath'], width: 40, height: 40),
                       const SizedBox(width: 10),
-                      Text(
-                        item['title'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          item['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 10),
                       Text('x${item['quantity']}'),
                       const SizedBox(width: 10),
                       Text(
-                        'Rs. ${(item['price'] * item['quantity']).toString()}',
+                        '₹${(item['price'] * item['quantity']).toStringAsFixed(2)}',
                       ),
                     ],
                   ),
                 ),
               ),
 
-            // Current product
             Container(
               margin: const EdgeInsets.symmetric(vertical: 6),
               padding: const EdgeInsets.all(10),
@@ -198,61 +232,103 @@ class _IntakePopoverState extends State<Intakepopover> {
                 border: Border.all(color: AppColors.primary),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Image.asset(
-                    widget.product['imagePath'],
-                    width: 40,
-                    height: 40,
+                  Row(
+                    children: [
+                      Image.asset(
+                        widget.product['imagePath'],
+                        width: 40,
+                        height: 40,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          widget.product['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    widget.product['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Spacer(),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 18),
-                          onPressed: () {
-                            if (quantity > 1) {
-                              setState(() {
-                                quantity--;
-                              });
-                            }
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _priceController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Price',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            prefixText: '₹',
+                          ),
+                          onChanged: (value) {
+                            setState(() {});
                           },
                         ),
-                        Text('$quantity', style: const TextStyle(fontSize: 16)),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 18),
-                          onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
-                          },
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade400),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove, size: 18),
+                              onPressed: () {
+                                if (quantity > 1) {
+                                  setState(() => quantity--);
+                                }
+                              },
+                            ),
+                            Text('$quantity', style: const TextStyle(fontSize: 16)),
+                            IconButton(
+                              icon: const Icon(Icons.add, size: 18),
+                              onPressed: () => setState(() => quantity++),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Original: ₹${originalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        'Total: ₹${(currentPrice * quantity).toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 18),
 
-            // Total Amount Box
-            TransactionTextRow(product: 'Total Amount', amount: grandTotal),
+            TransactionTextRow(
+              product: 'Total Amount',
+              amount: grandTotal.toDouble(),
+            ),
             const SizedBox(height: 16),
 
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Total:  ₹$grandTotal',
+                'Grand Total: ₹${grandTotal.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -261,7 +337,6 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 16),
 
-            // Add Product Button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -279,6 +354,8 @@ class _IntakePopoverState extends State<Intakepopover> {
                       widget.onAddProduct({
                         ...widget.product,
                         'quantity': quantity,
+                        'price': currentPrice,
+                        'originalPrice': originalPrice,
                       });
                       Navigator.pop(context);
                     },
@@ -292,14 +369,19 @@ class _IntakePopoverState extends State<Intakepopover> {
             ),
             const SizedBox(height: 18),
 
-            // Save & Close Buttons
             Row(
               children: [
                 Expanded(
                   child: SecondaryButton(
                     text: 'Save',
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      widget.onAddProduct({
+                        ...widget.product,
+                        'quantity': quantity,
+                        'price': currentPrice,
+                        'originalPrice': originalPrice,
+                      });
+                      await widget.onSaveIntake();
                     },
                     borderRadius: 8.0,
                     heightFactor: 0.07,

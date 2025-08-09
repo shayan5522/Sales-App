@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:salesapp/app/controllers/owner/owner_invite_controller.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
@@ -8,9 +9,10 @@ import 'package:salesapp/app/ui/widgets/buttons.dart';
 import '../../../../controllers/auth/logout_helper.dart';
 import '../../../widgets/logout_dialog.dart';
 
-
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  SettingsScreen({super.key});
+
+  final OwnerInviteController inviteController = Get.put(OwnerInviteController());
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Invite Labour Card
+            /// 🔹 Labour Invite Card
             Container(
               width: double.infinity,
               margin: EdgeInsets.only(bottom: screenHeight * 0.02),
@@ -43,59 +45,88 @@ class SettingsScreen extends StatelessWidget {
                 color: AppColors.secondary,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Invite Labour with Shop Code',
-                    style: AppTextStyles.title.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.045,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.012),
-                  Text(
-                    'Your Code:',
-                    style: AppTextStyles.subtitle.copyWith(
-                      fontSize: screenWidth * 0.038,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.004),
-                  Text(
-                    '123456',
-                    style: AppTextStyles.title.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.05,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.035),
-                  SizedBox(
-                    width: double.infinity,
-                    height: screenHeight * 0.06,
-                    child: PrimaryButton(
-                      text: 'Copy Code',
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Code copied!')),
-                        );
-                      },
-                      widthFactor: 1.0,
-                      heightFactor: 0.055,
-                      borderRadius: 8,
-                      textStyle: AppTextStyles.title.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: screenWidth * 0.042,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.01),
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: inviteController.inviteStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-            // Subscription Info Card
+                  if (snapshot.hasError) {
+                    return const Text("Something went wrong");
+                  }
+
+                  final codes = snapshot.data ?? [];
+
+                  if (codes.isEmpty) {
+                    return const Text("No invite codes found");
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Labour Invite Codes',
+                        style: AppTextStyles.title.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.045,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...codes.map((codeData) {
+                        final code = codeData['code'];
+                        final used = codeData['used'] == true;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: used ? Colors.grey[300] : Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.primary, width: 1),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    code ?? 'Unknown',
+                                    style: AppTextStyles.title.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.042,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    used ? 'Used' : 'Not Used',
+                                    style: AppTextStyles.subtitle.copyWith(
+                                      color: used ? Colors.red : Colors.green,
+                                      fontSize: screenWidth * 0.035,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: code));
+                                  Get.snackbar("Copied", "Invite code copied!");
+                                },
+                              )
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                },
+              ),
+
+            ),
+
+            /// 🔹 Subscription Info Card
             Container(
               width: double.infinity,
               margin: EdgeInsets.only(bottom: screenHeight * 0.04),
@@ -129,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
 
-            // Logout Button (same UI, new logic)
+            /// 🔹 Logout Button
             SizedBox(height: screenHeight * 0.09),
             PrimaryButton(
               text: 'Logout',

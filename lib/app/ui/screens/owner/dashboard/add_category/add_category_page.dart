@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 
+import 'categoryController.dart'; // path may vary
+
 class AddCategoryPage extends StatelessWidget {
   AddCategoryPage({super.key});
-  final TextEditingController _categoryController = TextEditingController();
+  final AddCategoryController controller = Get.put(AddCategoryController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppbar(title: "Add Category"),
+      appBar: const CustomAppbar(title: "Add Expense Category"),
       backgroundColor: const Color(0xFFEFEFF1),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -30,34 +34,21 @@ class AddCategoryPage extends StatelessWidget {
             /// 🔹 Category Text Field
             CustomTextField(
               hintText: "Enter Category name",
-              controller: _categoryController,
+              controller: controller.categoryNameController,
               borderColor: AppColors.primary,
               fillColor: Colors.white,
             ),
             const SizedBox(height: 24),
 
             /// 🔹 Save Button
-            PrimaryButton(
-              text: "Save",
-              onPressed: () {
-                final name = _categoryController.text.trim();
-                if (name.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Please enter category name")),
-                  );
-                  return;
-                }
-
-                // 🔽 TODO: Save logic
-                debugPrint("Saving category: $name");
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Category '$name' saved")),
-                );
-
-                _categoryController.clear();
-              },
-            ),
+            Obx(() {
+              return PrimaryButton(
+                text: controller.isLoading.value ? "Saving..." : "Save",
+                onPressed: () => controller.isLoading.value
+                    ? null
+                    : controller.saveCategory(),
+              );
+            }),
           ],
         ),
       ),

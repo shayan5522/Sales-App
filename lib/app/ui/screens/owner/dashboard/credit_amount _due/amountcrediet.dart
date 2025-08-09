@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/credit_amount%20_due/transactionController.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 
 class AmountCreditScreen extends StatefulWidget {
-  const AmountCreditScreen({super.key});
+   AmountCreditScreen({super.key});
+
+
 
   @override
   State<AmountCreditScreen> createState() => _AmountCreditDueScreenState();
 }
 
 class _AmountCreditDueScreenState extends State<AmountCreditScreen> {
+  final TransactionController _transactionController = Get.put(TransactionController());
+  bool isSaving = false;
   bool isCredited = true;
   DateTime? selectedDate = DateTime.now();
 
@@ -199,8 +206,34 @@ class _AmountCreditDueScreenState extends State<AmountCreditScreen> {
             PrimaryButton(
               text: 'Save',
               onPressed: () {
-                // Save logic here
+                final name = _nameController.text.trim();
+                final detail = _detailController.text.trim();
+                final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
+                final date = selectedDate ?? DateTime.now();
+
+                if (name.isEmpty || detail.isEmpty || price <= 0) {
+                  Get.snackbar('Error', 'Please fill all fields correctly.');
+                  return;
+                }
+
+                _transactionController.addTransaction(
+                  name: name,
+                  detail: detail,
+                  price: price,
+                  date: date,
+                  isCredit: isCredited,
+                );
+
+                // Optional: Clear fields after saving
+                _nameController.clear();
+                _detailController.clear();
+                _priceController.clear();
+                setState(() {
+                  selectedDate = DateTime.now();
+                  isCredited = true;
+                });
               },
+
               widthFactor: 1.0,
               heightFactor: 0.065,
               borderRadius: 8,

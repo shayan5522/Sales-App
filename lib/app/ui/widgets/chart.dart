@@ -19,13 +19,13 @@ class ResponsiveBarChart extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           double fullHeight = constraints.maxHeight;
-          double chartHeight = fullHeight - 40; // leave space for bottom labels
+          double chartHeight = fullHeight - 40; // Space for bottom labels
 
           return Padding(
             padding: const EdgeInsets.only(left: 8, right: 8),
             child: Stack(
               children: [
-                // Y-Axis Grid Lines + Labels (Reversed)
+                // Y-Axis Grid Lines + Labels
                 Positioned(
                   top: 0,
                   left: 0,
@@ -34,13 +34,16 @@ class ResponsiveBarChart extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: yAxisSteps.reversed.map((step) {
+                      final label = step >= 1000
+                          ? '${(step / 1000).toStringAsFixed(1)}k'
+                          : step.toStringAsFixed(0);
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
                             width: 30,
                             child: Text(
-                              '${step.toInt()}k',
+                              label,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -73,39 +76,48 @@ class ResponsiveBarChart extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: data.map((bar) {
-                        double barHeight =
-                            (bar.value / maxYValue) * chartHeight;
+                        double barHeight = maxYValue == 0
+                            ? 0
+                            : ((bar.value < 0 ? 0 : bar.value) / maxYValue) *
+                            chartHeight;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                height: barHeight,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(6),
-                                    topRight: Radius.circular(6),
+                          child: SizedBox(
+                            height: chartHeight, // ensure column doesn't overflow
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 500),
+                                  height: barHeight.clamp(0.0, chartHeight - 20), // clamp to prevent overflow
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(6),
+                                      topRight: Radius.circular(6),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              SizedBox(
-                                width: 50,
-                                child: Text(
-                                  bar.label,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                                const SizedBox(height: 4),
+                                SizedBox(
+                                  width: 50,
+                                  height: 16, // limit text height
+                                  child: Text(
+                                    bar.label,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+
                         );
                       }).toList(),
                     ),

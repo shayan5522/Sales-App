@@ -4,7 +4,7 @@ import 'package:salesapp/app/themes/styles.dart';
 
 class TransactionTextRow extends StatelessWidget {
   final String product;
-  final int amount;
+  final double amount;
 
   const TransactionTextRow({
     super.key,

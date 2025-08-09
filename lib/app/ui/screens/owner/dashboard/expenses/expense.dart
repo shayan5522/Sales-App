@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/textfield.dart'; // Import your custom textfield
+import 'package:salesapp/app/ui/widgets/textfield.dart';
+import 'expenseController.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -14,19 +16,7 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedCategory;
-
-  final List<String> _categories = [
-    'Food',
-    'Transport',
-    'Shopping',
-    'Bills',
-    'Other',
-  ];
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _descController = TextEditingController();
+  final ExpenseController controller = Get.put(ExpenseController());
 
   @override
   Widget build(BuildContext context) {
@@ -45,25 +35,23 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(12.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top image
               Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
                   child: Image.asset(
-                    'assets/images/laboursignin.png', // <-- Replace with your asset
+                    'assets/images/laboursignin.png',
                     height: screenHeight * 0.11,
                   ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
 
-              // Expense Name
               Text(
                 'Expense Name *',
                 style: AppTextStyles.title.copyWith(
@@ -74,13 +62,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               SizedBox(height: screenHeight * 0.008),
               CustomTextField(
                 hintText: 'Expense title',
-                controller: _nameController,
+                controller: controller.nameController,
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Required' : null,
+                value == null || value.isEmpty ? 'Required' : null,
               ),
               SizedBox(height: screenHeight * 0.018),
 
-              // Amount
               Text(
                 'Amount *',
                 style: AppTextStyles.title.copyWith(
@@ -91,14 +78,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               SizedBox(height: screenHeight * 0.008),
               CustomTextField(
                 hintText: 'Enter Amount',
-                controller: _amountController,
+                controller: controller.amountController,
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Required' : null,
+                value == null || value.isEmpty ? 'Required' : null,
               ),
               SizedBox(height: screenHeight * 0.018),
 
-              // Category
               Text(
                 'Category *',
                 style: AppTextStyles.title.copyWith(
@@ -107,24 +93,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.008),
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
+              Obx(() => DropdownButtonFormField<String>(
+                value: controller.selectedCategory.value,
                 hint: Text(
                   'Select category',
                   style: TextStyle(fontSize: fieldFontSize * 0.95),
                 ),
-                items: _categories
+                items: controller.categoryList
                     .map(
                       (cat) => DropdownMenuItem(
-                        value: cat,
-                        child: Text(
-                          cat,
-                          style: TextStyle(fontSize: fieldFontSize),
-                        ),
-                      ),
-                    )
+                    value: cat,
+                    child: Text(
+                      cat,
+                      style: TextStyle(fontSize: fieldFontSize),
+                    ),
+                  ),
+                )
                     .toList(),
-                onChanged: (val) => setState(() => _selectedCategory = val),
+                onChanged: (val) =>
+                controller.selectedCategory.value = val,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: screenWidth * 0.04,
@@ -140,14 +127,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.primary, width: 2),
+                    borderSide:
+                    BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
                 validator: (value) => value == null ? 'Required' : null,
-              ),
+              )),
               SizedBox(height: screenHeight * 0.018),
 
-              // Description
               Text(
                 'Description',
                 style: AppTextStyles.title.copyWith(
@@ -158,17 +145,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               SizedBox(height: screenHeight * 0.008),
               CustomTextField(
                 hintText: 'Enter description...',
-                controller: _descController,
+                controller: controller.descController,
                 maxlines: 3,
               ),
               SizedBox(height: screenHeight * 0.03),
 
-              // Save Button (using your custom PrimaryButton)
-              PrimaryButton(
-                text: 'Save Expense',
+              Obx(() => PrimaryButton(
+                text: controller.isLoading.value ? 'Saving...' : 'Save Expense',
                 onPressed: () {
+                  if (controller.isLoading.value) return;
+
                   if (_formKey.currentState!.validate()) {
-                    // Save logic here
+                    controller.saveExpense();
                   }
                 },
                 widthFactor: 1.0,
@@ -179,6 +167,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: fieldFontSize * 1.1,
                 ),
+              ),
               ),
               SizedBox(height: screenHeight * 0.02),
             ],
