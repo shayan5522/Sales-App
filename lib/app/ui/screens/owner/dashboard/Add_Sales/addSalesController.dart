@@ -7,9 +7,11 @@ import '../../../../widgets/custom_snackbar.dart';
 class SalesController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final isLoading = true.obs;
 
   Future<void> saveSale(List<Map<String, dynamic>> cart, String paymentType) async {
     try {
+      isLoading.value = true;
       final uid = _auth.currentUser!.uid;
 
       final salesRef = _firestore
@@ -57,6 +59,9 @@ class SalesController extends GetxController {
         message: "Failed to save Sales: $e",
         isError: true,
       );
+    }
+    finally{
+      isLoading.value = false;
     }
   }
 }
