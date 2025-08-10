@@ -59,7 +59,7 @@ class SalesReportPage extends StatelessWidget {
                 ),
                 child: ResponsiveBarChart(
                   maxYValue: controller.getMaxChartValue(),
-                  yAxisSteps: [0, 2, 4, 6, 8],
+                  yAxisSteps: controller.getYAxisSteps(),
                   data: controller.getProductChartData(),
                 ),
               ),

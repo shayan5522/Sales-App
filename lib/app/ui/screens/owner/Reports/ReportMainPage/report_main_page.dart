@@ -45,18 +45,34 @@ class ReportsMainPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Summary", style: AppTextStyles.heading),
                   SizedBox(
                     width: 140,
                     child: CustomDatePicker(
-                      label: '',
-                      initialDate: controller.selectedDate.value,
-                      onDateSelected: controller.updateSelectedDate,
+                      label: 'Starting Date',
+                      initialDate: controller.selectedStartDate.value,
+                      onDateSelected: (newDate) {
+                        controller.selectedStartDate.value = newDate;
+                        controller.fetchAllTotals();
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 140,
+                    child: CustomDatePicker(
+                      label: 'Ending Date',
+                      initialDate: controller.selectedEndDate.value,
+                      onDateSelected: (newDate) {
+                        controller.selectedEndDate.value = newDate;
+                        controller.fetchAllTotals();
+                      },
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 10),
+              Text("Total Summary", style: AppTextStyles.heading),
+              const SizedBox(height: 10),
 
               // Summary Cards Row
               Row(

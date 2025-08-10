@@ -17,6 +17,8 @@ class ReportsController extends GetxController {
   var cashProfit = 0.0.obs;
   var onlineProfit = 0.0.obs;
   var selectedDate = DateTime.now().obs;
+  var selectedStartDate = DateTime.now().obs;
+  var selectedEndDate = DateTime.now().obs;
   var cashSales = 0.0.obs;
   var onlineSales = 0.0.obs;
 
@@ -43,15 +45,28 @@ class ReportsController extends GetxController {
       }
 
       final userId = user.uid;
-      final date = selectedDate.value;
-      final startOfDay = DateTime(date.year, date.month, date.day);
-      final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+      final startDate = selectedStartDate.value;
+      final endDate = selectedEndDate.value;
+
+      // Set time components for proper date range comparison
+      final startOfPeriod = DateTime(startDate.year, startDate.month, startDate.day);
+      final endOfPeriod = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+
+      // Validate date range
+      if (startOfPeriod.isAfter(endOfPeriod)) {
+        CustomSnackbar.show(
+            title: 'Error',
+            message: 'Start date cannot be after end date',
+            isError: true
+        );
+        return;
+      }
 
       // Fetch all totals in parallel with date filtering
       await Future.wait([
-        _fetchSalesTotal(userId, startOfDay, endOfDay),
-        _fetchIntakeTotal(userId, startOfDay, endOfDay),
-        _fetchExpenseTotal(userId, startOfDay, endOfDay),
+        _fetchSalesTotal(userId, startOfPeriod, endOfPeriod),
+        _fetchIntakeTotal(userId, startOfPeriod, endOfPeriod),
+        _fetchExpenseTotal(userId, startOfPeriod, endOfPeriod),
       ]);
 
       // Calculate profits
@@ -68,7 +83,6 @@ class ReportsController extends GetxController {
         cashProfit.value = 0.0;
         onlineProfit.value = 0.0;
       }
-
     } catch (e) {
       CustomSnackbar.show(
           title: 'Error',
@@ -132,6 +146,7 @@ class ReportsController extends GetxController {
         .where('createdAt', isGreaterThanOrEqualTo: start)
         .where('createdAt', isLessThanOrEqualTo: end)
         .get();
+
 
     expenseAmount.value = querySnapshot.docs.fold(0.0, (sum, doc) {
       return sum + (doc.data()['amount'] ?? 0).toDouble();

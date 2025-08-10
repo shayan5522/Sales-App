@@ -26,6 +26,7 @@ class SettingsScreen extends StatelessWidget {
       appBar: CustomAppbar(
         title: 'Settings',
         backgroundColor: AppColors.primary,
+        showBackButton: false,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
