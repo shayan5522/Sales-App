@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 import '../../widgets/custom_snackbar.dart';
-import 'otp.dart';
 import '../../../controllers/auth/auth_controller.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class SignUpScreen extends StatelessWidget {
+  SignUpScreen({super.key});
 
-  @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final AuthController authController = Get.put(AuthController());
 
-  bool _isLoading = false;// added
+  Future<void> _handleSendOtp() async {
+    final phone = phoneController.text.trim();
+    if (phone.isEmpty) {
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Enter phone number",
+        isError: true,
+      );
+      return;
+    }
+
+    try {
+      await authController.sendOtp(phone);
+    } catch (e) {
+      // Error handling is done in the controller
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,29 +57,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 labelText: 'Enter phone number',
               ),
               const SizedBox(height: 32),
-              PrimaryButton(
-                text: "Send OTP",
-                isLoading: _isLoading, // adedd
-                onPressed: _isLoading
-                    ? () {}
-                    : () async {
-                  final phone = phoneController.text.trim();
-                  if (phone.isEmpty) {
-                    CustomSnackbar.show(
-                      title: "Error",
-                      message: "Enter phone number",
-                      isError: true,
-                    );
-                    return;
-                  }
-
-                  setState(() => _isLoading = true);
-
-                  await authController.sendOtp(phone);
-
-                  setState(() => _isLoading = false);
-                },
-              ),
+              Obx(() {
+                return SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      disabledBackgroundColor: AppColors.primary,
+                    ),
+                    onPressed: authController.isLoading.value
+                        ? null
+                        : () async {
+                      await _handleSendOtp();
+                    },
+                    child: authController.isLoading.value
+                        ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : Text(
+                      "Send OTP",
+                      style: AppTextStyles.subheading.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ],
           ),
         ),
@@ -77,4 +100,3 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
-

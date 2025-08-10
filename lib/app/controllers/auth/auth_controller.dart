@@ -12,23 +12,41 @@ import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   var verificationId = ''.obs;
+  RxBool isLoading = false.obs;
+  var lastError = ''.obs;
 
   Future<void> sendOtp(String phone) async {
-    await _authService.sendOtp(
-      phone: phone,
-      codeSent: (verId) {
-        verificationId.value = verId;
-        Get.to(() => OTPVerificationScreen());
-      },
-      onError: (e) {
-        CustomSnackbar.show(
-          title: "Error",
-          message: e.message ?? "OTP failed",
-          isError: true,
-        );
+    isLoading.value = true;
+    lastError.value = '';
 
-      },
-    );
+    try {
+      await _authService.sendOtp(
+        phone: phone,
+        codeSent: (verId) {
+          verificationId.value = verId;
+          isLoading.value = false; // Only stop loading after navigation
+          Get.to(() => OTPVerificationScreen());
+        },
+        onError: (e) {
+          isLoading.value = false;
+          lastError.value = e.message ?? "OTP failed";
+          CustomSnackbar.show(
+            title: "Error",
+            message: lastError.value,
+            isError: true,
+          );
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      lastError.value = "Failed to send OTP";
+      CustomSnackbar.show(
+        title: "Error",
+        message: lastError.value,
+        isError: true,
+      );
+      rethrow;
+    }
   }
 
 

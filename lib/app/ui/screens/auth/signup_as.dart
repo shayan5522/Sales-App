@@ -23,7 +23,7 @@ class _SignUpAsScreenState extends State<SignUpAsScreen> {
     setState(() => _isLoadingOwner = true);
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoadingOwner = false);
-    Get.to(() => const SignUpScreen());
+    Get.to(() =>  SignUpScreen());
   }
 
   void _handleLabourTap() async {
