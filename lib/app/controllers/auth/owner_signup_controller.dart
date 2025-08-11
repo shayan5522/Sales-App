@@ -78,7 +78,7 @@ class OwnerSignupController extends GetxController {
       }
 
       // Register owner under users/<uid>
-      await FirebaseFirestore.instance.collection('users').doc("$shopName").set({
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'uid': uid,
         'phone': phone,
         'role': 'owner',

@@ -202,4 +202,39 @@ class SalesReportController extends GetxController {
 
     return steps;
   }
+
+  Map<String, Map<String, dynamic>> getProductSummaryData() {
+    final productSummary = <String, Map<String, dynamic>>{};
+
+    for (var sale in salesData) {
+      final items = List<Map<String, dynamic>>.from(sale['items'] ?? []);
+
+      for (var item in items) {
+        final productName = item['title'] ?? 'Unknown';
+        final imagePath = item['imagePath'] ?? 'assets/images/products.png';
+        final quantity = (item['quantity'] ?? 0) as int;
+        final price = (item['price'] ?? 0).toDouble(); // sale price per unit
+        final intakePrice = (item['originalPrice'] ?? 0).toDouble(); // cost per unit
+
+        final totalSaleAmount = price * quantity;
+        final totalIntakeAmount = intakePrice * quantity;
+
+        if (!productSummary.containsKey(productName)) {
+          productSummary[productName] = {
+            'imagePath': imagePath,
+            'totalSales': 0.0,
+            'totalQuantity': 0,
+            'totalIntake': 0.0,
+          };
+        }
+
+        productSummary[productName]!['totalSales'] += totalSaleAmount;
+        productSummary[productName]!['totalQuantity'] += quantity;
+        productSummary[productName]!['totalIntake'] += totalIntakeAmount;
+      }
+    }
+
+    return productSummary;
+  }
+
 }
