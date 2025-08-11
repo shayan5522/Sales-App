@@ -17,12 +17,16 @@ class LabourSignupController extends GetxController {
         message: "Invite code is required.",
         isError: true,
       );
+      return;
     }
 
     isLoading.value = true;
 
     try {
-      final inviteDoc = await FirebaseFirestore.instance.collection('invites').doc(inputCode).get();
+      final inviteDoc = await FirebaseFirestore.instance
+          .collection('invites')
+          .doc(inputCode)
+          .get();
 
       if (!inviteDoc.exists) {
         CustomSnackbar.show(
@@ -30,6 +34,7 @@ class LabourSignupController extends GetxController {
           message: "Invalid invite code.",
           isError: true,
         );
+        return;
       }
 
       final invite = inviteDoc.data()!;
@@ -39,28 +44,32 @@ class LabourSignupController extends GetxController {
           message: "This code has already been used.",
           isError: true,
         );
+        return;
       }
 
       final shopName = invite['shopName'];
       final ownerId = invite['ownerId'];
 
-      // Check labour count
-      final labourSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'labour')
+      // ✅ Check how many invites are already used for this shop
+      final usedInvitesSnapshot = await FirebaseFirestore.instance
+          .collection('invites')
           .where('shopName', isEqualTo: shopName)
+          .where('used', isEqualTo: true)
           .get();
 
-      if (labourSnapshot.docs.length >= 3) {
+      if (usedInvitesSnapshot.docs.length >= 3) {
         CustomSnackbar.show(
           title: "Error",
-          message: "This shop already has 3 labours.",
+          message: "This shop already has 3 active labours.",
           isError: true,
         );
+        return;
       }
 
-      // Register new labour
-      final newLabourDoc = await FirebaseFirestore.instance.collection('users').add({
+      // ✅ Register new labour
+      final newLabourDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .add({
         'role': 'labour',
         'code': inputCode,
         'shopName': shopName,
@@ -68,16 +77,20 @@ class LabourSignupController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Mark invite used
-      await FirebaseFirestore.instance.collection('invites').doc(inputCode).update({
+      // ✅ Mark invite as used
+      await FirebaseFirestore.instance
+          .collection('invites')
+          .doc(inputCode)
+          .update({
         'used': true,
         'usedBy': newLabourDoc.id,
       });
 
-      /// ✅ Save login state
+      // ✅ Save login state
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       await prefs.setString('role', 'labour');
+      await prefs.setString('inviteCode', inputCode);
 
       print('✅ Labour added with ID: ${newLabourDoc.id}');
       Get.offAll(() => LaborPanel());
@@ -91,4 +104,5 @@ class LabourSignupController extends GetxController {
       isLoading.value = false;
     }
   }
+
 }

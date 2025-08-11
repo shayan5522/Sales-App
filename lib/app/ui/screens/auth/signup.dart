@@ -43,11 +43,11 @@ class SignUpScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              Center(child: Image.asset('assets/images/signup.png', height: 180)),
-              const SizedBox(height: 24),
+              Center(child: Image.asset('assets/images/signup.png', height: 80)),
+              const SizedBox(height: 80),
               Text(
                 'Welcome back to the app',
-                style: AppTextStyles.subtitle.copyWith(color: Color(0xFF0F1928)),
+                style: AppTextStyles.title.copyWith(color: Color(0xFF0F1928)),
               ),
               const SizedBox(height: 24),
               Text('Phone No', style: AppTextStyles.title),

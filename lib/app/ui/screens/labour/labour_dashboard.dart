@@ -24,24 +24,6 @@ class LabourDashboard extends StatelessWidget {
         centerTitle: false,
         showBackButton: false,
         title: 'Labour Dashboard',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => LogoutDialog(
-                  onCancel: () => Navigator.pop(context),
-                  onConfirm: () async {
-                    Navigator.pop(context);
-                    await logoutUser();
-                  },
-                ),
-              );
-            },
-          )
-        ],
       ),
 
       backgroundColor: const Color(0xFFEFEFF1),

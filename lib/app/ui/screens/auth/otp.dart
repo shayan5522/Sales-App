@@ -29,6 +29,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             Text("Enter 6-digit OTP sent to your phone", style: AppTextStyles.subtitle),

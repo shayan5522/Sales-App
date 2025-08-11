@@ -9,7 +9,7 @@ class LabourSettingPage extends StatelessWidget {
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
-    await logoutUser();
+    await LabourLogoutUser();
   }
 
   @override
