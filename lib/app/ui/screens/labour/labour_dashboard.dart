@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/styles.dart';
+import 'package:salesapp/app/ui/screens/labour/AddSales/labour_add_sales.dart';
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 
 import '../../../controllers/auth/logout_helper.dart';
 import '../../widgets/logout_dialog.dart';
+import 'AddCreditDebit/labour_transaction.dart';
+import 'AddExpense/labour_add_expense.dart';
+import 'AddIntake/labour_add_intake.dart';
+import 'AddReturn/labour_add_return.dart';
 class LabourDashboard extends StatelessWidget {
   const LabourDashboard({super.key});
 
@@ -14,10 +21,10 @@ class LabourDashboard extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppbar(
+        centerTitle: false,
+        showBackButton: false,
         title: 'Labour Dashboard',
         actions: [
-          const Icon(Icons.person, color: Colors.white),
-          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () {
@@ -28,7 +35,7 @@ class LabourDashboard extends StatelessWidget {
                   onCancel: () => Navigator.pop(context),
                   onConfirm: () async {
                     Navigator.pop(context);
-                    await logoutUser(); // 👈 This handles logout & navigation
+                    await logoutUser();
                   },
                 ),
               );
@@ -66,26 +73,31 @@ class LabourDashboard extends StatelessWidget {
                 mainAxisSpacing: 20,
                 crossAxisSpacing: 20,
                 childAspectRatio: 1,
-                children: const [
+                children: [
                   MainContainer(
                     imagePath: "assets/images/sales1111.png",
                     label: "Add Sale",
+                    onTap: (){Get.to(()=>const LabourAddSales());},
                   ),
-                  MainContainer(
+                   MainContainer(
                     imagePath: "assets/images/intake.png",
                     label: "Add Intake",
+                     onTap: (){Get.to(()=>const LabourAddIntake());},
                   ),
-                  MainContainer(
+                   MainContainer(
                     imagePath: "assets/images/products.png",
                     label: "Return",
+                     onTap: (){Get.to(()=>const LabourReturnProduct());},
                   ),
-                  MainContainer(
+                   MainContainer(
                     imagePath: "assets/images/Expense.png",
                     label: "Add Expense",
+                    onTap: (){Get.to(()=>const LabourAddExpenseScreen());},
                   ),
                   MainContainer(
                     imagePath: "assets/images/CD_report.png",
                     label: "Credit & amount due",
+                    onTap: (){Get.to(()=> LabourTransactionsScreen());},
                   ),
                 ],
               ),
