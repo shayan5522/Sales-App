@@ -55,11 +55,9 @@ class ExpenseReportController extends GetxController {
       isLoading.value=false;
     }
   }
-
   void filterByDateRange({DateTime? from, DateTime? to}) {
     fromDate = from;
     toDate = to;
-
     filteredExpenses.assignAll(allExpenses.where((expense) {
       final expenseDate = expense['date'] as DateTime;
       final isAfterFrom = fromDate == null || expenseDate.isAfter(fromDate!.subtract(const Duration(days: 1)));
@@ -67,7 +65,6 @@ class ExpenseReportController extends GetxController {
       return isAfterFrom && isBeforeTo;
     }));
   }
-
   Map<String, Map<String, dynamic>> getCategorySummary() {
     final summary = <String, Map<String, dynamic>>{};
 
