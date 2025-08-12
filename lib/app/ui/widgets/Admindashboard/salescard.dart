@@ -18,7 +18,7 @@ class SalesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.secondary,
@@ -39,6 +39,7 @@ class SalesCard extends StatelessWidget {
             maxLines: 1,
           ),
           Row(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.currency_rupee, color: AppColors.primary, size: 18),

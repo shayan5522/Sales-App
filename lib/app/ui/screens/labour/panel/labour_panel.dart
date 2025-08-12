@@ -3,18 +3,14 @@ import 'package:get/get.dart';
 import '../../../../controllers/labour_nav_controller.dart';
 import '../../../../themes/colors.dart';
 import '../labour_dashboard.dart';
+import '../labour_setting.dart';
 
 class LaborPanel extends StatelessWidget {
   final controller = Get.put(LaborNavController());
 
   final pages = [
     LabourDashboard(),
-    LabourDashboard(),
-    LabourDashboard(),
-    LabourDashboard(),
-    // ReportPage(),
-    // ProductPage(),
-    // SettingPage(),
+    LabourSettingPage(),
   ];
 
    LaborPanel({super.key});

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/credit_amount%20_due/transactionController.dart';
@@ -10,16 +9,16 @@ import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 
-class AmountCreditScreen extends StatefulWidget {
-   const AmountCreditScreen({super.key});
+class LabourTransactionsScreen extends StatefulWidget {
+  const LabourTransactionsScreen({super.key});
 
 
 
   @override
-  State<AmountCreditScreen> createState() => _AmountCreditDueScreenState();
+  State<LabourTransactionsScreen> createState() => _AmountCreditDueScreenState();
 }
 
-class _AmountCreditDueScreenState extends State<AmountCreditScreen> {
+class _AmountCreditDueScreenState extends State<LabourTransactionsScreen> {
   final TransactionController _transactionController = Get.put(TransactionController());
   bool isSaving = false;
   bool isCredited = true;

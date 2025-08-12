@@ -7,6 +7,7 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import '../../../../widgets/sale/salereportlist.dart';
+import 'all_products_page.dart';
 
 class SalesReportPage extends StatelessWidget {
   SalesReportPage({super.key}) {
@@ -59,7 +60,7 @@ class SalesReportPage extends StatelessWidget {
                 ),
                 child: ResponsiveBarChart(
                   maxYValue: controller.getMaxChartValue(),
-                  yAxisSteps: [0, 2, 4, 6, 8],
+                  yAxisSteps: controller.getYAxisSteps(),
                   data: controller.getProductChartData(),
                 ),
               ),
@@ -69,35 +70,79 @@ class SalesReportPage extends StatelessWidget {
               LayoutBuilder(
                 builder: (context, constraints) {
                   final itemWidth = (constraints.maxWidth - 12) / 2;
+                  final productSummary = controller.getProductSummaryData();
+                  final limitedSummary = productSummary.entries.take(4).toList();
+
 
                   return Wrap(
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      saleSummaryCard(
-                        width: itemWidth,
-                        title: "Total Sales",
-                        value: controller.salesData.length.toString(),
-                      ),
-                      saleSummaryCard(
-                        width: itemWidth,
-                        title: "Items Sold",
-                        value: controller.totalItemsSold.value.toString(),
-                      ),
-                      saleSummaryCard(
-                        width: itemWidth,
-                        title: "Total Income",
-                        value: "₹${controller.totalAmount.value.toStringAsFixed(2)}",
-                      ),
-                      saleSummaryCard(
-                        width: itemWidth,
-                        title: "Average Sale",
-                        value: controller.salesData.isEmpty
-                            ? "₹0.00"
-                            : "₹${(controller.totalAmount.value / controller.salesData.length).toStringAsFixed(2)}",
+                      ...limitedSummary.map((entry) {
+                        final data = entry.value;
+                        final profit = (data['totalSales'] as double) - (data['totalIntake'] as double);
+
+                        return Container(
+                          width: (MediaQuery.of(context).size.width - 48) / 2,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              )
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(child: Image.asset(data['imagePath'], height: 50, width: 50, fit: BoxFit.cover)),
+                              const SizedBox(height: 8),
+                              Text(entry.key, style: AppTextStyles.subtitleSmall.copyWith(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text("Sales: ₹${(data['totalSales'] as double).toStringAsFixed(2)}"),
+                              Text("Quantity: ${data['totalQuantity']} sold"),
+                              Text(
+                                "Profit: ₹${profit.toStringAsFixed(2)}",
+                                style: TextStyle(color: profit >= 0 ? Colors.green : Colors.red),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+
+                      // "View All" Button
+                      GestureDetector(
+                        onTap: () {
+                           Get.to(() => AllProductsPage(productSummary: productSummary));
+                        },
+                        child: Center(
+                          child: Container(
+                            width: (MediaQuery.of(context).size.width - 48) / 2,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "View All",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
+
                   );
+
                 },
               ),
               const SizedBox(height: 24),

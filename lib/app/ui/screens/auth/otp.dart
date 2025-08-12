@@ -24,11 +24,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: "OTP Verification"),
+      appBar: CustomAppbar(title: "OTP Verification",showBackButton: false,),
       backgroundColor: const Color(0xFFF6F6F9),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             Text("Enter 6-digit OTP sent to your phone", style: AppTextStyles.subtitle),

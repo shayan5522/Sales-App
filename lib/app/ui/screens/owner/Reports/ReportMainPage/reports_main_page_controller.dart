@@ -16,10 +16,20 @@ class ReportsController extends GetxController {
   var profitAmount = 0.0.obs;
   var cashProfit = 0.0.obs;
   var onlineProfit = 0.0.obs;
+  var selectedDate = DateTime.now().obs;
+  var selectedStartDate = DateTime.now().obs;
+  var selectedEndDate = DateTime.now().obs;
+  var cashSales = 0.0.obs;
+  var onlineSales = 0.0.obs;
 
   @override
   void onInit() {
     super.onInit();
+    fetchAllTotals();
+  }
+
+  void updateSelectedDate(DateTime newDate) {
+    selectedDate.value = newDate;
     fetchAllTotals();
   }
 
@@ -35,43 +45,92 @@ class ReportsController extends GetxController {
       }
 
       final userId = user.uid;
+      final startDate = selectedStartDate.value;
+      final endDate = selectedEndDate.value;
 
-      // Fetch all totals in parallel
+      // Set time components for proper date range comparison
+      final startOfPeriod = DateTime(startDate.year, startDate.month, startDate.day);
+      final endOfPeriod = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+
+      // Validate date range
+      if (startOfPeriod.isAfter(endOfPeriod)) {
+        CustomSnackbar.show(
+            title: 'Error',
+            message: 'Start date cannot be after end date',
+            isError: true
+        );
+        return;
+      }
+
+      // Fetch all totals in parallel with date filtering
       await Future.wait([
-        _fetchSalesTotal(userId),
-        _fetchIntakeTotal(userId),
-        _fetchExpenseTotal(userId),
+        _fetchSalesTotal(userId, startOfPeriod, endOfPeriod),
+        _fetchIntakeTotal(userId, startOfPeriod, endOfPeriod),
+        _fetchExpenseTotal(userId, startOfPeriod, endOfPeriod),
       ]);
 
       // Calculate profits
       profitAmount.value = salesAmount.value - (intakeAmount.value + expenseAmount.value);
-      cashProfit.value = profitAmount.value * 0.7; // 70% cash (example)
-      onlineProfit.value = profitAmount.value * 0.3; // 30% online (example)
 
+      // Calculate cash and online profits based on actual sales distribution
+      if (salesAmount.value > 0) {
+        final cashRatio = cashSales.value / salesAmount.value;
+        final onlineRatio = onlineSales.value / salesAmount.value;
+
+        cashProfit.value = profitAmount.value * cashRatio;
+        onlineProfit.value = profitAmount.value * onlineRatio;
+      } else {
+        cashProfit.value = 0.0;
+        onlineProfit.value = 0.0;
+      }
     } catch (e) {
-      CustomSnackbar.show(title: 'Error', message: 'Failed to fetch report data: ${e.toString()}', isError: true);
+      CustomSnackbar.show(
+          title: 'Error',
+          message: 'Failed to fetch report data: ${e.toString()}',
+          isError: true
+      );
     } finally {
       isLoading(false);
     }
   }
 
-  Future<void> _fetchSalesTotal(String userId) async {
+  Future<void> _fetchSalesTotal(String userId, DateTime start, DateTime end) async {
     final querySnapshot = await _firestore
         .collection('users')
         .doc(userId)
         .collection('sales')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
         .get();
 
-    salesAmount.value = querySnapshot.docs.fold(0.0, (sum, doc) {
-      return sum + (doc.data()['totalAmount'] ?? 0).toDouble();
-    });
+    double cashTotal = 0.0;
+    double onlineTotal = 0.0;
+    double total = 0.0;
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data();
+      final amount = (data['totalAmount'] ?? 0).toDouble();
+      total += amount;
+
+      if (data['paymentType'] == 'Cash') {
+        cashTotal += amount;
+      } else if (data['paymentType'] == 'Online') {
+        onlineTotal += amount;
+      }
+    }
+
+    cashSales.value = cashTotal;
+    onlineSales.value = onlineTotal;
+    salesAmount.value = total;
   }
 
-  Future<void> _fetchIntakeTotal(String userId) async {
+  Future<void> _fetchIntakeTotal(String userId, DateTime start, DateTime end) async {
     final querySnapshot = await _firestore
         .collection('users')
         .doc(userId)
         .collection('intakes')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
         .get();
 
     intakeAmount.value = querySnapshot.docs.fold(0.0, (sum, doc) {
@@ -79,12 +138,15 @@ class ReportsController extends GetxController {
     });
   }
 
-  Future<void> _fetchExpenseTotal(String userId) async {
+  Future<void> _fetchExpenseTotal(String userId, DateTime start, DateTime end) async {
     final querySnapshot = await _firestore
         .collection('users')
         .doc(userId)
         .collection('expenses')
+        .where('createdAt', isGreaterThanOrEqualTo: start)
+        .where('createdAt', isLessThanOrEqualTo: end)
         .get();
+
 
     expenseAmount.value = querySnapshot.docs.fold(0.0, (sum, doc) {
       return sum + (doc.data()['amount'] ?? 0).toDouble();

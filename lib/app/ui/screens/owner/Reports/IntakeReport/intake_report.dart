@@ -176,7 +176,7 @@ class IntakeReportPage extends StatelessWidget {
               imagePath: item['imagePath'] ?? "assets/images/products.png",
               name: item['title'] ?? "Unknown Product",
               Quantity: "${item['quantity']}",
-              amount: "\$${(item['price'] * item['quantity']).toStringAsFixed(2)}",
+              amount: "${(item['price'] * item['quantity']).toStringAsFixed(2)}",
             ));
           }),
         ],

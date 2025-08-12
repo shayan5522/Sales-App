@@ -23,7 +23,7 @@ class _SignUpAsScreenState extends State<SignUpAsScreen> {
     setState(() => _isLoadingOwner = true);
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoadingOwner = false);
-    Get.to(() => const SignUpScreen());
+    Get.to(() =>  SignUpScreen());
   }
 
   void _handleLabourTap() async {
@@ -42,7 +42,7 @@ class _SignUpAsScreenState extends State<SignUpAsScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 100),
               Image.asset('assets/images/signupas.png', height: 250),
               const SizedBox(height: 40),
               Text('Sign Up Your Account As', style: AppTextStyles.heading),

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
-import '../../../../../themes/colors.dart';
-import '../../../../widgets/appbar.dart';
-import '../../../../widgets/grid_container.dart';
-import '../intake/addintake.dart';
-import '../products/productController.dart';
+import '../../../../themes/colors.dart';
+import '../../../widgets/appbar.dart';
+import '../../../widgets/grid_container.dart';
+import '../../owner/dashboard/intake/addintake.dart';
+import '../../owner/dashboard/products/productController.dart';
 
-class Sales extends StatefulWidget {
-  const Sales({super.key});
+class LabourAddSales extends StatefulWidget {
+  const LabourAddSales({super.key});
 
   @override
-  State<Sales> createState() => _SalesState();
+  State<LabourAddSales> createState() => _LabourAddSalesState();
 }
 
-class _SalesState extends State<Sales> {
+class _LabourAddSalesState extends State<LabourAddSales> {
   final ProductController controller = Get.put(ProductController());
   final SalesController saleController = Get.put(SalesController());
   List<Map<String, dynamic>> cart = [];

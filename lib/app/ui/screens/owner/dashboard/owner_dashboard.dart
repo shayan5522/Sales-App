@@ -26,8 +26,11 @@ class OwnerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
     final controller = Get.find<DashboardController>();
+    final user = controller.auth.currentUser;
+    final date = controller.selectedDate.value;
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F9),
@@ -39,6 +42,10 @@ class OwnerDashboard extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
+        }
+
+        if (user == null) {
+          return const Center(child: Text("User not authenticated"));
         }
 
         return SingleChildScrollView(
@@ -66,32 +73,85 @@ class OwnerDashboard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/sales.png",
-                      label: "Total Sales",
-                      value: controller.totalSales.value.toInt(),
+                  SalesCard(
+                    imagePath: "assets/images/sales.png",
+                    label: "Total Sales",
+                    value: controller.totalSales.value.toInt(),
+                  ),
+                  const SizedBox(width: 0),
+                  SalesCard(
+                    imagePath: "assets/images/sales1111.png",
+                    label: "Total Intake",
+                    value: controller.totalIntake.value.toInt(),
+                  ),
+                  const SizedBox(width: 0),
+                  SalesCard(
+                    imagePath: "assets/images/earning.png",
+                    label: "Total Profit",
+                    value: controller.totalProfit.value.toInt(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Payment Breakdown Row
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text("Cash Sales", style: AppTextStyles.description),
+                          Text(
+                            controller.formatCurrency(controller.cashSales.value),
+                            style: AppTextStyles.heading.copyWith(fontSize: 18),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/sales1111.png",
-                      label: "Total Income",
-                      value: controller.totalIntake.value.toInt(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: SalesCard(
-                      imagePath: "assets/images/earning.png",
-                      label: "Total Profit",
-                      value: controller.totalProfit.value.toInt(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text("Online Sales", style: AppTextStyles.description),
+                          Text(
+                            controller.formatCurrency(controller.onlineSales.value),
+                            style: AppTextStyles.heading.copyWith(fontSize: 18),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
 
               // Earnings Cards Row
@@ -99,24 +159,25 @@ class OwnerDashboard extends StatelessWidget {
                 children: [
                   Flexible(
                     child: EarningsCard(
-                      income: controller.totalIntake.value,
-                      profit: controller.totalProfit.value,
-                      imagePath: "assets/images/earnings.jpeg",
+                      income: controller.cashSales.value,
+                      profit: controller.cashProfit.value,
+                      imagePath: "assets/images/cash_earning.png",
                       onSeeAll: () {},
+                      label: "Cash Earnings",
                     ),
                   ),
                   const SizedBox(width: 12),
                   Flexible(
                     child: EarningsCard(
-                      income: controller.totalIntake.value , // Example cash income
-                      profit: controller.totalProfit.value , // Example cash profit
-                      imagePath: "assets/images/earnings.jpeg",
+                      income: controller.onlineSales.value,
+                      profit: controller.onlineProfit.value,
+                      imagePath: "assets/images/online_earning.png",
                       onSeeAll: () {},
+                      label: "Online Earnings",
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
 
               // Quick Actions Section
@@ -168,12 +229,12 @@ class OwnerDashboard extends StatelessWidget {
                         {
                           "label": "Add Expense Category",
                           "icon": "assets/images/products.png",
-                          "screen":  AddCategoryPage(),
+                          "screen": AddCategoryPage(),
                         },
                         {
                           "label": "Credit & amount due",
                           "icon": "assets/images/products.png",
-                          "screen":  AmountCreditScreen(),
+                          "screen": AmountCreditScreen(),
                         },
                       ];
                       final item = items[index];
@@ -195,7 +256,7 @@ class OwnerDashboard extends StatelessWidget {
               GradientActionCard(
                 label: "Generate Report",
                 iconPath: "assets/images/earning.png",
-                onTap: () => Get.to(() =>  ReportsMainPage()),
+                onTap: () => Get.to(() => ReportsMainPage()),
               ),
               const SizedBox(height: 30),
             ],

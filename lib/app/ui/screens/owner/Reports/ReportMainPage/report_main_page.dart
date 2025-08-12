@@ -9,9 +9,11 @@ import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.d
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/summarycard.dart';
+import '../../../../widgets/datepicker.dart';
 import '../Credit_Debit_Page.dart';
 import '../ExpenseReport/expense_report_page.dart';
 import '../IntakeReport/intake_report.dart';
+
 class ReportsMainPage extends StatelessWidget {
   ReportsMainPage({super.key}) {
     Get.put(ReportsController());
@@ -26,6 +28,8 @@ class ReportsMainPage extends StatelessWidget {
       appBar: const CustomAppbar(
         title: 'Reports',
         centerTitle: true,
+        showBackButton: false,
+        leading: null,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -41,11 +45,34 @@ class ReportsMainPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Summary", style: AppTextStyles.heading),
-                  // const Icon(Icons.tune, color: AppColors.primary),
+                  SizedBox(
+                    width: 140,
+                    child: CustomDatePicker(
+                      label: 'Starting Date',
+                      initialDate: controller.selectedStartDate.value,
+                      onDateSelected: (newDate) {
+                        controller.selectedStartDate.value = newDate;
+                        controller.fetchAllTotals();
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 140,
+                    child: CustomDatePicker(
+                      label: 'Ending Date',
+                      initialDate: controller.selectedEndDate.value,
+                      onDateSelected: (newDate) {
+                        controller.selectedEndDate.value = newDate;
+                        controller.fetchAllTotals();
+                      },
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 10),
+              Text("Total Summary", style: AppTextStyles.heading),
+              const SizedBox(height: 10),
 
               // Summary Cards Row
               Row(
