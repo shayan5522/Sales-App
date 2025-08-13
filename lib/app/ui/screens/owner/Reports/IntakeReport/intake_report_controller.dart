@@ -130,4 +130,31 @@ class IntakeReportController extends GetxController {
     if (chartData.isEmpty) return 8000; // default
     return chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2;
   }
+  Map<String, Map<String, dynamic>> getProductSummaryData() {
+    final Map<String, Map<String, dynamic>> productMap = {};
+
+    for (var intake in intakeData) {
+      final items = List<Map<String, dynamic>>.from(intake['items'] ?? []);
+      for (var item in items) {
+        final name = item['title'] ?? 'Unknown Product';
+        final quantity = (item['quantity'] ?? 0) as int;
+        final price = (item['price'] ?? 0).toDouble();
+        final imagePath = item['imagePath'] ?? "assets/images/products.png";
+
+        if (!productMap.containsKey(name)) {
+          productMap[name] = {
+            'totalQuantity': 0,
+            'totalPrice': 0.0,
+            'imagePath': imagePath,
+          };
+        }
+
+        productMap[name]!['totalQuantity'] += quantity;
+        productMap[name]!['totalPrice'] += price * quantity;
+      }
+    }
+
+    return productMap;
+  }
+
 }

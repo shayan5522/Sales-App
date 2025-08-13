@@ -9,6 +9,7 @@ import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
 import 'package:salesapp/app/ui/widgets/sale/salereportlist.dart';
 
+import 'all_intake_products.dart';
 import 'intake_report_controller.dart';
 
 class IntakeReportPage extends StatelessWidget {
@@ -71,6 +72,87 @@ class IntakeReportPage extends StatelessWidget {
 
               /// 🔹 SUMMARY CARDS
               _buildSummaryCards(controller),
+
+              const SizedBox(height: 24),
+
+              /// 🔹 TOP 4 PRODUCTS SUMMARY (2 per row + View All button)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final productSummary = controller.getProductSummaryData();
+                  final limitedSummary = productSummary.entries.take(4).toList();
+
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      ...limitedSummary.map((entry) {
+                        final data = entry.value;
+                        return Container(
+                          width: (MediaQuery.of(context).size.width - 48) / 2,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              )
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Image.asset(
+                                  data['imagePath'] ?? "assets/images/products.png",
+                                  height: 50,
+                                  width: 50,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(entry.key,
+                                  style: AppTextStyles.subtitleSmall.copyWith(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text("Total Intaken: ${data['totalQuantity']}"),
+                              Text("Price: ₹${(data['totalPrice'] as double).toStringAsFixed(2)}"),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+
+                      /// View All Button
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to all intake products page
+                          Get.to(() => AllIntakeProductsPage(productSummary: productSummary));
+                        },
+                        child: Center(
+                          child: Container(
+                            width: (MediaQuery.of(context).size.width - 48) / 2,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "View All",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
 
               const SizedBox(height: 24),
 
