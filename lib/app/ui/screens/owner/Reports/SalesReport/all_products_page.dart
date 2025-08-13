@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salesapp/app/themes/colors.dart';
+import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/SalesReport/sales_report_controller.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import '../../../../widgets/datepicker.dart';
@@ -14,6 +16,7 @@ class AllProductsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: CustomAppbar(title: "All Sales"),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -53,13 +56,16 @@ class AllProductsPage extends StatelessWidget {
                         (data['totalIntake'] as double);
 
                     return Card(
+                      color: Colors.white,
+                      elevation: 2,
                       child: ListTile(
+                        tileColor: AppColors.white,
                         leading: Image.asset(
                           data['imagePath'],
                           height: 40,
                           width: 40,
                         ),
-                        title: Text(entry.key),
+                        title: Text(entry.key,style: AppTextStyles.title,),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
