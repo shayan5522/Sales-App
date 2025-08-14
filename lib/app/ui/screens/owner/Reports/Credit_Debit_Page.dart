@@ -4,10 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/transaction_view_controller.dart';
-import 'package:salesapp/app/ui/widgets/Expense/expensecard.dart';
 import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
-import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 
 import '../../../widgets/Amountcard.dart';
@@ -32,6 +30,79 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
     super.initState();
     controller.fetchTransactions();
     controller.filterTransactions(type: 'credit');
+  }
+
+  List<Widget> _buildGroupedTransactions() {
+    // Group transactions by date
+    final transactionsByDate = <DateTime, List<dynamic>>{};
+
+    for (var tx in controller.filteredTransactions) {
+      DateTime txDate;
+
+      try {
+        // Handle different possible date formats
+        if (tx['date'] is DateTime) {
+          txDate = tx['date'];
+        } else if (tx['date'] is String) {
+          // Try parsing ISO format first
+          txDate = DateTime.tryParse(tx['date']) ?? DateTime.now();
+        } else if (tx['createdAt'] is DateTime) {
+          txDate = tx['createdAt'];
+        } else if (tx['createdAt'] is String) {
+          txDate = DateTime.tryParse(tx['createdAt']) ?? DateTime.now();
+        } else {
+          txDate = DateTime.now();
+        }
+
+        // Normalize to date-only (remove time component)
+        final dateKey = DateTime(txDate.year, txDate.month, txDate.day);
+
+        if (!transactionsByDate.containsKey(dateKey)) {
+          transactionsByDate[dateKey] = [];
+        }
+        transactionsByDate[dateKey]!.add(tx);
+      } catch (e) {
+        // Fallback to current date if parsing fails
+        final dateKey = DateTime.now();
+        if (!transactionsByDate.containsKey(dateKey)) {
+          transactionsByDate[dateKey] = [];
+        }
+        transactionsByDate[dateKey]!.add(tx);
+      }
+    }
+
+    // Sort dates in descending order (newest first)
+    final sortedDates = transactionsByDate.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    return sortedDates.map((date) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Date Header
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+            child: Text(
+              DateFormat('dd-MMM-yyyy').format(date), // Formats as "12-Aug-2025"
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+
+          /// Transactions for this date
+          ...transactionsByDate[date]!.map((tx) {
+            return CustomExpenseListTile(
+              title: tx['name'] ?? 'No Name',
+              description: tx['detail'] ?? 'No Details',
+              price: (tx['price'] as num?)?.toInt() ?? 0,
+            );
+          }).toList(),
+        ],
+      );
+    }).toList();
   }
 
   @override
@@ -135,7 +206,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                           ? AppColors.primary
                           : Colors.white,
                       textColor: _selectedFilter == 'debit'
-                          ? Colors.white // ✅ fixed here
+                          ? Colors.white
                           : Colors.black,
                       onPressed: () {
                         setState(() {
@@ -166,28 +237,10 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   child: const Text('Show All'),
                 ),
               ),
-              const SizedBox(height: 12),
-
-              /// 🔹 TRANSACTIONS
-              const Text(
-                "Transactions:",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 12),
-
+              /// 🔹 GROUPED TRANSACTIONS BY DATE
               if (controller.filteredTransactions.isEmpty)
                 const Text("No transactions found."),
-              ...controller.filteredTransactions.map((tx) {
-                return CustomExpenseListTile(
-                  title: tx['name'],
-                  description: tx['detail'],
-                  price: (tx['price'] as double).toInt(),
-                );
-              }).toList(),
+              ..._buildGroupedTransactions(),
             ],
           ),
         );
