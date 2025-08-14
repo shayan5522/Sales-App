@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+
 class CenteredAmountCard extends StatelessWidget {
   final String title;
   final String subtitle;
+  final Color? subtitleColor; // Optional subtitle color
 
   const CenteredAmountCard({
     super.key,
     required this.title,
     required this.subtitle,
+    this.subtitleColor, // Constructor parameter
   });
 
   @override
@@ -35,7 +38,8 @@ class CenteredAmountCard extends StatelessWidget {
             subtitle,
             style: AppTextStyles.subtitleSmall.copyWith(
               fontSize: 12,
-              color: AppColors.primary,
+              color: subtitleColor ?? AppColors
+                  .primary, // Use provided color or default
             ),
             textAlign: TextAlign.center,
           ),

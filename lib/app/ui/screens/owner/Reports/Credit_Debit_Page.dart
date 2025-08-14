@@ -36,7 +36,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppbar(title: 'Credit & Debit Report'),
+      appBar: const CustomAppbar(title: 'Loan & Debit Report'),
       backgroundColor: AppColors.backgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -84,9 +84,10 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                 children: [
                   Expanded(
                     child: CenteredAmountCard(
-                      title: "Credit Amount",
+                      title: "Loan Amount",
                       subtitle:
                       "INR ${controller.totalCredit.value.toStringAsFixed(0)}",
+                      subtitleColor: Colors.red,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -95,6 +96,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                       title: "Debit Amount",
                       subtitle:
                       "INR ${controller.totalDebit.value.toStringAsFixed(0)}",
+                      subtitleColor: Colors.red,
                     ),
                   ),
                 ],

@@ -241,7 +241,7 @@ class OwnerDashboard extends StatelessWidget {
                             "screen": AddCategoryPage(),
                           },
                           {
-                            "label": "Credit & amount due",
+                            "label": "Loan & amount due",
                             "icon": "assets/images/products.png",
                             "screen": AmountCreditScreen(),
                           },

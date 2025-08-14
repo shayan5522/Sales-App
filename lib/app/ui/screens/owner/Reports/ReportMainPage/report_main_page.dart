@@ -245,7 +245,7 @@ class ReportsMainPage extends StatelessWidget {
                     ),
                     MainContainer(
                       imagePath: "assets/images/CD_report.png",
-                      label: "Credit & Due Report",
+                      label: "Loan & Due Report",
                       onTap: () => Get.to(() => const CreditDebitPage()),
                     ),
                   ],
