@@ -23,12 +23,14 @@ class LabourSignupController extends GetxController {
     isLoading.value = true;
 
     try {
-      final inviteDoc = await FirebaseFirestore.instance
+      // ✅ Find invite by code field
+      final inviteQuery = await FirebaseFirestore.instance
           .collection('invites')
-          .doc(inputCode)
+          .where('code', isEqualTo: inputCode)
+          .limit(1)
           .get();
 
-      if (!inviteDoc.exists) {
+      if (inviteQuery.docs.isEmpty) {
         CustomSnackbar.show(
           title: "Error",
           message: "Invalid invite code.",
@@ -37,7 +39,9 @@ class LabourSignupController extends GetxController {
         return;
       }
 
-      final invite = inviteDoc.data()!;
+      final inviteDoc = inviteQuery.docs.first;
+      final invite = inviteDoc.data();
+
       if (invite['used'] == true) {
         CustomSnackbar.show(
           title: "Error",
@@ -77,10 +81,10 @@ class LabourSignupController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // ✅ Mark invite as used
+      // ✅ Mark invite as used using actual document ID
       await FirebaseFirestore.instance
           .collection('invites')
-          .doc(inputCode)
+          .doc(inviteDoc.id)
           .update({
         'used': true,
         'usedBy': newLabourDoc.id,
@@ -104,5 +108,4 @@ class LabourSignupController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }
