@@ -25,12 +25,13 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
 
   DateTime? _fromDate;
   DateTime? _toDate;
-  String _selectedFilter = ''; // 'credit', 'debit', or ''
+  String _selectedFilter = 'credit'; // 'credit', 'debit', or ''
 
   @override
   void initState() {
     super.initState();
     controller.fetchTransactions();
+    controller.filterTransactions(type: 'credit');
   }
 
   @override
@@ -109,6 +110,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                 children: [
                   Expanded(
                     child: SecondaryButton(
+                      heightFactor: 0.04,
                       text: 'Credited Only',
                       color: _selectedFilter == 'credit'
                           ? AppColors.primary
@@ -127,12 +129,13 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: SecondaryButton(
+                      heightFactor: 0.04,
                       text: 'Debited Only',
                       color: _selectedFilter == 'debit'
                           ? AppColors.primary
                           : Colors.white,
                       textColor: _selectedFilter == 'debit'
-                          ? Colors.white
+                          ? Colors.white // ✅ fixed here
                           : Colors.black,
                       onPressed: () {
                         setState(() {
@@ -144,6 +147,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 16),
 
               /// 🔹 RESET FILTER
