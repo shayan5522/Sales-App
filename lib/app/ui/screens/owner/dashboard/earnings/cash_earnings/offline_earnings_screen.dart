@@ -24,29 +24,53 @@ class OfflineEarningsScreen extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Loading transactions...'),
+              ],
+            ),
+          );
         }
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              //Custom Date picker
+              // Date pickers
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomDatePicker(
-                    onDateSelected: (DateTime ) {  },
+                    onDateSelected: (date) {
+                      final newFromDate = DateTime(date.year, date.month, date.day);
+                      controller.updateDateRange(
+                        newFromDate,
+                        controller.toDate.value,
+                      );
+                    },
                     label: 'From Date',
+                    initialDate: controller.fromDate.value,
                     restrictToToday: true,
                   ),
                   CustomDatePicker(
-                    onDateSelected: (DateTime ) {  },
+                    onDateSelected: (date) {
+                      final newToDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+                      controller.updateDateRange(
+                        controller.fromDate.value,
+                        newToDate,
+                      );
+                    },
                     label: 'To Date',
+                    initialDate: controller.toDate.value,
                   ),
                 ],
               ),
-              SizedBox(height: 16,),
+              const SizedBox(height: 16),
+
               // Summary Cards
               Row(
                 children: [
@@ -69,22 +93,45 @@ class OfflineEarningsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Transactions List
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Recent Transactions', style: AppTextStyles.subheading)),
+              // Transactions List with date range header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Transactions (${_formatDate(controller.fromDate.value)} - ${_formatDate(controller.toDate.value)})',
+                    style: AppTextStyles.title,
+                  ),
+                  // Text(
+                  //   '${controller.transactions.length} items',
+                  //   style: AppTextStyles.subtitle,
+                  // ),
+                ],
+              ),
               const SizedBox(height: 12),
-              ...controller.transactions.map((transaction) => TransactionListItem(
-                title: 'Cash Sale',
-                amount: transaction['amount'],
-                date: (transaction['createdAt'] as Timestamp).toDate(),
-                items: (transaction['items'] as List).length,
 
-              )),
+              if (controller.transactions.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: Text(
+                    'No transactions found for selected date range',
+                    style: AppTextStyles.subtitle.copyWith(color: Colors.grey),
+                  ),
+                )
+              else
+                ...controller.transactions.map((transaction) => TransactionListItem(
+                  title: 'Cash Sale',
+                  amount: transaction['amount'],
+                  date: (transaction['createdAt'] as Timestamp).toDate(),
+                  items: (transaction['items'] as List).length,
+                )),
             ],
           ),
         );
       }),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
