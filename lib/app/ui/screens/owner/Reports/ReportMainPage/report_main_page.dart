@@ -9,6 +9,7 @@ import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.d
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/summarycard.dart';
+import '../../../../../controllers/owner_dashboard_controller.dart';
 import '../../../../widgets/datepicker.dart';
 import '../Credit_Debit_Page.dart';
 import '../ExpenseReport/expense_report_page.dart';
@@ -22,6 +23,7 @@ class ReportsMainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ReportsController>();
+    final Dashboardcontroller = Get.find<DashboardController>();
 
     Future<void> _refreshData() async {
       await controller.fetchAllTotals();
@@ -199,9 +201,9 @@ class ReportsMainPage extends StatelessWidget {
                 // Profit Breakdown Row
                 Row(
                   children: [
-                    _profitBox("Profit Amount in Cash", controller.cashProfit.value),
+                    _profitBox("Profit Amount in Cash", Dashboardcontroller.cashProfit.value),
                     const SizedBox(width: 12),
-                    _profitBox("Profit Amount Online", controller.onlineProfit.value),
+                    _profitBox("Profit Amount Online", Dashboardcontroller.onlineProfit.value),
                   ],
                 ),
                 const SizedBox(height: 32),
