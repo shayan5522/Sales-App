@@ -19,21 +19,20 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
     defaultConfig {
-        applicationId = "com.xavics.salesapp"
-        minSdkVersion 23
+        applicationId "com.xavics.salesapp"
+        minSdkVersion 23 // ⬅ Change this line
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
     }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug") // or your release config
-            ndk {
-                debugSymbolLevel 'none'
-            }
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so flutter run --release works.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
-
 }
 flutter {
     source = "../.."

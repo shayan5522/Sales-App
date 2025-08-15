@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,116 +29,190 @@ class _ProductScreenState extends State<ProductScreen> {
     String title = '';
     double price = 0.0;
     File? imageFile;
-    var isLoading = false.obs; // Local loading state for the dialog
+    var isLoading = false.obs;
 
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) {
-        return Obx(() => AlertDialog(
+        return Obx(() => Dialog(
+          insetPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           backgroundColor: AppColors.backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Add Product'),
-          content: StatefulBuilder(
-            builder: (context, setState) {
-              return SingleChildScrollView(
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: isLoading.value
-                            ? null
-                            : () async {
-                          final picked = await ImagePicker().pickImage(
-                            source: ImageSource.gallery,
-                          );
-                          if (picked != null) {
-                            setState(() => imageFile = File(picked.path));
-                          }
-                        },
+              borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const CustomAppbar(
+                        title: 'Add New Product',
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Image Picker
+                    GestureDetector(
+                      onTap: isLoading.value
+                          ? null
+                          : () async {
+                        final picked = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                        );
+                        if (picked != null) {
+                          imageFile = File(picked.path);
+                          (context as Element).markNeedsBuild();
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                              offset: Offset(0, 4),
+                            )
+                          ],
+                        ),
                         child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage: imageFile != null
-                              ? FileImage(imageFile!)
-                              : const AssetImage('assets/images/products.png')
-                          as ImageProvider,
-                          backgroundColor: Colors.grey[300],
+                          radius: 45,
+                          backgroundColor: Colors.blue,
+                          // backgroundImage: imageFile != null
+                          //     ? FileImage(imageFile!)
+                          //     : const AssetImage(
+                          //     'assets/images/products.png')
+                          // as ImageProvider,
                           child: imageFile == null
-                              ? const Icon(
-                            Icons.camera_alt,
-                            color: AppColors.secondary,
-                          )
+                              ? Icon(Icons.camera_alt,
+                              color: AppColors.secondary, size: 28)
                               : null,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        decoration:
-                        const InputDecoration(labelText: 'Product Name'),
-                        validator: (value) =>
-                        value == null || value.isEmpty ? 'Required' : null,
-                        onSaved: (value) => title = value!,
-                        enabled: !isLoading.value,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Product Name Field
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Enter Product Name',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Price'),
-                        validator: (value) =>
-                        value == null || double.tryParse(value) == null
-                            ? 'Enter valid price'
-                            : null,
-                        onSaved: (value) => price = double.tryParse(value ?? '0') ?? 0.0,
-                        enabled: !isLoading.value,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Required'
+                          : null,
+                      onSaved: (value) => title = value!,
+                      enabled: !isLoading.value,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Price Field
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Enter Price',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
-                    ],
-                  ),
+                      validator: (value) => value == null ||
+                          double.tryParse(value) == null
+                          ? 'Enter valid price'
+                          : null,
+                      onSaved: (value) =>
+                      price = double.tryParse(value ?? '0') ?? 0.0,
+                      enabled: !isLoading.value,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: isLoading.value
+                                ? null
+                                : () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text("Cancel"),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isLoading.value
+                                ? null
+                                : () async {
+                              if (formKey.currentState!.validate()) {
+                                formKey.currentState!.save();
+                                isLoading.value = true;
+                                try {
+                                  await controller.addProduct(
+                                    title: title,
+                                    price: price,
+                                    imageFile: imageFile,
+                                  );
+                                  Navigator.pop(context);
+                                } finally {
+                                  isLoading.value = false;
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: isLoading.value
+                                ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                AlwaysStoppedAnimation<Color>(
+                                    Colors.white),
+                              ),
+                            )
+                                : const Text("Add", style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-              );
-            },
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (!isLoading.value)
-                  SecondaryButton(
-                    text: "Cancel",
-                    onPressed: () => Navigator.pop(context),
-                    widthFactor: 0.2,
-                    heightFactor: 0.045,
-                  ),
-                const SizedBox(width: 12),
-                SecondaryButton2(
-                  text: isLoading.value ? "Adding..." : "Add",
-                  onPressed: isLoading.value
-                      ? null
-                      : () async {
-                    if (formKey.currentState!.validate()) {
-                      formKey.currentState!.save();
-                      isLoading.value = true;
-                      try {
-                        await controller.addProduct(
-                          title: title,
-                          price: price,
-                          imageFile: imageFile,
-                        );
-                        Navigator.pop(context);
-                      } finally {
-                        isLoading.value = false;
-                      }
-                    }
-                  },
-                  widthFactor: 0.2,
-                  heightFactor: 0.045,
-                  isLoading: isLoading.value,
-                ),
-              ],
+              ),
             ),
-          ],
+          ),
         ));
       },
     );
@@ -188,15 +261,58 @@ class _ProductScreenState extends State<ProductScreen> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.9,
                   ),
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return GridCard(
-                      title: product['title'],
-                      imagePath: product['imagePath'],
-                      price: product['price'],
-                      onDelete: () => controller.deleteProduct(product['id']),
-                    );
-                  },
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return GridCard(
+                        title: product['title'],
+                        imagePath: product['imagePath'],
+                        price: product['price'],
+                          onDelete: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                backgroundColor: AppColors.backgroundColor, // Match your app background
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 28),
+                                    SizedBox(width: 8),
+                                    Text('Confirm Deletion', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                content: Text(
+                                  'Are you sure you want to delete "${product['title']}"?',
+                                  style: const TextStyle(color: Colors.black87, fontSize: 15),
+                                ),
+                                actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                actions: [
+                                  OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(color: AppColors.primary),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.redAccent,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: const Icon(Icons.delete, size: 18, color: Colors.white),
+                                    label: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      controller.deleteProduct(product['id']);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                      );
+                    }
                 ),
               );
             });

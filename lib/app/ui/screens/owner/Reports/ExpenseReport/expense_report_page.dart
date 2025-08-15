@@ -9,6 +9,7 @@ import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/chart.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
+import 'all_expenses.dart';
 
 class ExpenseReportPage extends StatefulWidget {
   const ExpenseReportPage({super.key});
@@ -97,30 +98,65 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
               const SizedBox(height: 16),
 
               /// 🔹 EXPENSE CARDS GRID
+              /// 🔹 EXPENSE CARDS GRID
               LayoutBuilder(
                 builder: (context, constraints) {
                   final isWideScreen = constraints.maxWidth > 600;
                   final grouped = controller.getCategorySummary();
-                  return GridView.count(
-                    crossAxisCount: isWideScreen ? 3 : 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.95,
-                    children: grouped.entries.map((e) {
-                      final category = e.key;
-                      final data = e.value;
-                      return ExpenseCard(
-                        title: category,
-                        description: data['description'] ?? 'No description',
-                        price: (data['amount'] as double).toInt(),
-                      );
-                    }).toList(),
+
+                  // Show only first 4
+                  final firstFour = grouped.entries.take(4).toList();
+
+                  return Column(
+                    children: [
+                      GridView.count(
+                        crossAxisCount: isWideScreen ? 3 : 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 0.95,
+                        children: firstFour.map((e) {
+                          final category = e.key;
+                          final data = e.value;
+                          return ExpenseCard(
+                            title: category,
+                            description: data['description'] ?? 'No description',
+                            price: (data['amount'] as double).toInt(),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () {
+                         Get.to(() => const AllExpensesPage());
+                        },
+                        child: Center(
+                          child: Container(
+                            width: (MediaQuery.of(context).size.width - 48) / 2,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "View All",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 10),
 
               /// 🔹 CURRENT DATE RANGE
               if (fromDate != null && toDate != null)

@@ -13,18 +13,34 @@ Future<void> logoutUser() async {
 Future<void> LabourLogoutUser() async {
   final prefs = await SharedPreferences.getInstance();
   final inviteCode = prefs.getString('inviteCode');
+
   if (inviteCode != null && inviteCode.isNotEmpty) {
     try {
-      // Reset invite code status
-      await FirebaseFirestore.instance.collection('invites').doc(inviteCode).update({
-        'used': false,
-        'usedBy': null,
-      });
+      // ✅ Find invite document by code field
+      final inviteQuery = await FirebaseFirestore.instance
+          .collection('invites')
+          .where('code', isEqualTo: inviteCode)
+          .limit(1)
+          .get();
+
+      if (inviteQuery.docs.isNotEmpty) {
+        final inviteDoc = inviteQuery.docs.first;
+
+        // ✅ Reset invite code status
+        await FirebaseFirestore.instance
+            .collection('invites')
+            .doc(inviteDoc.id)
+            .update({
+          'used': false,
+          'usedBy': null,
+        });
+      }
     } catch (e) {
       print("Error resetting invite code: $e");
     }
   }
 
+  // ✅ Clear local data
   await prefs.clear();
   Get.offAll(() => const SignUpAsScreen());
 }

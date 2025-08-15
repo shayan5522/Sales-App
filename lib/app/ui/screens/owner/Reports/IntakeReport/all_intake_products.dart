@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/SalesReport/sales_report_controller.dart';
+import 'package:salesapp/app/ui/screens/owner/Reports/IntakeReport/intake_report_controller.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import '../../../../widgets/datepicker.dart';
 
-class AllProductsPage extends StatelessWidget {
-  AllProductsPage({super.key,
-    required Map<String, Map<String, dynamic>> productSummary});
+class AllIntakeProductsPage extends StatelessWidget {
+  AllIntakeProductsPage({super.key, required this.productSummary});
 
-  // Get the controller instance
-  final SalesReportController controller = Get.find<SalesReportController>();
+  final Map<String, Map<String, dynamic>> productSummary;
+
+  // Get the IntakeReportController instance
+  final IntakeReportController controller = Get.find<IntakeReportController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: CustomAppbar(title: "All Sales"),
+      appBar: CustomAppbar(title: "All Intake"),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
+            // 📅 Date Pickers
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -42,18 +44,17 @@ class AllProductsPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // 📦 Product Summary List
+
+            // 📦 Intake Product Summary List
             Obx(() {
-              final productSummary = controller.getProductSummaryData();
+              final intakeSummary = controller.getProductSummaryData();
 
               return Expanded(
                 child: controller.isLoading.value
                     ? const Center(child: CircularProgressIndicator())
                     : ListView(
-                  children: productSummary.entries.map((entry) {
+                  children: intakeSummary.entries.map((entry) {
                     final data = entry.value;
-                    final profit = (data['totalSales'] as double) -
-                        (data['totalIntake'] as double);
 
                     return Card(
                       color: Colors.white,
@@ -61,23 +62,23 @@ class AllProductsPage extends StatelessWidget {
                       child: ListTile(
                         tileColor: AppColors.white,
                         leading: Image.asset(
-                          data['imagePath'],
+                          data['imagePath'] ?? "assets/images/products.png",
                           height: 40,
                           width: 40,
+                          fit: BoxFit.cover,
                         ),
-                        title: Text(entry.key,style: AppTextStyles.title,),
+                        title: Text(
+                          entry.key,
+                          style: AppTextStyles.title,
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Sales: ₹${(data['totalSales'] as double).toStringAsFixed(2)}",
+                              "Total Intaken: ${data['totalQuantity']}",
                             ),
-                            Text("Quantity: ${data['totalQuantity']} sold"),
                             Text(
-                              "Profit: ₹${profit.toStringAsFixed(2)}",
-                              style: TextStyle(
-                                color: profit >= 0 ? Colors.green : Colors.red,
-                              ),
+                              "Price: ₹${(data['totalPrice'] as double).toStringAsFixed(2)}",
                             ),
                           ],
                         ),

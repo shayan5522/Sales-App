@@ -42,10 +42,99 @@ class _ReturnReportState extends State<ReturnReport> {
         }
 
         if (controller.transactions.isEmpty) {
-          return Center(
-            child: Text(
-              'No transactions found for selected date range.',
-              style: TextStyle(fontSize: 16, color: Colors.red),
+          return SingleChildScrollView(
+            child: SizedBox(
+              height: screenHeight * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  /// Date pickers (still visible in empty state)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.06,
+                      vertical: screenHeight * 0.02,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minHeight: 56, maxHeight: 80),
+                              child: CustomDatePicker(
+                                label: 'From DATE',
+                                initialDate: fromDate,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    fromDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
+                                  });
+                                  controller.fetchReturnReports(
+                                    fromDate: fromDate!,
+                                    toDate: toDate!,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.04),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minHeight: 56, maxHeight: 80),
+                              child: CustomDatePicker(
+                                label: 'TO DATE',
+                                initialDate: toDate,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    toDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+                                  });
+                                  controller.fetchReturnReports(
+                                    fromDate: fromDate!,
+                                    toDate: toDate!,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// Empty state illustration
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.receipt_long,
+                          size: 80,
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'No return transactions found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Try adjusting your date range',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
