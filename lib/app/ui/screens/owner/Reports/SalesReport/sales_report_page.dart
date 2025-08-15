@@ -39,6 +39,7 @@ class SalesReportPage extends StatelessWidget {
                     label: "From Date",
                     onDateSelected: controller.updateFromDate,
                     initialDate: controller.fromDate.value,
+                    restrictToToday: true,
                   ),
                   CustomDatePicker(
                     label: "To Date",

@@ -42,6 +42,8 @@ class IntakeReportPage extends StatelessWidget {
                     label: "From Date",
                     onDateSelected: controller.updateFromDate,
                     initialDate: controller.fromDate.value,
+                    lastDate: controller.toDate.value,
+                    restrictToToday: true,
                   ),
                   CustomDatePicker(
                     label: "To Date",

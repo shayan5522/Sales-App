@@ -124,7 +124,8 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         controller.filterByDateRange(from: fromDate, to: toDate);
                       },
                       initialDate: fromDate ?? DateTime.now(),
-                      lastDate: toDate ?? DateTime.now(), // Prevent fromDate > toDate
+                      lastDate: toDate ?? DateTime.now(),
+                      restrictToToday: true,
                     ),
                   ),
                   const SizedBox(width: 12),

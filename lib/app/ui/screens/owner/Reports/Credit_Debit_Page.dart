@@ -133,6 +133,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                         controller.filterByDateRange(
                             from: _fromDate, to: _toDate);
                       },
+                      restrictToToday: true,
                     ),
                   ),
                   const SizedBox(width: 12),

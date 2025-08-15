@@ -111,7 +111,8 @@ class StockReportPage extends StatelessWidget {
                     label: "From Date",
                     onDateSelected: controller.updateFromDate,
                     initialDate: controller.fromDate.value,
-                    lastDate: DateTime.now(), // Restrict to today or earlier
+                    lastDate: controller.toDate.value,
+                    restrictToToday: true,
                   ),
                   CustomDatePicker(
                     label: "To Date",

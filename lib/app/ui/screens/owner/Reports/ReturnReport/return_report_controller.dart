@@ -13,6 +13,7 @@ class ReturnReportController extends GetxController {
   void onInit() {
     super.onInit();
     final now = DateTime.now();
+
     fetchReturnReports(
       fromDate: DateTime(now.year, now.month, now.day, 0, 0, 0),
       toDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
