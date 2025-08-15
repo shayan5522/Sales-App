@@ -16,6 +16,8 @@ import '../user_management/usermanagement.dart';
 import 'Add_Sales/sales.dart';
 import 'add_category/add_category_page.dart';
 import 'credit_amount _due/amountcrediet.dart';
+import 'earnings/cash_earnings/offline_earnings_screen.dart';
+import 'earnings/online_earnings/online_earnings_screen.dart';
 import 'expenses/expense.dart';
 import 'intake/addintake.dart';
 
@@ -171,7 +173,7 @@ class OwnerDashboard extends StatelessWidget {
                         income: controller.cashSales.value,
                         profit: controller.cashProfit.value,
                         imagePath: "assets/images/cash_earning.png",
-                        onSeeAll: () {},
+                        onSeeAll: () => Get.to(() => OfflineEarningsScreen()),
                         label: "Cash Earnings",
                       ),
                     ),
@@ -181,7 +183,7 @@ class OwnerDashboard extends StatelessWidget {
                         income: controller.onlineSales.value,
                         profit: controller.onlineProfit.value,
                         imagePath: "assets/images/online_earning.png",
-                        onSeeAll: () {},
+                        onSeeAll: () => Get.to(() => OnlineEarningsScreen()),
                         label: "Online Earnings",
                       ),
                     ),
@@ -241,7 +243,7 @@ class OwnerDashboard extends StatelessWidget {
                             "screen": AddCategoryPage(),
                           },
                           {
-                            "label": "Credit & amount due",
+                            "label": "Loan & amount due",
                             "icon": "assets/images/products.png",
                             "screen": AmountCreditScreen(),
                           },

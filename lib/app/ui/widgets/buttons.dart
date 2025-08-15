@@ -72,7 +72,7 @@ class SecondaryButton extends StatelessWidget {
   final double widthFactor;
   final double heightFactor;
   final Color color;
-  final Color textColor; // ✅ Added
+  final Color textColor; // ✅ Customizable
   final double borderRadius;
   final TextStyle? textStyle;
   final bool isLoading;
@@ -84,7 +84,7 @@ class SecondaryButton extends StatelessWidget {
     this.widthFactor = 0.24,
     this.heightFactor = 0.035,
     this.color = AppColors.primary,
-    this.textColor = Colors.white, // ✅ Default
+    this.textColor = Colors.white, // ✅ Default to white
     this.borderRadius = 6.0,
     this.textStyle,
     this.isLoading = false,
@@ -118,15 +118,17 @@ class SecondaryButton extends StatelessWidget {
         )
             : Text(
           text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: textStyle ??
+              TextStyle(
+                color: textColor, // ✅ Uses passed textColor now
+                fontWeight: FontWeight.bold,
+              ),
         ),
       ),
-      );
+    );
   }
 }
+
 class SecondaryButton2 extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;

@@ -30,11 +30,75 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
     controller.fetchExpenses();
   }
 
+  List<Widget> _buildGroupedExpenses() {
+    final expensesByDate = <DateTime, List<dynamic>>{};
+
+    for (var exp in controller.filteredExpenses) {
+      DateTime expDate;
+
+      try {
+        if (exp['date'] is DateTime) {
+          expDate = exp['date'];
+        } else if (exp['date'] is String) {
+          expDate = DateTime.tryParse(exp['date']) ?? DateTime.now();
+        } else if (exp['createdAt'] is DateTime) {
+          expDate = exp['createdAt'];
+        } else if (exp['createdAt'] is String) {
+          expDate = DateTime.tryParse(exp['createdAt']) ?? DateTime.now();
+        } else {
+          expDate = DateTime.now();
+        }
+
+        final dateKey = DateTime(expDate.year, expDate.month, expDate.day);
+
+        if (!expensesByDate.containsKey(dateKey)) {
+          expensesByDate[dateKey] = [];
+        }
+        expensesByDate[dateKey]!.add(exp);
+      } catch (e) {
+        final dateKey = DateTime.now();
+        if (!expensesByDate.containsKey(dateKey)) {
+          expensesByDate[dateKey] = [];
+        }
+        expensesByDate[dateKey]!.add(exp);
+      }
+    }
+
+    final sortedDates = expensesByDate.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    return sortedDates.map((date) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+            child: Text(
+              DateFormat('dd-MMM-yyyy').format(date),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          ...expensesByDate[date]!.map((exp) {
+            return CustomExpenseListTile(
+              title: exp['title'] ?? 'No Title',
+              description: exp['description'] ?? 'No Description',
+              price: (exp['amount'] as num?)?.toInt() ?? 0,
+            );
+          }).toList(),
+        ],
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppbar(title: 'Expense Report'),
-      backgroundColor:  AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
@@ -60,6 +124,7 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         controller.filterByDateRange(from: fromDate, to: toDate);
                       },
                       initialDate: fromDate ?? DateTime.now(),
+                      lastDate: toDate ?? DateTime.now(), // Prevent fromDate > toDate
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -71,6 +136,8 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         controller.filterByDateRange(from: fromDate, to: toDate);
                       },
                       initialDate: toDate ?? DateTime.now(),
+                      firstDate: fromDate, // Prevent toDate < fromDate
+                      lastDate: DateTime.now(), // Can't select future dates
                     ),
                   ),
                 ],
@@ -98,13 +165,10 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
               const SizedBox(height: 16),
 
               /// 🔹 EXPENSE CARDS GRID
-              /// 🔹 EXPENSE CARDS GRID
               LayoutBuilder(
                 builder: (context, constraints) {
                   final isWideScreen = constraints.maxWidth > 600;
                   final grouped = controller.getCategorySummary();
-
-                  // Show only first 4
                   final firstFour = grouped.entries.take(4).toList();
 
                   return Column(
@@ -128,9 +192,7 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                       ),
                       const SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () {
-                         Get.to(() => const AllExpensesPage());
-                        },
+                        onTap: () => Get.to(() => const AllExpensesPage()),
                         child: Center(
                           child: Container(
                             width: (MediaQuery.of(context).size.width - 48) / 2,
@@ -156,27 +218,12 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                 },
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
 
-              /// 🔹 CURRENT DATE RANGE
-              if (fromDate != null && toDate != null)
-                Text(
-                  "${DateFormat("dd MMM yyyy").format(fromDate!)} - ${DateFormat("dd MMM yyyy").format(toDate!)}",
-                  style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w600),
-                ),
-
-              const SizedBox(height: 12),
-
-              /// 🔹 EXPENSE LIST
+              /// 🔹 EXPENSE LIST GROUPED BY DATE
               if (controller.filteredExpenses.isEmpty)
                 const Text("No expenses found."),
-              ...controller.filteredExpenses.map((exp) {
-                return CustomExpenseListTile(
-                  title: exp['title'],
-                  description: exp['description'],
-                  price: (exp['amount'] as num).toInt(),
-                );
-              }).toList(),
+              ..._buildGroupedExpenses(),
             ],
           ),
         );

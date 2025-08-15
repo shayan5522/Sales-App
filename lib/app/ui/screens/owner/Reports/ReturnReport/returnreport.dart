@@ -200,19 +200,20 @@ class _ReturnReportState extends State<ReturnReport> {
               ),
 
               /// Income & Profit cards
+              /// Return Summary cards
               Row(
                 children: [
                   Expanded(
                     child: CenteredAmountCard(
-                      title: 'Total Income\nOnline',
-                      subtitle: '₹ ${controller.totalIncome.value.toStringAsFixed(2)}',
+                      title: 'Total Returns',
+                      subtitle: controller.totalReturnCount.value.toString(),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.04),
                   Expanded(
                     child: CenteredAmountCard(
-                      title: 'Total Profit\nOnline',
-                      subtitle: '₹ ${controller.totalProfit.value.toStringAsFixed(2)}',
+                      title: 'Total Amount',
+                      subtitle: '₹ ${controller.totalReturnAmount.value.toStringAsFixed(2)}',
                     ),
                   ),
                 ],
@@ -260,6 +261,7 @@ class _ReturnReportState extends State<ReturnReport> {
                             return TransactionTextRow(
                               product: item['product'],
                               amount: item['amount'],
+                              quantity: item['quantity'],
                             );
                           },
                         ),

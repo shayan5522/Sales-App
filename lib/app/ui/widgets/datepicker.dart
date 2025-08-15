@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
+
 class CustomDatePicker extends StatefulWidget {
   final String? label;
   final Function(DateTime) onDateSelected;
   final DateTime? initialDate;
+  final DateTime? firstDate;  // New optional parameter
+  final DateTime? lastDate;   // New optional parameter
+  final bool restrictToToday; // New optional parameter
 
   const CustomDatePicker({
     super.key,
     this.label,
     required this.onDateSelected,
     this.initialDate,
+    this.firstDate,
+    this.lastDate,
+    this.restrictToToday = false, // Default to false for backward compatibility
   });
 
   @override
@@ -19,7 +26,7 @@ class CustomDatePicker extends StatefulWidget {
 }
 
 class _CustomDatePickerState extends State<CustomDatePicker> {
-  DateTime? selectedDate;
+  late DateTime selectedDate;
 
   @override
   void initState() {
@@ -28,11 +35,16 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   }
 
   Future<void> _pickDate() async {
+    final DateTime effectiveFirstDate = widget.firstDate ?? DateTime(2000);
+    final DateTime effectiveLastDate = widget.restrictToToday
+        ? DateTime.now()
+        : widget.lastDate ?? DateTime(2100);
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate!,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      initialDate: selectedDate,
+      firstDate: effectiveFirstDate,
+      lastDate: effectiveLastDate,
     );
 
     if (picked != null) {
@@ -43,7 +55,8 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate!);
+    final formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -56,7 +69,6 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
               color: AppColors.textPrimary,
             ),
           ),
-          // const SizedBox(height: 2),
         ],
         GestureDetector(
           onTap: _pickDate,
