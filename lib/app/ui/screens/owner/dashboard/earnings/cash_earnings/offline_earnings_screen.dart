@@ -5,6 +5,7 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import '../../../../../widgets/amount_card.dart';
 import '../../../../../widgets/appbar.dart';
+import '../../../../../widgets/datepicker.dart';
 import '../../../../../widgets/transaction_list_item.dart';
 import 'offline_earnings_controller.dart';
 
@@ -30,6 +31,22 @@ class OfflineEarningsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              //Custom Date picker
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomDatePicker(
+                    onDateSelected: (DateTime ) {  },
+                    label: 'From Date',
+                    restrictToToday: true,
+                  ),
+                  CustomDatePicker(
+                    onDateSelected: (DateTime ) {  },
+                    label: 'To Date',
+                  ),
+                ],
+              ),
+              SizedBox(height: 16,),
               // Summary Cards
               Row(
                 children: [

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 
 class OnlineEarningsController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,10 +11,21 @@ class OnlineEarningsController extends GetxController {
   RxDouble totalProfit = 0.0.obs;
   RxList<Map<String, dynamic>> transactions = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
+  Rx<DateTime> fromDate = DateTime.now().obs;
+  Rx<DateTime> toDate = DateTime.now().obs;
 
   @override
   void onInit() {
     super.onInit();
+    // Initialize with today's date
+    fromDate.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    toDate.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 23, 59, 59);
+    fetchOnlineEarnings();
+  }
+
+  void updateDateRange(DateTime newFromDate, DateTime newToDate) {
+    fromDate.value = newFromDate;
+    toDate.value = newToDate;
     fetchOnlineEarnings();
   }
 
@@ -27,6 +39,7 @@ class OnlineEarningsController extends GetxController {
       final uid = _auth.currentUser?.uid;
       if (uid == null) return;
 
+      // First get all online sales (without date filtering)
       final snapshot = await _firestore
           .collection('users')
           .doc(uid)
@@ -34,8 +47,18 @@ class OnlineEarningsController extends GetxController {
           .where('paymentType', isEqualTo: 'Online')
           .get();
 
+      // Process all documents and filter locally
       for (var doc in snapshot.docs) {
         final data = doc.data();
+        final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+
+        // Skip if no createdAt date or outside our date range
+        if (createdAt == null ||
+            createdAt.isBefore(fromDate.value) ||
+            createdAt.isAfter(toDate.value)) {
+          continue;
+        }
+
         final amount = (data['totalAmount'] ?? 0).toDouble();
         totalSales.value += amount;
 
@@ -49,7 +72,6 @@ class OnlineEarningsController extends GetxController {
           final quantity = (item['quantity'] ?? 0).toInt();
           final discount = (item['discount'] ?? 0).toDouble();
 
-          // Calculate profit considering discount
           saleProfit += ((salePrice - discount) - originalPrice) * quantity;
         }
 
@@ -63,8 +85,16 @@ class OnlineEarningsController extends GetxController {
           'createdAt': data['createdAt'],
         });
       }
+
+      // Sort transactions by date (newest first)
+      transactions.sort((a, b) {
+        final aDate = (a['createdAt'] as Timestamp).toDate();
+        final bDate = (b['createdAt'] as Timestamp).toDate();
+        return bDate.compareTo(aDate);
+      });
+
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch online earnings: $e');
+      CustomSnackbar.show(title: 'Error', message: 'Failed to fetch online earnings. Try Again Later');
     } finally {
       isLoading.value = false;
     }
