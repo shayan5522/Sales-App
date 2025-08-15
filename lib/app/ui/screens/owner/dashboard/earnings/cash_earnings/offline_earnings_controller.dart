@@ -37,16 +37,27 @@ class OfflineEarningsController extends GetxController {
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final amount = (data['totalAmount'] ?? 0).toDouble();
-        final profit = (data['totalProfit'] ?? 0).toDouble();
-
         totalSales.value += amount;
-        totalProfit.value += profit;
+
+        // Calculate profit from items
+        double saleProfit = 0.0;
+        final items = data['items'] as List? ?? [];
+
+        for (var item in items.cast<Map<String, dynamic>>()) {
+          final originalPrice = (item['originalPrice'] ?? 0).toDouble();
+          final salePrice = (item['price'] ?? 0).toDouble();
+          final quantity = (item['quantity'] ?? 0).toInt();
+
+          saleProfit += (salePrice - originalPrice) * quantity;
+        }
+
+        totalProfit.value += saleProfit;
 
         transactions.add({
           'id': doc.id,
           'amount': amount,
-          'profit': profit,
-          'items': data['items'],
+          'profit': saleProfit,
+          'items': items,
           'createdAt': data['createdAt'],
         });
       }
