@@ -35,33 +35,28 @@ class OnlineEarningsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: CustomDatePicker(
-                      onDateSelected: (date) {
-                        final newFromDate = DateTime(date.year, date.month, date.day);
-                        controller.updateDateRange(
-                          newFromDate,
-                          controller.toDate.value,
-                        );
-                      },
-                      label: 'From Date',
-                      initialDate: controller.fromDate.value,
-                      restrictToToday: true,
-                    ),
+                  CustomDatePicker(
+                    onDateSelected: (date) {
+                      final newFromDate = DateTime(date.year, date.month, date.day);
+                      controller.updateDateRange(
+                        newFromDate,
+                        controller.toDate.value,
+                      );
+                    },
+                    label: 'From Date',
+                    initialDate: controller.fromDate.value,
+                    restrictToToday: true,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomDatePicker(
-                      onDateSelected: (date) {
-                        final newToDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
-                        controller.updateDateRange(
-                          controller.fromDate.value,
-                          newToDate,
-                        );
-                      },
-                      label: 'To Date',
-                      initialDate: controller.toDate.value,
-                    ),
+                  CustomDatePicker(
+                    onDateSelected: (date) {
+                      final newToDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+                      controller.updateDateRange(
+                        controller.fromDate.value,
+                        newToDate,
+                      );
+                    },
+                    label: 'To Date',
+                    initialDate: controller.toDate.value,
                   ),
                 ],
               ),
