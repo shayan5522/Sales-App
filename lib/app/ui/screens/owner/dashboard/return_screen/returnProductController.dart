@@ -9,44 +9,147 @@ class ReturnProductController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Add a new intake
+//   Future<void> returnProduct(List<Map<String, dynamic>> cart) async {
+//     try {
+//       final uid = _auth.currentUser!.uid;
+//
+//       final returnRef = _firestore
+//           .collection('users')
+//           .doc(uid)
+//           .collection('returns')
+//           .doc(); // auto-generated ID
+//
+//       double totalAmount = 0.0;
+//
+//       // Build and sanitize items list
+//       final List<Map<String, dynamic>> items = cart.map((item) {
+//         final double price = (item['price'] as num).toDouble();
+//         final int quantity = (item['quantity'] as num).toInt();
+//
+//         totalAmount += price * quantity;
+//
+//         return {
+//           'title': item['title'],
+//           'price': price,
+//           'quantity': quantity,
+//           'imagePath': item['imagePath'],
+//         };
+//       }).toList();
+//
+//       final returnData = {
+//         'id': returnRef.id,
+//         'totalAmount': totalAmount,
+//         'createdAt': FieldValue.serverTimestamp(),
+//         'items': items,
+//       };
+//
+//       await returnRef.set(returnData);
+//       CustomSnackbar.show(title: "Success", message: "Return product saved successfully");
+//     } catch (e) {
+//       CustomSnackbar.show(title: "Error", message: "Failed to save Return product: $e", isError: true);
+//     }
+//   }
+// }
+
+
   Future<void> returnProduct(List<Map<String, dynamic>> cart) async {
-    try {
-      final uid = _auth.currentUser!.uid;
+  try {
+  final uid = _auth.currentUser!.uid;
+  final batch = _firestore.batch();
 
-      final returnRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('returns')
-          .doc(); // auto-generated ID
+  // 1. Create the return document
+  final returnRef = _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('returns')
+      .doc();
 
-      double totalAmount = 0.0;
+  double totalAmount = 0.0;
+  final List<Map<String, dynamic>> items = [];
 
-      // Build and sanitize items list
-      final List<Map<String, dynamic>> items = cart.map((item) {
-        final double price = (item['price'] as num).toDouble();
-        final int quantity = (item['quantity'] as num).toInt();
+  // 2. Process each item in the return
+  for (var item in cart) {
+  final double price = (item['price'] as num).toDouble();
+  final int quantity = (item['quantity'] as num).toInt();
 
-        totalAmount += price * quantity;
+  totalAmount += price * quantity;
 
-        return {
-          'title': item['title'],
-          'price': price,
-          'quantity': quantity,
-          'imagePath': item['imagePath'],
-        };
-      }).toList();
+  items.add({
+  'title': item['title'],
+  'price': price,
+  'quantity': quantity,
+  'imagePath': item['imagePath'],
+  // No need for productId since we're not updating product documents
+  });
 
-      final returnData = {
-        'id': returnRef.id,
-        'totalAmount': totalAmount,
-        'createdAt': FieldValue.serverTimestamp(),
-        'items': items,
-      };
+  // 3. Create a compensating intake record (negative quantity)
+  final intakeRef = _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('intakes')
+      .doc();
 
-      await returnRef.set(returnData);
-      CustomSnackbar.show(title: "Success", message: "Return product saved successfully");
-    } catch (e) {
-      CustomSnackbar.show(title: "Error", message: "Failed to save Return product: $e", isError: true);
-    }
+  batch.set(intakeRef, {
+  'createdAt': FieldValue.serverTimestamp(),
+  'items': [{
+  'title': item['title'],
+  'price': price,
+  'quantity': -quantity, // Negative quantity for return
+  'imagePath': item['imagePath'],
+  }],
+  'totalAmount': -totalAmount, // Negative amount for return
+  });
   }
-}
+
+  // 4. Create the return record
+  batch.set(returnRef, {
+  'id': returnRef.id,
+  'totalAmount': totalAmount,
+  'createdAt': FieldValue.serverTimestamp(),
+  'items': items,
+  });
+
+  await batch.commit();
+
+  CustomSnackbar.show(
+  title: "Success",
+  message: "Return processed successfully"
+  );
+  } catch (e) {
+  CustomSnackbar.show(
+  title: "Error",
+  message: "Failed to process return: $e",
+  isError: true
+  );
+  print("Error details: $e");
+  }
+  }
+
+  /// Helper function to calculate current stock for a product
+  Future<int> getCurrentStock(String productTitle) async {
+  final uid = _auth.currentUser!.uid;
+
+  // Get all intake records for this product
+  final intakeSnapshot = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('intakes')
+      .where('items', arrayContainsAny: [
+  {'title': productTitle}
+  ])
+      .get();
+
+  int totalStock = 0;
+
+  for (var doc in intakeSnapshot.docs) {
+  final items = doc['items'] as List;
+  for (var item in items.cast<Map<String, dynamic>>()) {
+  if (item['title'] == productTitle) {
+  totalStock += (item['quantity'] as num).toInt();
+  }
+  }
+  }
+
+  return totalStock;
+  }
+  }

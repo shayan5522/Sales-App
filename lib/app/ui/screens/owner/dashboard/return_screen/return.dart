@@ -29,43 +29,31 @@ class _ReturnProductState extends State<ReturnProduct> {
   void _openIntakeDialog(Map<String, dynamic> product) {
     showDialog(
       context: context,
-      barrierDismissible: true,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-              maxWidth: MediaQuery.of(context).size.width * 0.95,
-            ),
-            child: Intakepopover(
-              cart: cart,
-              product: product,
-              onAddProduct: (newProduct) {
-                setState(() {
-                  final existingIndex = cart.indexWhere((item) =>
-                  item['title'] == newProduct['title'] &&
-                      item['price'] == newProduct['price']
-                  );
-                  if (existingIndex == -1) {
-                    cart.add(newProduct);
-                  } else {
-                    cart[existingIndex]['quantity'] += newProduct['quantity'];
-                  }
-                });
-              },
-              onSaveIntake: () async {
-                final cartCopy = List<Map<String, dynamic>>.from(cart);
-                await returnProductController.returnProduct(cartCopy);
-                setState(() {
-                  cart.clear();
-                });
-                Navigator.pop(context);
-              },
-            ),
+          child: Intakepopover(
+            cart: cart,
+            product: product,
+            onAddProduct: (newProduct) {
+              setState(() {
+                final existingIndex = cart.indexWhere((item) =>
+                item['id'] == newProduct['id'] // Match by ID instead of title
+                );
+                if (existingIndex == -1) {
+                  cart.add({
+                    ...newProduct,
+                    'id': product['id'], // Include product ID
+                  });
+                } else {
+                  cart[existingIndex]['quantity'] += newProduct['quantity'];
+                }
+              });
+            },
+            onSaveIntake: () async {
+              await returnProductController.returnProduct(cart);
+              setState(() => cart.clear());
+              Navigator.pop(context);
+            },
           ),
         );
       },
