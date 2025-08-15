@@ -5,8 +5,8 @@ class ReturnReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   RxList<Map<String, dynamic>> transactions = <Map<String, dynamic>>[].obs;
-  RxDouble totalIncome = 0.0.obs;
-  RxDouble totalProfit = 0.0.obs;
+  RxDouble totalReturnAmount = 0.0.obs;
+  RxInt totalReturnCount = 0.obs; // New count variable
   RxBool isLoading = false.obs;
 
   @override
@@ -19,17 +19,15 @@ class ReturnReportController extends GetxController {
     );
   }
 
-
   Future<void> fetchReturnReports({
     required DateTime fromDate,
     required DateTime toDate,
   }) async {
     try {
       isLoading.value = true;
-
       transactions.clear();
-      totalIncome.value = 0.0;
-      totalProfit.value = 0.0;
+      totalReturnAmount.value = 0.0;
+      totalReturnCount.value = 0; // Reset count
 
       final usersSnapshot = await _firestore.collection('users').get();
 
@@ -38,34 +36,32 @@ class ReturnReportController extends GetxController {
             .collection('users')
             .doc(userDoc.id)
             .collection('returns')
+            .where('createdAt', isGreaterThanOrEqualTo: fromDate)
+            .where('createdAt', isLessThanOrEqualTo: toDate)
             .get();
+
+        totalReturnCount.value += returnsSnapshot.docs.length; // Count returns
 
         for (final returnDoc in returnsSnapshot.docs) {
           final data = returnDoc.data();
-          final Timestamp? timestamp = data['createdAt'];
+          final totalAmount = (data['totalAmount'] ?? 0) is num
+              ? (data['totalAmount'] as num).toDouble()
+              : 0.0;
 
-          if (timestamp == null) continue;
+          totalReturnAmount.value += totalAmount;
 
-          final DateTime returnDate = timestamp.toDate();
-
-          if (returnDate.isBefore(fromDate) || returnDate.isAfter(toDate)) {
-            continue;
-          }
-
+          // Add each item from the return as a transaction
           final List<dynamic> items = data['items'] ?? [];
           for (final item in items) {
-            final String productTitle = item['title'] ?? 'Unknown';
-            final double price = (item['price'] ?? 0) is num
-                ? (item['price'] as num).toDouble()
-                : 0.0;
-
             transactions.add({
-              'product': productTitle,
-              'amount': price,
+              'product': item['title'] ?? 'Unknown',
+              'amount': (item['price'] ?? 0) is num
+                  ? (item['price'] as num).toDouble()
+                  : 0.0,
+              'quantity': (item['quantity'] ?? 0) is num
+                  ? (item['quantity'] as num).toInt()
+                  : 0,
             });
-
-            totalIncome.value += price;
-            totalProfit.value += price;
           }
         }
       }
@@ -75,7 +71,4 @@ class ReturnReportController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }
-
-
