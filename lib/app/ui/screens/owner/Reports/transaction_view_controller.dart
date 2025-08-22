@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../../widgets/custom_snackbar.dart';
 
 class TransactionViewController extends GetxController {
@@ -11,6 +10,7 @@ class TransactionViewController extends GetxController {
 
   RxDouble totalCredit = 0.0.obs;
   RxDouble totalDebit = 0.0.obs;
+  RxDouble totalPending = 0.0.obs;
 
   DateTime? fromDate;
   DateTime? toDate;
@@ -28,35 +28,54 @@ class TransactionViewController extends GetxController {
 
       final creditList = creditSnap.docs.map((doc) {
         final data = doc.data();
+        final originalAmount = (data['originalAmount'] ?? data['price'] ?? 0).toDouble();
+        final paidAmount = (data['paidAmount'] ?? 0).toDouble();
+        final remainingAmount = originalAmount - paidAmount;
+
         return {
+          'id': doc.id,
           'type': 'credit',
           'name': data['name'],
           'detail': data['detail'],
-          'price': data['price'],
+          'originalAmount': originalAmount,
+          'paidAmount': paidAmount,
+          'remainingAmount': remainingAmount,
+          'isFullyPaid': remainingAmount <= 0,
           'date': (data['date'] as Timestamp).toDate(),
+          'createdAt': (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         };
       }).toList();
 
       final debitList = debitSnap.docs.map((doc) {
         final data = doc.data();
+        final originalAmount = (data['originalAmount'] ?? data['price'] ?? 0).toDouble();
+        final paidAmount = (data['paidAmount'] ?? 0).toDouble();
+        final remainingAmount = originalAmount - paidAmount;
+
         return {
+          'id': doc.id,
           'type': 'debit',
           'name': data['name'],
           'detail': data['detail'],
-          'price': data['price'],
+          'originalAmount': originalAmount,
+          'paidAmount': paidAmount,
+          'remainingAmount': remainingAmount,
+          'isFullyPaid': remainingAmount <= 0,
           'date': (data['date'] as Timestamp).toDate(),
+          'createdAt': (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         };
       }).toList();
 
       allTransactions.assignAll([...creditList, ...debitList]);
       filteredTransactions.assignAll(allTransactions);
 
-      totalCredit.value = creditList.fold(0.0, (sum, item) => sum + (item['price'] ?? 0));
-      totalDebit.value = debitList.fold(0.0, (sum, item) => sum + (item['price'] ?? 0));
+      totalCredit.value = creditList.fold(0.0, (sum, item) => sum + (item['originalAmount'] ?? 0));
+      totalDebit.value = debitList.fold(0.0, (sum, item) => sum + (item['originalAmount'] ?? 0));
+      totalPending.value = creditList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0)) +
+          debitList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0));
     } catch (e) {
       CustomSnackbar.show(title: 'Error', message: 'Failed to load transactions: $e');
-    }
-    finally{
+    } finally {
       isLoading.value = false;
     }
   }
@@ -80,6 +99,74 @@ class TransactionViewController extends GetxController {
   void filterByDateRange({DateTime? from, DateTime? to}) {
     fromDate = from;
     toDate = to;
-    filterTransactions(); // uses current type + new date range
+    filterTransactions();
+  }
+
+  Future<void> addPayment(String transactionId, String type, double amount, String note) async {
+    try {
+      final uid = _auth.currentUser!.uid;
+      final collection = type == 'credit' ? 'credits' : 'debits';
+
+      // Get current transaction
+      final doc = await _firestore.collection('users').doc(uid).collection(collection).doc(transactionId).get();
+      if (!doc.exists) throw Exception('Transaction not found');
+
+      final data = doc.data()!;
+      final currentPaid = (data['paidAmount'] ?? 0).toDouble();
+      final originalAmount = (data['originalAmount'] ?? data['price'] ?? 0).toDouble();
+      final newPaid = currentPaid + amount;
+
+      if (newPaid > originalAmount) {
+        throw Exception('Payment amount exceeds remaining balance');
+      }
+
+      // Update transaction with new payment
+      await _firestore.collection('users').doc(uid).collection(collection).doc(transactionId).update({
+        'paidAmount': newPaid,
+        'isFullyPaid': newPaid >= originalAmount,
+        'lastPaymentDate': FieldValue.serverTimestamp(),
+      });
+
+      // Add payment record to subcollection
+      await _firestore.collection('users').doc(uid).collection(collection).doc(transactionId)
+          .collection('payments').add({
+        'amount': amount,
+        'note': note,
+        'date': FieldValue.serverTimestamp(),
+        'createdBy': uid,
+      });
+
+      // Refresh data
+      await fetchTransactions();
+
+      CustomSnackbar.show(title: 'Success', message: 'Payment of ₹${amount.toStringAsFixed(2)} recorded successfully');
+    } catch (e) {
+      CustomSnackbar.show(title: 'Error', message: 'Failed to record payment: $e', isError: true);
+    }
+  }
+
+  Future<void> markAsFullyPaid(String transactionId, String type) async {
+    try {
+      final uid = _auth.currentUser!.uid;
+      final collection = type == 'credit' ? 'credits' : 'debits';
+
+      final doc = await _firestore.collection('users').doc(uid).collection(collection).doc(transactionId).get();
+      if (!doc.exists) throw Exception('Transaction not found');
+
+      final data = doc.data()!;
+      final originalAmount = (data['originalAmount'] ?? data['price'] ?? 0).toDouble();
+
+      await _firestore.collection('users').doc(uid).collection(collection).doc(transactionId).update({
+        'paidAmount': originalAmount,
+        'isFullyPaid': true,
+        'completedDate': FieldValue.serverTimestamp(),
+      });
+
+      await fetchTransactions();
+
+      CustomSnackbar.show(title: 'Success', message: 'Transaction marked as fully paid');
+    } catch (e) {
+      CustomSnackbar.show(title: 'Error', message: 'Failed to mark as paid: $e', isError: true);
+    }
   }
 }
