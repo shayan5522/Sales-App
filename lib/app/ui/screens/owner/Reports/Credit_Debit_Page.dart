@@ -169,7 +169,7 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                       title: "Debit Amount",
                       subtitle:
                       "INR ${controller.totalDebit.value.toStringAsFixed(0)}",
-                      subtitleColor: Colors.red,
+                      subtitleColor: AppColors.primary,
                     ),
                   ),
                 ],
