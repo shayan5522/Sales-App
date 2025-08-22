@@ -5,13 +5,13 @@ import 'package:salesapp/app/themes/styles.dart';
 class SalesCard extends StatelessWidget {
   final String imagePath;
   final String label;
-  final int value;
+  final String value; // ✅ changed from int to String
 
   const SalesCard({
     super.key,
     required this.imagePath,
     required this.label,
-    required this.value,
+    required this.value, // ✅ now a String
   });
 
   @override
@@ -44,7 +44,7 @@ class SalesCard extends StatelessWidget {
             children: [
               const Icon(Icons.currency_rupee, color: AppColors.primary, size: 18),
               Text(
-                value.toString(),
+                value, // ✅ already formatted string
                 style: AppTextStyles.heading.copyWith(fontSize: 18),
               ),
             ],
@@ -54,3 +54,4 @@ class SalesCard extends StatelessWidget {
     );
   }
 }
+

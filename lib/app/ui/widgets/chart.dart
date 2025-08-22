@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'chart_formatter.dart';
 
 class ResponsiveBarChart extends StatelessWidget {
   final List<BarData> data;
   final double maxYValue;
   final List<double> yAxisSteps;
+  final bool useLogarithmicScale;
 
   const ResponsiveBarChart({
     super.key,
     required this.data,
     required this.maxYValue,
     required this.yAxisSteps,
+    this.useLogarithmicScale = false,
   });
 
   @override
@@ -20,8 +22,9 @@ class ResponsiveBarChart extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           double fullHeight = constraints.maxHeight;
-          double chartHeight = fullHeight - 50; // Increased space for bottom labels
-          final bool useCompactFormatting = maxYValue > 10000;
+          double chartHeight = fullHeight - 50;
+          final bool useCompactFormatting = maxYValue > 1000;
+          final String valueScale = ChartFormatter.determineValueScale(maxYValue);
 
           return Padding(
             padding: const EdgeInsets.only(left: 8, right: 8),
@@ -36,16 +39,16 @@ class ResponsiveBarChart extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: yAxisSteps.reversed.map((step) {
-                      final label = _formatYAxisLabel(step, useCompactFormatting);
+                      final label = _formatYAxisLabel(step, useCompactFormatting, valueScale);
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: 36, // Slightly wider for larger numbers
+                            width: valueScale.isNotEmpty ? 42 : 36,
                             child: Text(
                               label,
                               style: const TextStyle(
-                                fontSize: 10, // Slightly smaller font
+                                fontSize: 10,
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -65,10 +68,31 @@ class ResponsiveBarChart extends StatelessWidget {
                   ),
                 ),
 
+                // Scale indicator (e.g., "Values in Millions")
+                if (valueScale.isNotEmpty)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'Values in ${valueScale == 'K' ? 'Thousands' : valueScale == 'M' ? 'Millions' : valueScale == 'B' ? 'Billions' : 'Trillions'}',
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // Bars with horizontal scroll
                 Positioned(
-                  bottom: 40, // Increased bottom padding
-                  left: 40, // Increased to accommodate wider Y-axis labels
+                  bottom: 22,
+                  left: valueScale.isNotEmpty ? 46 : 40,
                   right: 0,
                   height: chartHeight,
                   child: SingleChildScrollView(
@@ -76,13 +100,16 @@ class ResponsiveBarChart extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: data.map((bar) {
-                        double barHeight = maxYValue == 0
+                        double scaledValue = ChartFormatter.scaleValue(bar.value, valueScale);
+                        double scaledMaxValue = ChartFormatter.scaleValue(maxYValue, valueScale);
+
+                        double barHeight = scaledMaxValue == 0
                             ? 0
-                            : ((bar.value < 0 ? 0 : bar.value) / maxYValue) *
+                            : ((scaledValue < 0 ? 0 : scaledValue) / scaledMaxValue) *
                             chartHeight;
 
                         // Calculate available height for bar after accounting for labels
-                        double maxBarHeight = chartHeight - 40; // Reserve space for labels
+                        double maxBarHeight = chartHeight - 40;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -96,7 +123,7 @@ class ResponsiveBarChart extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 4.0),
                                     child: Text(
-                                      _formatYAxisLabel(bar.value, useCompactFormatting),
+                                      _formatYAxisLabel(bar.value, useCompactFormatting, valueScale),
                                       style: const TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
@@ -130,7 +157,7 @@ class ResponsiveBarChart extends StatelessWidget {
                                 // Bar label with constrained height
                                 SizedBox(
                                   width: 50,
-                                  height: 13, // Increased height for potential 2 lines
+                                  height: 32,
                                   child: Text(
                                     bar.label,
                                     style: const TextStyle(
@@ -158,23 +185,9 @@ class ResponsiveBarChart extends StatelessWidget {
     );
   }
 
-  String _formatYAxisLabel(double value, bool useCompactFormatting) {
-    if (useCompactFormatting) {
-      if (value >= 1000000) {
-        return '${(value / 1000000).toStringAsFixed(1)}M';
-      } else if (value >= 1000) {
-        return '${(value / 1000).toStringAsFixed(1)}K';
-      }
-    }
-
-    // For smaller values or when not using compact formatting
-    if (value == value.truncateToDouble()) {
-      return value.toInt().toString();
-    } else if (value < 1) {
-      return value.toStringAsFixed(2);
-    } else {
-      return value.toStringAsFixed(value < 10 ? 1 : 0);
-    }
+  String _formatYAxisLabel(double value, bool useCompactFormatting, String scale) {
+    // Use the ChartFormatter utility for consistent formatting
+    return ChartFormatter.formatValue(value, forceCompact: useCompactFormatting);
   }
 }
 
@@ -183,57 +196,4 @@ class BarData {
   final double value;
 
   BarData({required this.label, required this.value});
-}
-
-// Utility class for consistent chart formatting across all reports
-class ChartFormatter {
-  static String formatValue(double value, {bool forceCompact = false}) {
-    final bool useCompact = forceCompact || value.abs() >= 10000;
-
-    if (useCompact) {
-      if (value.abs() >= 1000000) {
-        return '${(value / 1000000).toStringAsFixed(1)}M';
-      } else if (value.abs() >= 1000) {
-        return '${(value / 1000).toStringAsFixed(1)}K';
-      }
-    }
-
-    if (value == value.truncateToDouble()) {
-      return value.toInt().toString();
-    } else if (value.abs() < 1) {
-      return value.toStringAsFixed(2);
-    } else {
-      return value.toStringAsFixed(value.abs() < 10 ? 1 : 0);
-    }
-  }
-
-  static List<double> calculateYAxisSteps(double maxValue, {int preferredSteps = 5}) {
-    if (maxValue <= 0) return [0, 1, 2, 3, 4];
-
-    // Calculate appropriate number of steps (4-6 is ideal)
-    double rawStepSize = maxValue / preferredSteps;
-
-    // Round to a "nice" interval
-    double magnitude = pow(10, (log(rawStepSize) / ln10).floor()).toDouble();
-    double residual = rawStepSize / magnitude;
-    double stepSize;
-
-    if (residual > 5) {
-      stepSize = 10 * magnitude;
-    } else if (residual > 2) {
-      stepSize = 5 * magnitude;
-    } else if (residual > 1) {
-      stepSize = 2 * magnitude;
-    } else {
-      stepSize = magnitude;
-    }
-
-    // Generate steps
-    final steps = <double>[];
-    for (double value = 0; value <= maxValue * 1.05; value += stepSize) {
-      steps.add(value);
-    }
-
-    return steps;
-  }
 }

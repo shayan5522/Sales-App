@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../widgets/chart.dart';
+import '../../../../widgets/chart_formatter.dart';
 import '../../../../widgets/custom_snackbar.dart';
+import 'dart:math';
 
 class IntakeReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -127,9 +129,38 @@ class IntakeReportController extends GetxController {
   // Get max Y value for chart
   double getMaxChartValue() {
     final chartData = getProductChartData();
-    if (chartData.isEmpty) return 8000; // default
-    return chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2;
+    if (chartData.isEmpty) return 8; // default when no data
+
+    // Get the maximum value from the chart data
+    final maxDataValue = chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+
+    // For extremely large values, use a different approach
+    if (maxDataValue >= 1000000) {
+      return maxDataValue * 1.1; // Just add 10% padding
+    }
+
+    // For smaller values, use the existing logic
+    double maxValue;
+    if (maxDataValue <= 10) {
+      maxValue = maxDataValue.ceilToDouble();
+    } else if (maxDataValue <= 100) {
+      maxValue = (maxDataValue / 10).ceilToDouble() * 10;
+    } else if (maxDataValue <= 1000) {
+      maxValue = (maxDataValue / 100).ceilToDouble() * 100;
+    } else {
+      maxValue = (maxDataValue / 1000).ceilToDouble() * 1000;
+    }
+
+    return maxValue * 1.1;
   }
+  // Calculate Y-axis steps for the chart
+  List<double> getYAxisSteps() {
+    final maxValue = getMaxChartValue();
+    return ChartFormatter.calculateYAxisSteps(maxValue);
+  }
+
+
+
   Map<String, Map<String, dynamic>> getProductSummaryData() {
     final Map<String, Map<String, dynamic>> productMap = {};
 
@@ -156,5 +187,4 @@ class IntakeReportController extends GetxController {
 
     return productMap;
   }
-
 }
