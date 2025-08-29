@@ -19,7 +19,7 @@ class ExpenseReportPage extends StatefulWidget {
 }
 
 class _ExpenseReportPageState extends State<ExpenseReportPage> {
-  final controller = Get.put(ExpenseReportController());
+  final ExpenseReportController controller = Get.put(ExpenseReportController());
 
   DateTime? fromDate;
   DateTime? toDate;
@@ -27,11 +27,11 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
   @override
   void initState() {
     super.initState();
-    controller.fetchExpenses();
+    // fetchExpenses is already called in controller's onInit
   }
 
   List<Widget> _buildGroupedExpenses() {
-    final expensesByDate = <DateTime, List<dynamic>>{};
+    final expensesByDate = <DateTime, List<Map<String, dynamic>>>{};
 
     for (var exp in controller.filteredExpenses) {
       DateTime expDate;
@@ -75,7 +75,7 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
             padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
             child: Text(
               DateFormat('dd-MMM-yyyy').format(date),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -123,8 +123,9 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         setState(() => fromDate = date);
                         controller.filterByDateRange(from: fromDate, to: toDate);
                       },
-                      initialDate: fromDate ?? DateTime.now(),
-                      lastDate: toDate ?? DateTime.now(), // Prevent fromDate > toDate
+                      initialDate: fromDate,
+                      lastDate: toDate ?? DateTime.now(),
+                      restrictToToday: true,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -135,9 +136,9 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         setState(() => toDate = date);
                         controller.filterByDateRange(from: fromDate, to: toDate);
                       },
-                      initialDate: toDate ?? DateTime.now(),
-                      firstDate: fromDate, // Prevent toDate < fromDate
-                      lastDate: DateTime.now(), // Can't select future dates
+                      initialDate: toDate,
+                      firstDate: fromDate,
+                      lastDate: DateTime.now(),
                     ),
                   ),
                 ],
@@ -157,8 +158,8 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ResponsiveBarChart(
-                  maxYValue: chartData.map((e) => e.value).fold<double>(0.0, (p, c) => c > p ? c : p),
-                  yAxisSteps: [0, 2, 4, 6, 8],
+                  maxYValue: controller.getMaxChartValue(),
+                  yAxisSteps: controller.getYAxisSteps(),
                   data: chartData,
                 ),
               ),
@@ -170,6 +171,13 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                   final isWideScreen = constraints.maxWidth > 600;
                   final grouped = controller.getCategorySummary();
                   final firstFour = grouped.entries.take(4).toList();
+
+                  if (firstFour.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("No expense categories found."),
+                    );
+                  }
 
                   return Column(
                     children: [
@@ -191,28 +199,29 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
                         }).toList(),
                       ),
                       const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () => Get.to(() => const AllExpensesPage()),
-                        child: Center(
-                          child: Container(
-                            width: (MediaQuery.of(context).size.width - 48) / 2,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "View All",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
+                      if (grouped.length > 4)
+                        GestureDetector(
+                          onTap: () => Get.to(() => const AllExpensesPage()),
+                          child: Center(
+                            child: Container(
+                              width: (MediaQuery.of(context).size.width - 48) / 2,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "View All",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   );
                 },
@@ -222,8 +231,12 @@ class _ExpenseReportPageState extends State<ExpenseReportPage> {
 
               /// 🔹 EXPENSE LIST GROUPED BY DATE
               if (controller.filteredExpenses.isEmpty)
-                const Text("No expenses found."),
-              ..._buildGroupedExpenses(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text("No expenses found for the selected date range."),
+                )
+              else
+                ..._buildGroupedExpenses(),
             ],
           ),
         );

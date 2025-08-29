@@ -3,12 +3,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/chart.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
-import 'package:salesapp/app/ui/widgets/intakeproduct.dart';
-import 'package:salesapp/app/ui/widgets/sale/salereportlist.dart';
-
+import '../../../../widgets/appbar.dart';
+import '../../../../widgets/chart.dart';
+import '../../../../widgets/datepicker.dart';
+import '../../../../widgets/sale/salereportlist.dart';
 import 'all_intake_products.dart';
 import 'intake_report_controller.dart';
 
@@ -16,7 +14,7 @@ class IntakeReportPage extends StatelessWidget {
   IntakeReportPage({super.key}) {
     Get.put(IntakeReportController());
   }
-
+  final formatter = NumberFormat.compact();
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<IntakeReportController>();
@@ -42,6 +40,8 @@ class IntakeReportPage extends StatelessWidget {
                     label: "From Date",
                     onDateSelected: controller.updateFromDate,
                     initialDate: controller.fromDate.value,
+                    lastDate: controller.toDate.value,
+                    restrictToToday: true,
                   ),
                   CustomDatePicker(
                     label: "To Date",
@@ -64,7 +64,7 @@ class IntakeReportPage extends StatelessWidget {
                 ),
                 child: ResponsiveBarChart(
                   maxYValue: controller.getMaxChartValue(),
-                  yAxisSteps: [0, 2, 4, 6, 8],
+                  yAxisSteps: controller.getYAxisSteps(),
                   data: controller.getProductChartData(),
                 ),
               ),
@@ -204,8 +204,8 @@ class IntakeReportPage extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 index == 0
-                    ? '${controller.totalItemsIntaken.value}'
-                    : '${controller.totalExpense.value.toStringAsFixed(2)}',
+                    ? formatter.format(controller.totalItemsIntaken.value)
+                    : "₹${formatter.format(controller.totalExpense.value)}",
                 style: AppTextStyles.title.copyWith(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

@@ -3,15 +3,15 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 
 class EarningsCard extends StatelessWidget {
-  final String label; // ✅ Added label
-  final double income;
-  final double profit;
+  final String label;
+  final String income;   // ✅ changed to String
+  final String profit;   // ✅ changed to String
   final String imagePath;
   final VoidCallback onSeeAll;
 
   const EarningsCard({
     super.key,
-    required this.label, // ✅ Required label
+    required this.label,
     required this.income,
     required this.profit,
     required this.imagePath,
@@ -83,7 +83,7 @@ class EarningsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEarningRow({required String label, required double amount}) {
+  Widget _buildEarningRow({required String label, required String amount}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -96,13 +96,13 @@ class EarningsCard extends StatelessWidget {
         ),
         Row(
           children: [
-            const Icon(
-              Icons.currency_rupee,
-              color: AppColors.primary,
-              size: 18,
-            ),
+            // const Icon(
+            //   Icons.currency_rupee,
+            //   color: AppColors.primary,
+            //   size: 18,
+            // ),
             Text(
-              amount.toStringAsFixed(2),
+              amount, // ✅ already formatted
               style: AppTextStyles.subtitle,
             ),
           ],

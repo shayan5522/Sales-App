@@ -7,9 +7,9 @@ import 'package:salesapp/app/ui/screens/owner/Reports/transaction_view_controlle
 import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
-
 import '../../../widgets/Amountcard.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class CreditDebitPage extends StatefulWidget {
   const CreditDebitPage({super.key});
@@ -20,10 +20,9 @@ class CreditDebitPage extends StatefulWidget {
 
 class _CreditDebitPageState extends State<CreditDebitPage> {
   final controller = Get.put(TransactionViewController());
-
   DateTime? _fromDate;
   DateTime? _toDate;
-  String _selectedFilter = 'credit'; // 'credit', 'debit', or ''
+  String _selectedFilter = 'credit';
 
   @override
   void initState() {
@@ -32,19 +31,124 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
     controller.filterTransactions(type: 'credit');
   }
 
+  void _showPaymentDialog(Map<String, dynamic> transaction) {
+    final amountController = TextEditingController();
+    final noteController = TextEditingController();
+    final remaining = transaction['remainingAmount'] ?? 0.0;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: const [
+            Icon(Icons.payment, color: Colors.blue, size: 28),
+            SizedBox(width: 8),
+            Text(
+              'Record Payment',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                "Remaining Balance: ₹${remaining.toStringAsFixed(2)}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: amountController,
+              decoration: InputDecoration(
+                labelText: 'Amount',
+                prefixText: '₹ ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: noteController,
+              decoration: InputDecoration(
+                labelText: 'Note (optional)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              maxLines: 2,
+            ),
+            SizedBox(height: 25,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SecondaryButton(text: "Cancel", onPressed: () => Navigator.pop(context),),
+                SecondaryButton(text: "Save", onPressed: () async {
+                  final amount = double.tryParse(amountController.text) ?? 0;
+                  if (amount <= 0) {
+                    CustomSnackbar.show(
+                      title: 'Error',
+                      message: 'Please enter a valid amount',
+                      isError: true,
+                    );
+                    return;
+                  }
+                  if (amount > remaining) {
+                    CustomSnackbar.show(
+                      title: 'Error',
+                      message: 'Amount exceeds remaining balance',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  await controller.addPayment(
+                    transaction['id'],
+                    transaction['type'],
+                    amount,
+                    noteController.text,
+                  );
+                  Navigator.pop(context);
+                },),
+              ],
+            )
+          ],
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        actions: [
+
+        ],
+      ),
+    );
+  }
+
+
   List<Widget> _buildGroupedTransactions() {
-    // Group transactions by date
     final transactionsByDate = <DateTime, List<dynamic>>{};
 
     for (var tx in controller.filteredTransactions) {
       DateTime txDate;
 
       try {
-        // Handle different possible date formats
         if (tx['date'] is DateTime) {
           txDate = tx['date'];
         } else if (tx['date'] is String) {
-          // Try parsing ISO format first
           txDate = DateTime.tryParse(tx['date']) ?? DateTime.now();
         } else if (tx['createdAt'] is DateTime) {
           txDate = tx['createdAt'];
@@ -54,7 +158,6 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
           txDate = DateTime.now();
         }
 
-        // Normalize to date-only (remove time component)
         final dateKey = DateTime(txDate.year, txDate.month, txDate.day);
 
         if (!transactionsByDate.containsKey(dateKey)) {
@@ -62,7 +165,6 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
         }
         transactionsByDate[dateKey]!.add(tx);
       } catch (e) {
-        // Fallback to current date if parsing fails
         final dateKey = DateTime.now();
         if (!transactionsByDate.containsKey(dateKey)) {
           transactionsByDate[dateKey] = [];
@@ -71,7 +173,6 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
       }
     }
 
-    // Sort dates in descending order (newest first)
     final sortedDates = transactionsByDate.keys.toList()
       ..sort((a, b) => b.compareTo(a));
 
@@ -79,27 +180,78 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Date Header
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-            child: Text(
-              DateFormat('dd-MMM-yyyy').format(date), // Formats as "12-Aug-2025"
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+          Text(
+            DateFormat('dd-MMM-yyyy').format(date),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
-
-          /// Transactions for this date
+          const SizedBox(height: 8),
           ...transactionsByDate[date]!.map((tx) {
-            return CustomExpenseListTile(
-              title: tx['name'] ?? 'No Name',
-              description: tx['detail'] ?? 'No Details',
-              price: (tx['price'] as num?)?.toInt() ?? 0,
+            final isFullyPaid = tx['isFullyPaid'] ?? false;
+            final remaining = tx['remainingAmount'] ?? 0.0;
+
+            return Card(
+              color: Colors.white,
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: ListTile(
+                tileColor: AppColors.white,
+                title: Text(tx['name'] ?? 'No Name'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(tx['detail'] ?? 'No Details'),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Original: ₹${(tx['originalAmount'] ?? 0).toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      'Paid: ₹${(tx['paidAmount'] ?? 0).toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      'Remaining: ₹${remaining.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: remaining > 0 ? Colors.red : Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: !isFullyPaid ? IconButton(
+                  icon: const Icon(Icons.payment, color: AppColors.primary),
+                  onPressed: () => _showPaymentDialog(tx),
+                ) : const Icon(Icons.check_circle, color: Colors.green),
+                onLongPress: !isFullyPaid ? () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Mark as Fully Paid'),
+                      content: Text('Mark "${tx['name']}" as fully paid?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await controller.markAsFullyPaid(tx['id'], tx['type']);
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Mark Paid'),
+                        ),
+                      ],
+                    ),
+                  );
+                } : null,
+              ),
             );
           }).toList(),
+          const SizedBox(height: 16),
         ],
       );
     }).toList();
@@ -130,69 +282,64 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                       initialDate: _fromDate ?? DateTime.now(),
                       onDateSelected: (date) {
                         setState(() => _fromDate = date);
-                        controller.filterByDateRange(
-                            from: _fromDate, to: _toDate);
+                        controller.filterByDateRange(from: _fromDate, to: _toDate);
                       },
+                      restrictToToday: true,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomDatePicker(
-                      label: "To Date",
-                      initialDate: _toDate ?? DateTime.now(),
-                      onDateSelected: (date) {
-                        setState(() => _toDate = date);
-                        controller.filterByDateRange(
-                            from: _fromDate, to: _toDate);
-                      },
-                    ),
+                  CustomDatePicker(
+                    label: "To Date",
+                    initialDate: _toDate ?? DateTime.now(),
+                    onDateSelected: (date) {
+                      setState(() => _toDate = date);
+                      controller.filterByDateRange(from: _fromDate, to: _toDate);
+                    },
                   ),
                 ],
               ),
               const SizedBox(height: 16),
 
-              /// 🔹 CREDIT + TOTAL VALUE CARDS
+              /// 🔹 FINANCIAL OVERVIEW CARDS
               Row(
                 children: [
                   Expanded(
                     child: CenteredAmountCard(
-                      title: "Loan Amount",
-                      subtitle:
-                      "INR ${controller.totalCredit.value.toStringAsFixed(0)}",
+                      title: "Total Loan",
+                      subtitle: "₹${controller.totalCredit.value.toStringAsFixed(0)}",
                       subtitleColor: Colors.red,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CenteredAmountCard(
-                      title: "Debit Amount",
-                      subtitle:
-                      "INR ${controller.totalDebit.value.toStringAsFixed(0)}",
-                      subtitleColor: Colors.red,
+                      title: "Total Debit",
+                      subtitle: "₹${controller.totalDebit.value.toStringAsFixed(0)}",
+                      subtitleColor: AppColors.primary,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              CenteredAmountCard(
+                title: "Pending Amount",
+                subtitle: "₹${controller.totalPending.value.toStringAsFixed(0)}",
+                subtitleColor: Colors.orange,
+              ),
 
               const SizedBox(height: 16),
 
-              /// 🔹 FILTER BUTTONS WITH SELECT HIGHLIGHT
+              /// 🔹 FILTER BUTTONS
               Row(
                 children: [
                   Expanded(
                     child: SecondaryButton(
                       heightFactor: 0.04,
                       text: 'Credited Only',
-                      color: _selectedFilter == 'credit'
-                          ? AppColors.primary
-                          : Colors.white,
-                      textColor: _selectedFilter == 'credit'
-                          ? Colors.white
-                          : Colors.black,
+                      color: _selectedFilter == 'credit' ? AppColors.primary : Colors.white,
+                      textColor: _selectedFilter == 'credit' ? Colors.white : Colors.black,
                       onPressed: () {
-                        setState(() {
-                          _selectedFilter = 'credit';
-                        });
+                        setState(() => _selectedFilter = 'credit');
                         controller.filterTransactions(type: 'credit');
                       },
                     ),
@@ -202,16 +349,10 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                     child: SecondaryButton(
                       heightFactor: 0.04,
                       text: 'Debited Only',
-                      color: _selectedFilter == 'debit'
-                          ? AppColors.primary
-                          : Colors.white,
-                      textColor: _selectedFilter == 'debit'
-                          ? Colors.white
-                          : Colors.black,
+                      color: _selectedFilter == 'debit' ? AppColors.primary : Colors.white,
+                      textColor: _selectedFilter == 'debit' ? Colors.white : Colors.black,
                       onPressed: () {
-                        setState(() {
-                          _selectedFilter = 'debit';
-                        });
+                        setState(() => _selectedFilter = 'debit');
                         controller.filterTransactions(type: 'debit');
                       },
                     ),
@@ -232,15 +373,20 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                     });
                     controller.fromDate = null;
                     controller.toDate = null;
-                    controller.filterTransactions(); // Show all
+                    controller.filterTransactions();
                   },
                   child: const Text('Show All'),
                 ),
               ),
-              /// 🔹 GROUPED TRANSACTIONS BY DATE
+
+              /// 🔹 TRANSACTIONS LIST
               if (controller.filteredTransactions.isEmpty)
-                const Text("No transactions found."),
-              ..._buildGroupedTransactions(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: Center(child: Text("No transactions found.")),
+                )
+              else
+                ..._buildGroupedTransactions(),
             ],
           ),
         );

@@ -15,18 +15,19 @@ class ReturnReport extends StatefulWidget {
   State<ReturnReport> createState() => _ReturnReportState();
 }
 
-final ScrollController _transactionScrollController = ScrollController();
-
 class _ReturnReportState extends State<ReturnReport> {
   final ReturnReportController controller = Get.put(ReturnReportController());
+  final ScrollController _transactionScrollController = ScrollController();
 
   DateTime? fromDate = DateTime.now();
   DateTime? toDate = DateTime.now();
+
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -52,7 +53,7 @@ class _ReturnReportState extends State<ReturnReport> {
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: screenWidth * 0.06,
-                      vertical: screenHeight * 0.02,
+                      vertical: screenHeight * 0.01,
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,13 +68,19 @@ class _ReturnReportState extends State<ReturnReport> {
                                 initialDate: fromDate,
                                 onDateSelected: (date) {
                                   setState(() {
-                                    fromDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
+                                    fromDate = DateTime(date.year, date.month, date.day);
+                                    // Ensure toDate isn't before fromDate
+                                    if (toDate!.isBefore(fromDate!)) {
+                                      toDate = fromDate;
+                                    }
                                   });
                                   controller.fetchReturnReports(
                                     fromDate: fromDate!,
                                     toDate: toDate!,
                                   );
                                 },
+                                lastDate: toDate, // Can't select after toDate
+                                restrictToToday: true,
                               ),
                             ),
                           ),
@@ -90,12 +97,18 @@ class _ReturnReportState extends State<ReturnReport> {
                                 onDateSelected: (date) {
                                   setState(() {
                                     toDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+                                    // Ensure fromDate isn't after toDate
+                                    if (fromDate!.isAfter(toDate!)) {
+                                      fromDate = DateTime(toDate!.year, toDate!.month, toDate!.day);
+                                    }
                                   });
                                   controller.fetchReturnReports(
                                     fromDate: fromDate!,
                                     toDate: toDate!,
                                   );
                                 },
+                                firstDate: fromDate, // Can't select before fromDate
+                                lastDate: DateTime.now(), // Can't select future dates
                               ),
                             ),
                           ),
@@ -141,7 +154,7 @@ class _ReturnReportState extends State<ReturnReport> {
 
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.06,
+            horizontal: screenWidth * 0.02,
             vertical: screenHeight * 0.02,
           ),
           child: Column(
@@ -163,13 +176,19 @@ class _ReturnReportState extends State<ReturnReport> {
                           initialDate: fromDate,
                           onDateSelected: (date) {
                             setState(() {
-                              fromDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
+                              fromDate = DateTime(date.year, date.month, date.day);
+                              // Ensure toDate isn't before fromDate
+                              if (toDate!.isBefore(fromDate!)) {
+                                toDate = fromDate;
+                              }
                             });
                             controller.fetchReturnReports(
                               fromDate: fromDate!,
                               toDate: toDate!,
                             );
                           },
+                          lastDate: toDate, // Can't select after toDate
+                          restrictToToday: true,
                         ),
                       ),
                     ),
@@ -186,12 +205,18 @@ class _ReturnReportState extends State<ReturnReport> {
                           onDateSelected: (date) {
                             setState(() {
                               toDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
+                              // Ensure fromDate isn't after toDate
+                              if (fromDate!.isAfter(toDate!)) {
+                                fromDate = DateTime(toDate!.year, toDate!.month, toDate!.day);
+                              }
                             });
                             controller.fetchReturnReports(
                               fromDate: fromDate!,
                               toDate: toDate!,
                             );
                           },
+                          firstDate: fromDate, // Can't select before fromDate
+                          lastDate: DateTime.now(), // Can't select future dates
                         ),
                       ),
                     ),
@@ -200,19 +225,20 @@ class _ReturnReportState extends State<ReturnReport> {
               ),
 
               /// Income & Profit cards
+              /// Return Summary cards
               Row(
                 children: [
                   Expanded(
                     child: CenteredAmountCard(
-                      title: 'Total Income\nOnline',
-                      subtitle: '₹ ${controller.totalIncome.value.toStringAsFixed(2)}',
+                      title: 'Total Returns',
+                      subtitle: controller.totalReturnCount.value.toString(),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.04),
                   Expanded(
                     child: CenteredAmountCard(
-                      title: 'Total Profit\nOnline',
-                      subtitle: '₹ ${controller.totalProfit.value.toStringAsFixed(2)}',
+                      title: 'Total Amount',
+                      subtitle: '₹ ${controller.totalReturnAmount.value.toStringAsFixed(2)}',
                     ),
                   ),
                 ],
@@ -232,7 +258,7 @@ class _ReturnReportState extends State<ReturnReport> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
+                  horizontal: screenWidth * 0.02,
                   vertical: screenHeight * 0.018,
                 ),
                 child: Column(
@@ -260,6 +286,7 @@ class _ReturnReportState extends State<ReturnReport> {
                             return TransactionTextRow(
                               product: item['product'],
                               amount: item['amount'],
+                              quantity: item['quantity'],
                             );
                           },
                         ),

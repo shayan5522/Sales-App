@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +21,7 @@ class SalesReportController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debugPrint('Initializing SalesReportController');
+   // debugPrint('Initializing SalesReportController');
     fetchSalesData();
   }
 
@@ -49,18 +50,18 @@ class SalesReportController extends GetxController {
           .doc(userId)
           .collection('sales');
 
-      debugPrint('Querying sales from ${fromDate.value} to ${toDate.value}');
+     // debugPrint('Querying sales from ${fromDate.value} to ${toDate.value}');
 
       final querySnapshot = await salesRef
           .where('createdAt', isGreaterThanOrEqualTo: fromDate.value)
           .where('createdAt', isLessThanOrEqualTo: toDate.value)
           .get();
 
-      debugPrint('Found ${querySnapshot.docs.length} sales records');
+     // debugPrint('Found ${querySnapshot.docs.length} sales records');
 
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
-        debugPrint('Processing document ${doc.id} with data: $data');
+        //debugPrint('Processing document ${doc.id} with data: $data');
 
         if (data.containsKey('items') && data['items'] is List) {
           final items = List<Map<String, dynamic>>.from(data['items']);
@@ -81,8 +82,8 @@ class SalesReportController extends GetxController {
 
       salesData.sort((a, b) => (b['createdAt'] as DateTime).compareTo(a['createdAt'] as DateTime));
     } catch (e, stackTrace) {
-      debugPrint('Error fetching sales: $e');
-      debugPrint('Stack trace: $stackTrace');
+      //debugPrint('Error fetching sales: $e');
+     // debugPrint('Stack trace: $stackTrace');
       // Get.snackbar('Error', 'Failed to load sales data');
       CustomSnackbar.show(title: "Error", message: "Failed to load sales data");
     } finally {
@@ -91,13 +92,13 @@ class SalesReportController extends GetxController {
   }
 
   void updateFromDate(DateTime newDate) {
-    debugPrint('Updating fromDate to $newDate');
+  //  debugPrint('Updating fromDate to $newDate');
     fromDate.value = newDate;
     fetchSalesData();
   }
 
   void updateToDate(DateTime newDate) {
-    debugPrint('Updating toDate to $newDate');
+  //  debugPrint('Updating toDate to $newDate');
     toDate.value = newDate;
     fetchSalesData();
   }
@@ -109,43 +110,79 @@ class SalesReportController extends GetxController {
 
   // Get chart data for products
   List<BarData> getProductChartData() {
-    debugPrint('Generating chart data from ${salesData.length} sales');
+    //debugPrint('Generating chart data from ${salesData.length} sales');
     final productMap = <String, double>{};
 
     for (var sale in salesData) {
       try {
         final items = List<Map<String, dynamic>>.from(sale['items'] ?? []);
-        debugPrint('Processing ${items.length} items for chart');
+        //debugPrint('Processing ${items.length} items for chart');
 
         for (var item in items) {
           final productName = item['title'] ?? 'Unknown';
           final value = (item['price'] ?? 0).toDouble() * (item['quantity'] ?? 1);
           productMap[productName] = (productMap[productName] ?? 0) + value;
-          debugPrint('Added $productName with value $value');
+       //   debugPrint('Added $productName with value $value');
         }
       } catch (e) {
         debugPrint('Error processing sale for chart: $e');
       }
     }
 
-    debugPrint('Chart data generated with ${productMap.length} products');
+    //debugPrint('Chart data generated with ${productMap.length} products');
     return productMap.entries
         .map((e) => BarData(label: e.key, value: e.value))
         .toList();
   }
 
-  // Get max Y value for chart
-  double getMaxChartValue() {
-    final chartData = getProductChartData();
-    if (chartData.isEmpty) {
-      debugPrint('No chart data, returning default max value');
-      return 8; // default when no data
+  // Add this method to your SalesReportController
+  List<double> getYAxisSteps() {
+    final maxValue = getMaxChartValue();
+
+    // If no data, return default steps
+    if (maxValue <= 0) return [0, 2, 4, 6, 8];
+
+    // Calculate appropriate number of steps (4-6 is ideal)
+    int numberOfSteps = 5;
+    double rawStepSize = maxValue / numberOfSteps;
+
+    // Round to a "nice" interval
+    double magnitude = pow(10, (log(rawStepSize) / ln10).floor()).toDouble();
+    double residual = rawStepSize / magnitude;
+    double stepSize;
+
+    if (residual > 5) {
+      stepSize = 10 * magnitude;
+    } else if (residual > 2) {
+      stepSize = 5 * magnitude;
+    } else if (residual > 1) {
+      stepSize = 2 * magnitude;
+    } else {
+      stepSize = magnitude;
     }
 
-    // Get the maximum value from the chart data
+    // Generate steps
+    final steps = <double>[];
+    for (double value = 0; value <= maxValue * 1.05; value += stepSize) {
+      steps.add(value);
+    }
+
+    return steps;
+  }
+
+// Update getMaxChartValue to ensure proper scaling
+  double getMaxChartValue() {
+    final chartData = getProductChartData();
+    if (chartData.isEmpty) return 8;
+
     final maxDataValue = chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b);
 
-    // Calculate a nice rounded max value that's slightly higher than the max data value
+    // Handle very large values with logarithmic approach if needed
+    if (maxDataValue > 1000000) {
+      return (maxDataValue * 1.1); // Let the formatting handle the display
+    }
+
+    // Existing logic for smaller values
     double maxValue;
     if (maxDataValue <= 10) {
       maxValue = maxDataValue.ceilToDouble();
@@ -157,50 +194,7 @@ class SalesReportController extends GetxController {
       maxValue = (maxDataValue / 1000).ceilToDouble() * 1000;
     }
 
-    // Ensure we have some padding at the top
-    maxValue = maxValue * 1.1;
-
-    debugPrint('Calculated max chart value: $maxValue');
-    return maxValue;
-  }
-
-  // Add this method to your SalesReportController
-  List<double> getYAxisSteps() {
-    final maxValue = getMaxChartValue();
-
-    // If no data, return default steps
-    if (maxValue <= 0) return [0, 2, 4, 6, 8];
-
-    // Calculate reasonable step size based on max value
-    double stepSize;
-    if (maxValue <= 10) {
-      stepSize = 2;
-    } else if (maxValue <= 50) {
-      stepSize = 10;
-    } else if (maxValue <= 100) {
-      stepSize = 20;
-    } else if (maxValue <= 500) {
-      stepSize = 50;
-    } else if (maxValue <= 1000) {
-      stepSize = 100;
-    } else if (maxValue <= 5000) {
-      stepSize = 500;
-    } else {
-      stepSize = 1000;
-    }
-
-    // Generate steps
-    final steps = <double>[];
-    for (double value = 0; value <= maxValue; value += stepSize) {
-      steps.add(value);
-    }
-
-    // Ensure we have at least 3 steps
-    if (steps.length < 3) {
-      steps.add(steps.last + stepSize);
-    }
-
-    return steps;
+    return maxValue * 1.1;
   }
 
   Map<String, Map<String, dynamic>> getProductSummaryData() {

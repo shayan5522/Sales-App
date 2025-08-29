@@ -10,12 +10,15 @@ import '../../../widgets/Admindashboard/gradient_action_card.dart';
 import '../../../widgets/Admindashboard/salescard.dart';
 import '../../../widgets/custom_dashboard_appbar.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/products/products.dart';
+import '../../../widgets/number_formatter.dart';
 import '../Reports/ReportMainPage/report_main_page.dart';
 import '../Reports/ReportMainPage/reports_main_page_controller.dart';
 import '../user_management/usermanagement.dart';
 import 'Add_Sales/sales.dart';
 import 'add_category/add_category_page.dart';
 import 'credit_amount _due/amountcrediet.dart';
+import 'earnings/cash_earnings/offline_earnings_screen.dart';
+import 'earnings/online_earnings/online_earnings_screen.dart';
 import 'expenses/expense.dart';
 import 'intake/addintake.dart';
 
@@ -85,22 +88,23 @@ class OwnerDashboard extends StatelessWidget {
                     SalesCard(
                       imagePath: "assets/images/sales.png",
                       label: "Total Sales",
-                      value: controller.totalSales.value.toInt(),
+                      value: NumberFormatter.compact(controller.totalSales.value.toDouble()),
                     ),
                     const SizedBox(width: 0),
                     SalesCard(
                       imagePath: "assets/images/sales1111.png",
                       label: "Total Intake",
-                      value: controller.totalIntake.value.toInt(),
+                      value: NumberFormatter.compact(controller.totalIntake.value.toDouble()),
                     ),
                     const SizedBox(width: 0),
                     SalesCard(
                       imagePath: "assets/images/earning.png",
                       label: "Total Profit",
-                      value: controller.totalProfit.value.toInt(),
+                      value: NumberFormatter.compact(controller.totalProfit.value.toDouble()),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
 
                 // Payment Breakdown Row
@@ -125,7 +129,7 @@ class OwnerDashboard extends StatelessWidget {
                           children: [
                             Text("Cash Sales", style: AppTextStyles.description),
                             Text(
-                              controller.formatCurrency(controller.cashSales.value),
+                              NumberFormatter.currency(controller.cashSales.value),  // ✅ updated
                               style: AppTextStyles.heading.copyWith(fontSize: 18),
                             ),
                           ],
@@ -152,7 +156,7 @@ class OwnerDashboard extends StatelessWidget {
                           children: [
                             Text("Online Sales", style: AppTextStyles.description),
                             Text(
-                              controller.formatCurrency(controller.onlineSales.value),
+                              NumberFormatter.currency(controller.onlineSales.value), // ✅ updated
                               style: AppTextStyles.heading.copyWith(fontSize: 18),
                             ),
                           ],
@@ -161,6 +165,7 @@ class OwnerDashboard extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
 
                 // Earnings Cards Row
@@ -168,25 +173,26 @@ class OwnerDashboard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: EarningsCard(
-                        income: controller.cashSales.value,
-                        profit: controller.cashProfit.value,
+                        income: controller.formatCurrency(controller.cashSales.value),
+                        profit: controller.formatCurrency(controller.cashProfit.value),
                         imagePath: "assets/images/cash_earning.png",
-                        onSeeAll: () {},
+                        onSeeAll: () => Get.to(() => OfflineEarningsScreen()),
                         label: "Cash Earnings",
                       ),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
                       child: EarningsCard(
-                        income: controller.onlineSales.value,
-                        profit: controller.onlineProfit.value,
+                        income: controller.formatCurrency(controller.onlineSales.value),
+                        profit: controller.formatCurrency(controller.onlineProfit.value),
                         imagePath: "assets/images/online_earning.png",
-                        onSeeAll: () {},
+                        onSeeAll: () => Get.to(() => OnlineEarningsScreen()),
                         label: "Online Earnings",
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
 
                 // Quick Actions Section

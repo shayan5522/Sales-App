@@ -133,20 +133,12 @@ class DashboardController extends GetxController {
   }
 
   void _calculateRealProfits() {
-    // Calculate total profit (Sales - (Intake + Expenses))
-    totalProfit.value = totalSales.value - (totalIntake.value + totalExpense.value);
+    // Remove these lines - they're causing the discrepancy
+     totalProfit.value = totalSales.value - (totalIntake.value + totalExpense.value);
 
-    // Calculate payment type specific profits based on actual sales distribution
-    if (totalSales.value > 0) {
-      final cashRatio = cashSales.value / totalSales.value;
-      final onlineRatio = onlineSales.value / totalSales.value;
-
-      cashProfit.value = totalProfit.value * cashRatio;
-      onlineProfit.value = totalProfit.value * onlineRatio;
-    } else {
-      cashProfit.value = 0.0;
-      onlineProfit.value = 0.0;
-    }
+    // Just ensure non-negative values if needed
+    cashProfit.value = cashProfit.value < 0 ? 0 : cashProfit.value;
+    onlineProfit.value = onlineProfit.value < 0 ? 0 : onlineProfit.value;
   }
 
   Future<void> _fetchSalesData(String userId, DateTime start, DateTime end) async {
@@ -160,21 +152,41 @@ class DashboardController extends GetxController {
 
     double cashTotal = 0.0;
     double onlineTotal = 0.0;
+    double cashProfitTotal = 0.0;
+    double onlineProfitTotal = 0.0;
 
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final amount = (data['totalAmount'] ?? 0).toDouble();
+      final items = data['items'] as List? ?? [];
+
+      double saleProfit = 0.0;
+
+      for (var item in items.cast<Map<String, dynamic>>()) {
+        final originalPrice = (item['originalPrice'] ?? 0).toDouble();
+        final salePrice = (item['price'] ?? 0).toDouble();
+        final quantity = (item['quantity'] ?? 0).toInt();
+        final discount = (item['discount'] ?? 0).toDouble();
+
+        // Same calculation as in detailed screens
+        saleProfit += ((salePrice - discount) - originalPrice) * quantity;
+      }
+
       if (data['paymentType'] == 'Cash') {
         cashTotal += amount;
+        cashProfitTotal += saleProfit;
       } else if (data['paymentType'] == 'Online') {
         onlineTotal += amount;
+        onlineProfitTotal += saleProfit;
       }
-      // Default case: if paymentType is missing, it's not counted
     }
 
     cashSales.value = cashTotal;
     onlineSales.value = onlineTotal;
+    cashProfit.value = cashProfitTotal;
+    onlineProfit.value = onlineProfitTotal;
     totalSales.value = cashTotal + onlineTotal;
+    totalProfit.value = cashProfitTotal + onlineProfitTotal;
   }
 
   Future<void> _fetchIntakeData(String userId, DateTime start, DateTime end) async {

@@ -5,11 +5,13 @@ import 'package:salesapp/app/themes/styles.dart';
 class TransactionTextRow extends StatelessWidget {
   final String product;
   final double amount;
+  final int? quantity;
 
   const TransactionTextRow({
     super.key,
     required this.product,
     required this.amount,
+     this.quantity,
   });
 
   @override
@@ -22,22 +24,38 @@ class TransactionTextRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: AppColors.secondary,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product name
-          Text(product, style: AppTextStyles.subtitle),
-          // Amount with ₹
+          // Main product row
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.currency_rupee, size: 14, color: Colors.blue),
-              Text(
-                amount.toString(),
-                style: AppTextStyles.subtitle.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+              // Product name
+              Text(product, style: AppTextStyles.subtitle),
+              // Amount with ₹
+              Row(
+                children: [
+                  const Icon(Icons.currency_rupee, size: 14, color: Colors.blue),
+                  Text(
+                    amount.toStringAsFixed(2),
+                    style: AppTextStyles.subtitle.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ],
+          ),
+          // Quantity subtitle
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              'Quantity: $quantity',
+              style: AppTextStyles.subtitleSmall.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
           ),
         ],
       ),

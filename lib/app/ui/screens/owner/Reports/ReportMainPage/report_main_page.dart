@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/Reports/ReportMainPage/reports_main_page_controller.dart';
@@ -9,7 +10,9 @@ import 'package:salesapp/app/ui/screens/owner/Reports/StockReport/stock_report.d
 import 'package:salesapp/app/ui/widgets/Admindashboard/dashboard_main-container.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/summarycard.dart';
+import '../../../../../controllers/owner_dashboard_controller.dart';
 import '../../../../widgets/datepicker.dart';
+import '../../../../widgets/number_formatter.dart';
 import '../Credit_Debit_Page.dart';
 import '../ExpenseReport/expense_report_page.dart';
 import '../IntakeReport/intake_report.dart';
@@ -18,10 +21,12 @@ class ReportsMainPage extends StatelessWidget {
   ReportsMainPage({super.key}) {
     Get.put(ReportsController());
   }
+  final formatter = NumberFormat.compact();
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ReportsController>();
+    final Dashboardcontroller = Get.find<DashboardController>();
 
     Future<void> _refreshData() async {
       await controller.fetchAllTotals();
@@ -88,26 +93,27 @@ class ReportsMainPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SummaryCard(
-                        amount: controller.formatCurrency(controller.salesAmount.value),
+                        amount: NumberFormatter.compact(controller.salesAmount.value),
                         label: "Sale Amount",
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: SummaryCard(
-                        amount: controller.formatCurrency(controller.intakeAmount.value),
+                        amount: NumberFormatter.compact(controller.intakeAmount.value),
                         label: "Intake Amount",
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: SummaryCard(
-                        amount: controller.formatCurrency(controller.expenseAmount.value),
+                        amount: NumberFormatter.compact(controller.expenseAmount.value),
                         label: "Expense Amount",
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
 
                 // Total Profit Box
@@ -124,7 +130,7 @@ class ReportsMainPage extends StatelessWidget {
                         spreadRadius: 2,
                         blurRadius: 8,
                         offset: const Offset(0, 4),
-                      )
+                      ),
                     ],
                     border: Border.all(color: Colors.grey.shade300),
                   ),
@@ -150,8 +156,11 @@ class ReportsMainPage extends StatelessWidget {
                           // Icon and Label
                           Row(
                             children: [
-                              const Icon(Icons.monetization_on_rounded,
-                                  color: Colors.green, size: 28),
+                              const Icon(
+                                Icons.monetization_on_rounded,
+                                color: Colors.green,
+                                size: 28,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Total Profit',
@@ -169,7 +178,7 @@ class ReportsMainPage extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            controller.formatCurrency(controller.profitAmount.value),
+                            "₹${formatter.format(controller.profitAmount.value)}",
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -199,9 +208,15 @@ class ReportsMainPage extends StatelessWidget {
                 // Profit Breakdown Row
                 Row(
                   children: [
-                    _profitBox("Profit Amount in Cash", controller.cashProfit.value),
+                    _profitBox(
+                      "Profit Amount in Cash",
+                      Dashboardcontroller.cashProfit.value,
+                    ),
                     const SizedBox(width: 12),
-                    _profitBox("Profit Amount Online", controller.onlineProfit.value),
+                    _profitBox(
+                      "Profit Amount Online",
+                      Dashboardcontroller.onlineProfit.value,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -260,7 +275,6 @@ class ReportsMainPage extends StatelessWidget {
   }
 
   Widget _profitBox(String label, double amount) {
-    final controller = Get.find<ReportsController>();
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -278,9 +292,8 @@ class ReportsMainPage extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.currency_rupee, size: 18, color: AppColors.primary),
                 Text(
-                  controller.formatCurrency(amount),
+                  NumberFormatter.currency(amount),   // ✅ new way
                   style: AppTextStyles.heading.copyWith(fontSize: 18),
                 ),
               ],
@@ -290,4 +303,5 @@ class ReportsMainPage extends StatelessWidget {
       ),
     );
   }
+
 }

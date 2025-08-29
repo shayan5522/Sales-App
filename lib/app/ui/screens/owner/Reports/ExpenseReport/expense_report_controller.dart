@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-
+import '../../../../widgets/chart.dart';
+import '../../../../widgets/chart_formatter.dart';
 import '../../../../widgets/custom_snackbar.dart';
 
 class ExpenseReportController extends GetxController {
@@ -15,6 +16,12 @@ class ExpenseReportController extends GetxController {
   DateTime? fromDate;
   DateTime? toDate;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchExpenses();
+  }
+
   Future<void> fetchExpenses() async {
     try {
       isLoading.value = true;
@@ -25,6 +32,7 @@ class ExpenseReportController extends GetxController {
           .collection('users')
           .doc(uid)
           .collection('expenses')
+          .orderBy('createdAt', descending: true)
           .get();
 
       final expenses = snapshot.docs.map((doc) {
@@ -37,9 +45,10 @@ class ExpenseReportController extends GetxController {
         }
 
         return {
+          'id': doc.id,
           'title': data['name'] ?? 'No Title',
           'description': data['description'] ?? '',
-          'amount': data['amount'] ?? 0,
+          'amount': (data['amount'] ?? 0).toDouble(),
           'category': data['category'] ?? 'Uncategorized',
           'date': date,
         };
@@ -50,9 +59,8 @@ class ExpenseReportController extends GetxController {
     } catch (e) {
       CustomSnackbar.show(title: "Error", message: "Failed to fetch expenses: $e", isError: true);
       print(e);
-    }
-    finally{
-      isLoading.value=false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -60,10 +68,17 @@ class ExpenseReportController extends GetxController {
     fromDate = from;
     toDate = to;
 
+    if (fromDate == null && toDate == null) {
+      filteredExpenses.assignAll(allExpenses);
+      return;
+    }
+
     filteredExpenses.assignAll(allExpenses.where((expense) {
       final expenseDate = expense['date'] as DateTime;
-      final isAfterFrom = fromDate == null || expenseDate.isAfter(fromDate!.subtract(const Duration(days: 1)));
-      final isBeforeTo = toDate == null || expenseDate.isBefore(toDate!.add(const Duration(days: 1)));
+      final isAfterFrom = fromDate == null ||
+          expenseDate.isAfter(fromDate!.subtract(const Duration(days: 1)));
+      final isBeforeTo = toDate == null ||
+          expenseDate.isBefore(toDate!.add(const Duration(days: 1)));
       return isAfterFrom && isBeforeTo;
     }));
   }
@@ -98,6 +113,7 @@ class ExpenseReportController extends GetxController {
     }
     return totals;
   }
+
   Map<String, Map<String, dynamic>> getCategorySummaryFromAll() {
     final summary = <String, Map<String, dynamic>>{};
     for (var exp in allExpenses) {
@@ -117,4 +133,40 @@ class ExpenseReportController extends GetxController {
     return summary;
   }
 
+  // Get max Y value for chart
+  double getMaxChartValue() {
+    final chartData = getCategoryTotals().entries.map((e) {
+      return BarData(label: e.key, value: e.value);
+    }).toList();
+
+    if (chartData.isEmpty) return 8; // default when no data
+
+    // Get the maximum value from the chart data
+    final maxDataValue = chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+
+    // For extremely large values, use a different approach
+    if (maxDataValue >= 1000000) {
+      return maxDataValue * 1.1; // Just add 10% padding
+    }
+
+    // For smaller values, use the existing logic
+    double maxValue;
+    if (maxDataValue <= 10) {
+      maxValue = maxDataValue.ceilToDouble();
+    } else if (maxDataValue <= 100) {
+      maxValue = (maxDataValue / 10).ceilToDouble() * 10;
+    } else if (maxDataValue <= 1000) {
+      maxValue = (maxDataValue / 100).ceilToDouble() * 100;
+    } else {
+      maxValue = (maxDataValue / 1000).ceilToDouble() * 1000;
+    }
+
+    return maxValue * 1.1;
+  }
+
+  // Calculate Y-axis steps for the chart
+  List<double> getYAxisSteps() {
+    final maxValue = getMaxChartValue();
+    return ChartFormatter.calculateYAxisSteps(maxValue);
+  }
 }
