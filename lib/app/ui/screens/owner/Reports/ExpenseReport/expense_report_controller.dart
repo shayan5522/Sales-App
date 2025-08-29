@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class ExpenseReportController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
@@ -46,7 +48,7 @@ class ExpenseReportController extends GetxController {
       allExpenses.assignAll(expenses);
       filteredExpenses.assignAll(expenses);
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch expenses: $e");
+      CustomSnackbar.show(title: "Error", message: "Failed to fetch expenses: $e", isError: true);
       print(e);
     }
     finally{
@@ -96,4 +98,23 @@ class ExpenseReportController extends GetxController {
     }
     return totals;
   }
+  Map<String, Map<String, dynamic>> getCategorySummaryFromAll() {
+    final summary = <String, Map<String, dynamic>>{};
+    for (var exp in allExpenses) {
+      final category = exp['category'];
+      final amount = (exp['amount'] as num).toDouble();
+      final description = exp['description'] ?? '';
+
+      if (summary.containsKey(category)) {
+        summary[category]!['amount'] += amount;
+      } else {
+        summary[category] = {
+          'amount': amount,
+          'description': description,
+        };
+      }
+    }
+    return summary;
+  }
+
 }

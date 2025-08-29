@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class TransactionController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -31,9 +33,18 @@ class TransactionController extends GetxController {
           .collection(collectionName)
           .add(data);
 
-      Get.snackbar('Success', '${isCredit ? "Credit" : "Debit"} added!');
+      // Get.snackbar('Success', '${isCredit ? "Credit" : "Debit"} added!');
+      CustomSnackbar.show(
+        title: "Success",
+        message: "${isCredit ? "Credit" : "Debit"} added!",
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add transaction: $e');
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to add transaction: $e",
+        isError: true,
+      );
+      // Get.snackbar('Error', 'Failed to add transaction: $e');
     }
   }
 }

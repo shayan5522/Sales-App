@@ -6,6 +6,8 @@ import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 
+import '../../widgets/custom_snackbar.dart';
+
 class OTPVerificationScreen extends StatefulWidget {
   const OTPVerificationScreen({super.key}); // also fix constructor
 
@@ -22,11 +24,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: "OTP Verification"),
+      appBar: CustomAppbar(title: "OTP Verification",showBackButton: false,),
       backgroundColor: const Color(0xFFF6F6F9),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             Text("Enter 6-digit OTP sent to your phone", style: AppTextStyles.subtitle),
@@ -45,7 +48,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   : () async {
                 final code = otpController.text.trim();
                 if (code.length != 6) {
-                  Get.snackbar("Error", "Enter valid 6-digit OTP");
+                  CustomSnackbar.show(
+                    title: "Error",
+                    message: "Enter valid 6-digit OTP",
+                    isError: true,
+                  );
+
                   return;
                 }
 

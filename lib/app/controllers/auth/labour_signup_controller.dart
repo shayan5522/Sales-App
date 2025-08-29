@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../ui/screens/labour/panel/labour_panel.dart';
+import '../../ui/widgets/custom_snackbar.dart';
 
 class LabourSignupController extends GetxController {
   final isLoading = false.obs;
@@ -11,43 +12,68 @@ class LabourSignupController extends GetxController {
     final inputCode = shopCodeController.value.trim().toUpperCase();
 
     if (inputCode.isEmpty) {
-      Get.snackbar("Error", "Invite code is required.");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Invite code is required.",
+        isError: true,
+      );
       return;
     }
 
     isLoading.value = true;
 
     try {
-      final inviteDoc = await FirebaseFirestore.instance.collection('invites').doc(inputCode).get();
+      // ✅ Find invite by code field
+      final inviteQuery = await FirebaseFirestore.instance
+          .collection('invites')
+          .where('code', isEqualTo: inputCode)
+          .limit(1)
+          .get();
 
-      if (!inviteDoc.exists) {
-        Get.snackbar("Error", "Invalid invite code.");
+      if (inviteQuery.docs.isEmpty) {
+        CustomSnackbar.show(
+          title: "Error",
+          message: "Invalid invite code.",
+          isError: true,
+        );
         return;
       }
 
-      final invite = inviteDoc.data()!;
+      final inviteDoc = inviteQuery.docs.first;
+      final invite = inviteDoc.data();
+
       if (invite['used'] == true) {
-        Get.snackbar("Error", "This code has already been used.");
+        CustomSnackbar.show(
+          title: "Error",
+          message: "This code has already been used.",
+          isError: true,
+        );
         return;
       }
 
       final shopName = invite['shopName'];
       final ownerId = invite['ownerId'];
 
-      // Check labour count
-      final labourSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'labour')
+      // ✅ Check how many invites are already used for this shop
+      final usedInvitesSnapshot = await FirebaseFirestore.instance
+          .collection('invites')
           .where('shopName', isEqualTo: shopName)
+          .where('used', isEqualTo: true)
           .get();
 
-      if (labourSnapshot.docs.length >= 3) {
-        Get.snackbar("Error", "This shop already has 3 labours.");
+      if (usedInvitesSnapshot.docs.length >= 3) {
+        CustomSnackbar.show(
+          title: "Error",
+          message: "This shop already has 3 active labours.",
+          isError: true,
+        );
         return;
       }
 
-      // Register new labour
-      final newLabourDoc = await FirebaseFirestore.instance.collection('users').add({
+      // ✅ Register new labour
+      final newLabourDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .add({
         'role': 'labour',
         'code': inputCode,
         'shopName': shopName,
@@ -55,21 +81,29 @@ class LabourSignupController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Mark invite used
-      await FirebaseFirestore.instance.collection('invites').doc(inputCode).update({
+      // ✅ Mark invite as used using actual document ID
+      await FirebaseFirestore.instance
+          .collection('invites')
+          .doc(inviteDoc.id)
+          .update({
         'used': true,
         'usedBy': newLabourDoc.id,
       });
 
-      /// ✅ Save login state
+      // ✅ Save login state
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       await prefs.setString('role', 'labour');
+      await prefs.setString('inviteCode', inputCode);
 
       print('✅ Labour added with ID: ${newLabourDoc.id}');
       Get.offAll(() => LaborPanel());
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong: ${e.toString()}");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Something went wrong: ${e.toString()}",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 
 class ProductController extends GetxController {
   RxList<Map<String, dynamic>> products = <Map<String, dynamic>>[].obs;
@@ -51,7 +52,7 @@ class ProductController extends GetxController {
 
       await fetchProducts(); // Refresh list
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add product: $e');
+      CustomSnackbar.show(title: "Error", message: "Failed to add product: $e");
     }
   }
 
@@ -80,7 +81,7 @@ class ProductController extends GetxController {
 
       products.assignAll(productList);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch products: $e');
+      CustomSnackbar.show(title: "Error", message: "Failed to fetch products: $e", isError: true);
     }finally {
       isLoading.value = false;
     }
@@ -100,7 +101,7 @@ class ProductController extends GetxController {
 
       await fetchProducts(); // Refresh list
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete product: $e');
+      CustomSnackbar.show(title: "Error", message: "Failed to delete product: $e", isError: true);
     }
   }
 }

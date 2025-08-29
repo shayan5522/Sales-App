@@ -5,17 +5,11 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Set a normal build directory (avoids empty path errors)
+rootProject.layout.buildDirectory.set(file("../build"))
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
+    layout.buildDirectory.set(file("${rootProject.layout.buildDirectory.get()}/${project.name}"))
     project.evaluationDependsOn(":app")
 }
 

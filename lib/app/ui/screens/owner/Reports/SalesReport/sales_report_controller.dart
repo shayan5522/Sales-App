@@ -3,19 +3,16 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import '../../../../widgets/chart.dart';
-
 class SalesReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   // Reactive variables
   var isLoading = false.obs;
   var salesData = <Map<String, dynamic>>[].obs;
   var totalAmount = 0.0.obs;
   var totalItemsSold = 0.obs;
-
   // Date range for filtering
   var fromDate = DateTime.now().subtract(const Duration(days: 30)).obs;
   var toDate = DateTime.now().obs;
@@ -38,7 +35,8 @@ class SalesReportController extends GetxController {
       final user = _auth.currentUser;
       if (user == null) {
         debugPrint('No authenticated user found');
-        Get.snackbar('Error', 'User not authenticated');
+        // Get.snackbar('Error', 'User not authenticated');
+        CustomSnackbar.show(title: 'Error', message: 'User not authenticated');
         return;
       }
 
@@ -85,7 +83,8 @@ class SalesReportController extends GetxController {
     } catch (e, stackTrace) {
       debugPrint('Error fetching sales: $e');
       debugPrint('Stack trace: $stackTrace');
-      Get.snackbar('Error', 'Failed to load sales data');
+      // Get.snackbar('Error', 'Failed to load sales data');
+      CustomSnackbar.show(title: "Error", message: "Failed to load sales data");
     } finally {
       isLoading(false);
     }
@@ -140,10 +139,102 @@ class SalesReportController extends GetxController {
     final chartData = getProductChartData();
     if (chartData.isEmpty) {
       debugPrint('No chart data, returning default max value');
-      return 8000; // default
+      return 8; // default when no data
     }
-    final maxValue = chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2;
+
+    // Get the maximum value from the chart data
+    final maxDataValue = chartData.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+
+    // Calculate a nice rounded max value that's slightly higher than the max data value
+    double maxValue;
+    if (maxDataValue <= 10) {
+      maxValue = maxDataValue.ceilToDouble();
+    } else if (maxDataValue <= 100) {
+      maxValue = (maxDataValue / 10).ceilToDouble() * 10;
+    } else if (maxDataValue <= 1000) {
+      maxValue = (maxDataValue / 100).ceilToDouble() * 100;
+    } else {
+      maxValue = (maxDataValue / 1000).ceilToDouble() * 1000;
+    }
+
+    // Ensure we have some padding at the top
+    maxValue = maxValue * 1.1;
+
     debugPrint('Calculated max chart value: $maxValue');
     return maxValue;
   }
+
+  // Add this method to your SalesReportController
+  List<double> getYAxisSteps() {
+    final maxValue = getMaxChartValue();
+
+    // If no data, return default steps
+    if (maxValue <= 0) return [0, 2, 4, 6, 8];
+
+    // Calculate reasonable step size based on max value
+    double stepSize;
+    if (maxValue <= 10) {
+      stepSize = 2;
+    } else if (maxValue <= 50) {
+      stepSize = 10;
+    } else if (maxValue <= 100) {
+      stepSize = 20;
+    } else if (maxValue <= 500) {
+      stepSize = 50;
+    } else if (maxValue <= 1000) {
+      stepSize = 100;
+    } else if (maxValue <= 5000) {
+      stepSize = 500;
+    } else {
+      stepSize = 1000;
+    }
+
+    // Generate steps
+    final steps = <double>[];
+    for (double value = 0; value <= maxValue; value += stepSize) {
+      steps.add(value);
+    }
+
+    // Ensure we have at least 3 steps
+    if (steps.length < 3) {
+      steps.add(steps.last + stepSize);
+    }
+
+    return steps;
+  }
+
+  Map<String, Map<String, dynamic>> getProductSummaryData() {
+    final productSummary = <String, Map<String, dynamic>>{};
+
+    for (var sale in salesData) {
+      final items = List<Map<String, dynamic>>.from(sale['items'] ?? []);
+
+      for (var item in items) {
+        final productName = item['title'] ?? 'Unknown';
+        final imagePath = item['imagePath'] ?? 'assets/images/products.png';
+        final quantity = (item['quantity'] ?? 0) as int;
+        final price = (item['price'] ?? 0).toDouble(); // sale price per unit
+        final intakePrice = (item['originalPrice'] ?? 0).toDouble(); // cost per unit
+
+        final totalSaleAmount = price * quantity;
+        final totalIntakeAmount = intakePrice * quantity;
+
+        if (!productSummary.containsKey(productName)) {
+          productSummary[productName] = {
+            'imagePath': imagePath,
+            'totalSales': 0.0,
+            'totalQuantity': 0,
+            'totalIntake': 0.0,
+          };
+        }
+
+        productSummary[productName]!['totalSales'] += totalSaleAmount;
+        productSummary[productName]!['totalQuantity'] += quantity;
+        productSummary[productName]!['totalIntake'] += totalIntakeAmount;
+      }
+    }
+
+    return productSummary;
+  }
+
 }

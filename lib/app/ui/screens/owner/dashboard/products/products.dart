@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,11 +29,12 @@ class _ProductScreenState extends State<ProductScreen> {
     String title = '';
     double price = 0.0;
     File? imageFile;
+    var isLoading = false.obs; // Local loading state for the dialog
 
     await showDialog(
       context: context,
       builder: (_) {
-        return AlertDialog(
+        return Obx(() => AlertDialog(
           backgroundColor: AppColors.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -49,7 +49,9 @@ class _ProductScreenState extends State<ProductScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       GestureDetector(
-                        onTap: () async {
+                        onTap: isLoading.value
+                            ? null
+                            : () async {
                           final picked = await ImagePicker().pickImage(
                             source: ImageSource.gallery,
                           );
@@ -79,6 +81,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         validator: (value) =>
                         value == null || value.isEmpty ? 'Required' : null,
                         onSaved: (value) => title = value!,
+                        enabled: !isLoading.value,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -89,6 +92,7 @@ class _ProductScreenState extends State<ProductScreen> {
                             ? 'Enter valid price'
                             : null,
                         onSaved: (value) => price = double.tryParse(value ?? '0') ?? 0.0,
+                        enabled: !isLoading.value,
                       ),
                     ],
                   ),
@@ -100,33 +104,42 @@ class _ProductScreenState extends State<ProductScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SecondaryButton(
-                  text: "Cancel",
-                  onPressed: () => Navigator.pop(context),
-                  widthFactor: 0.2,
-                  heightFactor: 0.045,
-                ),
+                if (!isLoading.value)
+                  SecondaryButton(
+                    text: "Cancel",
+                    onPressed: () => Navigator.pop(context),
+                    widthFactor: 0.2,
+                    heightFactor: 0.045,
+                  ),
                 const SizedBox(width: 12),
-                SecondaryButton(
-                  text: "Add",
-                  onPressed: () async {
+                SecondaryButton2(
+                  text: isLoading.value ? "Adding..." : "Add",
+                  onPressed: isLoading.value
+                      ? null
+                      : () async {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState!.save();
-                      await controller.addProduct(
-                        title: title,
-                        price: price,
-                        imageFile: imageFile,
-                      );
-                      Navigator.pop(context);
+                      isLoading.value = true;
+                      try {
+                        await controller.addProduct(
+                          title: title,
+                          price: price,
+                          imageFile: imageFile,
+                        );
+                        Navigator.pop(context);
+                      } finally {
+                        isLoading.value = false;
+                      }
                     }
                   },
                   widthFactor: 0.2,
                   heightFactor: 0.045,
+                  isLoading: isLoading.value,
                 ),
               ],
             ),
           ],
-        );
+        ));
       },
     );
   }
@@ -134,7 +147,10 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Products'),
+      appBar: CustomAppbar(
+          title: 'Products',
+        showBackButton: false,
+      ),
       backgroundColor: AppColors.backgroundColor,
       floatingActionButton: SecondaryButton(
         text: "Add Product",

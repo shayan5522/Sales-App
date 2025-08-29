@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
 class IntakeController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   /// Add a new intake
   Future<void> saveIntake(List<Map<String, dynamic>> cart) async {
     try {
@@ -42,9 +42,18 @@ class IntakeController extends GetxController {
       };
 
       await intakeRef.set(intakeData);
-      Get.snackbar('Success', 'Intake saved successfully');
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Intake saved successfully",
+        isError: false,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save intake: $e');
+
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to save intake: $e",
+        isError: true,
+      );
     }
   }
 }

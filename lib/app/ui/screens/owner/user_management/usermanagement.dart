@@ -110,22 +110,22 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             ),
                           ),
                           SizedBox(width: screenWidth * 0.04),
-                          Expanded(
-                            child: PrimaryButton(
-                              text: 'Remove',
-                              onPressed: () {
-                                controller.deleteInvite(invite['id']);
-                              },
-                              widthFactor: 1.0,
-                              heightFactor: 0.05,
-                              borderRadius: 6,
-                              textStyle: AppTextStyles.title.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenWidth * 0.038,
-                              ),
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: PrimaryButton(
+                          //     text: 'Remove',
+                          //     onPressed: () {
+                          //       controller.deleteInvite(invite['id']);
+                          //     },
+                          //     widthFactor: 1.0,
+                          //     heightFactor: 0.05,
+                          //     borderRadius: 6,
+                          //     textStyle: AppTextStyles.title.copyWith(
+                          //       color: Colors.white,
+                          //       fontWeight: FontWeight.bold,
+                          //       fontSize: screenWidth * 0.038,
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],

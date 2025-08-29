@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class ExpenseController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore  = FirebaseFirestore.instance;
@@ -38,7 +40,11 @@ class ExpenseController extends GetxController {
         snapshot.docs.map((doc) => doc['name'].toString()).toList(),
       );
     } catch (e) {
-      Get.snackbar("Error", "Failed to load categories: $e");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to load categories: $e",
+        isError: true,
+      );
     }
   }
 
@@ -50,7 +56,11 @@ class ExpenseController extends GetxController {
     final category = selectedCategory.value;
 
     if (name.isEmpty || amount.isEmpty || category == null) {
-      Get.snackbar("Validation", "Please fill all required fields");
+      CustomSnackbar.show(
+        title: "Validation",
+        message: "Please fill all required fields",
+        isError: true,
+      );
       return;
     }
 
@@ -70,8 +80,10 @@ class ExpenseController extends GetxController {
         "category": category,
         "createdAt": FieldValue.serverTimestamp(),
       });
-
-      Get.snackbar("Success", "Expense saved successfully");
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Expense saved successfully",
+      );
 
       // Clear form fields
       nameController.clear();
@@ -79,7 +91,12 @@ class ExpenseController extends GetxController {
       descController.clear();
       selectedCategory.value = null;
     } catch (e) {
-      Get.snackbar("Error", "Failed to save expense: $e");
+      // Get.snackbar("Error", "Failed to save expense: $e");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to save expense: $e",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

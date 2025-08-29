@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../../widgets/custom_snackbar.dart';
+
 class ReturnProductController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -42,9 +44,9 @@ class ReturnProductController extends GetxController {
       };
 
       await returnRef.set(returnData);
-      Get.snackbar('Success', 'Return product saved successfully');
+      CustomSnackbar.show(title: "Success", message: "Return product saved successfully");
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save Return product: $e');
+      CustomSnackbar.show(title: "Error", message: "Failed to save Return product: $e", isError: true);
     }
   }
 }

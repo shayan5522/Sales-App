@@ -6,11 +6,12 @@ import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/credit_amount%20_due/transactionController.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import 'package:salesapp/app/ui/widgets/datepicker.dart';
 import 'package:salesapp/app/ui/widgets/textfield.dart';
 
 class AmountCreditScreen extends StatefulWidget {
-   AmountCreditScreen({super.key});
+   const AmountCreditScreen({super.key});
 
 
 
@@ -212,7 +213,12 @@ class _AmountCreditDueScreenState extends State<AmountCreditScreen> {
                 final date = selectedDate ?? DateTime.now();
 
                 if (name.isEmpty || detail.isEmpty || price <= 0) {
-                  Get.snackbar('Error', 'Please fill all fields correctly.');
+                  CustomSnackbar.show(
+                    title: 'Error',
+                    message: 'Please fill all fields correctly.',
+                    isError: true,
+                  );
+                  // Get.snackbar('Error', 'Please fill all fields correctly.');
                   return;
                 }
 

@@ -6,7 +6,9 @@ import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/themes/styles.dart';
 import 'package:salesapp/app/ui/widgets/appbar.dart';
 import 'package:salesapp/app/ui/widgets/buttons.dart';
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import '../../../../controllers/auth/logout_helper.dart';
+import '../../../../controllers/owner/owner_invite_controller.dart';
 import '../../../widgets/logout_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -24,6 +26,7 @@ class SettingsScreen extends StatelessWidget {
       appBar: CustomAppbar(
         title: 'Settings',
         backgroundColor: AppColors.primary,
+        showBackButton: false,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -108,15 +111,24 @@ class SettingsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.copy),
-                                onPressed: () {
-                                  Clipboard.setData(ClipboardData(text: code));
-                                  Get.snackbar("Copied", "Invite code copied!");
-                                },
-                              )
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.copy),
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(text: code));
+                                      CustomSnackbar.show(
+                                        title: "Copied",
+                                        message: "Invite code copied!",
+                                        isError: false,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ],
-                          ),
+                          )
+
                         );
                       }).toList(),
                     ],

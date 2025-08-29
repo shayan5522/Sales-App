@@ -2,19 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 class AddCategoryController extends GetxController {
   final TextEditingController categoryNameController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   RxBool isLoading = false.obs;
-
   Future<void> saveCategory() async {
     final name = categoryNameController.text.trim();
     if (name.isEmpty) {
-      Get.snackbar("Error", "Please enter category name",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Please enter category name",
+        isError: true,
+      );
       return;
     }
 
@@ -22,8 +23,11 @@ class AddCategoryController extends GetxController {
       isLoading.value = true;
       final user = _auth.currentUser;
       if (user == null) {
-        Get.snackbar("Error", "No logged-in user found",
-            snackPosition: SnackPosition.BOTTOM);
+        CustomSnackbar.show(
+          title: "Error",
+          message: "No logged-in user found",
+          isError: true,
+        );
         return;
       }
 
@@ -38,13 +42,17 @@ class AddCategoryController extends GetxController {
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      Get.snackbar("Success", "Category '$name' saved",
-          snackPosition: SnackPosition.BOTTOM);
-
+      CustomSnackbar.show(
+        title: "Success",
+        message: "Category '$name' saved",
+      );
       categoryNameController.clear();
     } catch (e) {
-      Get.snackbar("Error", "Failed to save category: $e",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to save category: $e",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }

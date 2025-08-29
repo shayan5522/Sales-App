@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
+import '../../ui/widgets/custom_snackbar.dart';
 
 class OwnerSignupController extends GetxController {
   final isLoading = false.obs;
@@ -44,7 +45,11 @@ class OwnerSignupController extends GetxController {
     final user = FirebaseAuth.instance.currentUser;
 
     if (rawShopName.isEmpty || user == null) {
-      Get.snackbar("Error", "Shop name required or user not logged in");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Shop name required or user not logged in",
+        isError: true,
+      );
       return;
     }
 
@@ -63,7 +68,11 @@ class OwnerSignupController extends GetxController {
           .get();
 
       if (existingShopQuery.docs.isNotEmpty) {
-        Get.snackbar("Error", "This phone number already has a registered shop.");
+        CustomSnackbar.show(
+          title: "Error",
+          message: "This phone number already has a registered shop.",
+          isError: true,
+        );
         isLoading.value = false;
         return;
       }
@@ -89,7 +98,11 @@ class OwnerSignupController extends GetxController {
       Get.offAll(() => OwnerPanel());
     } catch (e) {
       print('❌ Error during registration: $e');
-      Get.snackbar("Error", "Failed to register the shop.");
+      CustomSnackbar.show(
+        title: "Error",
+        message: "Failed to register the shop.",
+        isError: true,
+      );
     } finally {
       isLoading.value = false;
     }
