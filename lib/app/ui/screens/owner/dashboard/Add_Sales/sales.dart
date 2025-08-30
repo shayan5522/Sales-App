@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/sales_popover.dart';
 import '../../../../../themes/colors.dart';
 import '../../../../widgets/appbar.dart';
 import '../../../../widgets/grid_container.dart';
-import '../intake/addintake.dart';
 import '../products/productController.dart';
 
 class Sales extends StatefulWidget {
@@ -26,7 +26,7 @@ class _SalesState extends State<Sales> {
     controller.fetchProducts();
   }
 
-  void _openIntakeDialog(Map<String, dynamic> product) {
+  void _openSalesDialog(Map<String, dynamic> product) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -69,7 +69,7 @@ class _SalesState extends State<Sales> {
                       ),
                     ),
                     Expanded(
-                      child: Intakepopover(
+                      child: SalesPopover(
                         cart: cart,
                         product: product,
                         onAddProduct: (newProduct) {
@@ -84,7 +84,7 @@ class _SalesState extends State<Sales> {
                             }
                           });
                         },
-                        onSaveIntake: () async {
+                        onSaveSale: () async {
                           final cartCopy = List<Map<String, dynamic>>.from(cart);
                           await saleController.saveSale(cartCopy, paymentType);
                           setState(() {
@@ -162,7 +162,7 @@ class _SalesState extends State<Sales> {
                         itemBuilder: (context, index) {
                           final product = products[index];
                           return GestureDetector(
-                            onTap: () => _openIntakeDialog(product),
+                            onTap: () => _openSalesDialog(product),
                             child: GridCard(
                               title: product['title'],
                               imagePath: product['imagePath'],
