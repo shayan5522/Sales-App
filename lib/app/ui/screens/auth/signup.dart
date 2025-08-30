@@ -31,6 +31,47 @@ class SignUpScreen extends StatelessWidget {
     }
   }
 
+  // Future<void> _handleSendOtp() async {
+  //   final phone = phoneController.text.trim();
+  //
+  //   if (phone.isEmpty) {
+  //     CustomSnackbar.show(
+  //       title: "Error",
+  //       message: "Enter phone number",
+  //       isError: true,
+  //     );
+  //     return;
+  //   }
+  //
+  //   // Indian numbers → 10 digits starting from 6-9
+  //   final indiaRegex = RegExp(r'^[6-9]\d{9}$');
+  //
+  //   // Pakistani numbers → 10 digits after 0 (03xxxxxxxxx → write without leading 0)
+  //   // Example: user enters 3xxxxxxxxx (not 03xxxxxxxxx)
+  //   final pakistanRegex = RegExp(r'^[3]\d{9}$');
+  //
+  //   String fullPhone = "";
+  //
+  //   if (indiaRegex.hasMatch(phone)) {
+  //     fullPhone = "+91$phone";
+  //   } else if (pakistanRegex.hasMatch(phone)) {
+  //     fullPhone = "+92$phone";
+  //   } else {
+  //     CustomSnackbar.show(
+  //       title: "Error",
+  //       message: "Enter valid Indian or Pakistani number",
+  //       isError: true,
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     await authController.sendOtp(fullPhone);
+  //   } catch (e) {
+  //     // Already handled in controller
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
