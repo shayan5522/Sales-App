@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/screens/auth/splash.dart';
+import 'package:salesapp/app/ui/screens/owner/dashboard/owner_dashboard.dart';
 import 'app/ui/screens/auth/splash.dart';
 import 'firebase_options.dart';
 

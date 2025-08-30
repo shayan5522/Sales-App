@@ -93,21 +93,27 @@ class ReportsMainPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SummaryCard(
-                        amount: NumberFormatter.compact(controller.salesAmount.value),
+                        amount: NumberFormatter.compact(
+                          controller.salesAmount.value,
+                        ),
                         label: "Sale Amount",
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: SummaryCard(
-                        amount: NumberFormatter.compact(controller.intakeAmount.value),
+                        amount: NumberFormatter.compact(
+                          controller.intakeAmount.value,
+                        ),
                         label: "Intake Amount",
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: SummaryCard(
-                        amount: NumberFormatter.compact(controller.expenseAmount.value),
+                        amount: NumberFormatter.compact(
+                          controller.expenseAmount.value,
+                        ),
                         label: "Expense Amount",
                       ),
                     ),
@@ -234,32 +240,32 @@ class ReportsMainPage extends StatelessWidget {
                   childAspectRatio: 1,
                   children: [
                     MainContainer(
-                      imagePath: "assets/images/stock.png",
+                      imagePath: "assets/images/Stockreport.png",
                       label: "Stock",
                       onTap: () => Get.to(() => const StockReportPage()),
                     ),
                     MainContainer(
-                      imagePath: "assets/images/intake.png",
+                      imagePath: "assets/images/intakereport.png",
                       label: "Intake",
                       onTap: () => Get.to(() => IntakeReportPage()),
                     ),
                     MainContainer(
-                      imagePath: "assets/images/sales1111.png",
+                      imagePath: "assets/images/Salesreport.png",
                       label: "Sales",
                       onTap: () => Get.to(() => SalesReportPage()),
                     ),
                     MainContainer(
-                      imagePath: "assets/images/Expense.png",
+                      imagePath: "assets/images/Expensereport.png",
                       label: "Expense",
                       onTap: () => Get.to(() => const ExpenseReportPage()),
                     ),
                     MainContainer(
-                      imagePath: "assets/images/return_report.png",
+                      imagePath: "assets/images/Returnreport.png",
                       label: "Return Report",
                       onTap: () => Get.to(() => const ReturnReport()),
                     ),
                     MainContainer(
-                      imagePath: "assets/images/CD_report.png",
+                      imagePath: "assets/images/loanreport.png",
                       label: "Loan & Due Report",
                       onTap: () => Get.to(() => const CreditDebitPage()),
                     ),
@@ -282,18 +288,25 @@ class ReportsMainPage extends StatelessWidget {
           color: AppColors.secondary,
           borderRadius: BorderRadius.circular(12),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: AppTextStyles.description.copyWith(fontSize: 13)),
+            Text(
+              label,
+              style: AppTextStyles.description.copyWith(fontSize: 13),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
                 Text(
-                  NumberFormatter.currency(amount),   // ✅ new way
+                  NumberFormatter.currency(amount), // ✅ new way
                   style: AppTextStyles.heading.copyWith(fontSize: 18),
                 ),
               ],
@@ -303,5 +316,4 @@ class ReportsMainPage extends StatelessWidget {
       ),
     );
   }
-
 }

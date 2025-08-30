@@ -12,6 +12,7 @@ import 'AddCreditDebit/labour_transaction.dart';
 import 'AddExpense/labour_add_expense.dart';
 import 'AddIntake/labour_add_intake.dart';
 import 'AddReturn/labour_add_return.dart';
+
 class LabourDashboard extends StatelessWidget {
   const LabourDashboard({super.key});
 
@@ -57,29 +58,39 @@ class LabourDashboard extends StatelessWidget {
                 childAspectRatio: 1,
                 children: [
                   MainContainer(
-                    imagePath: "assets/images/sales1111.png",
+                    imagePath: "assets/images/Addsalee.png",
                     label: "Add Sale",
-                    onTap: (){Get.to(()=>const LabourAddSales());},
-                  ),
-                   MainContainer(
-                    imagePath: "assets/images/intake.png",
-                    label: "Add Intake",
-                     onTap: (){Get.to(()=>const LabourAddIntake());},
-                  ),
-                   MainContainer(
-                    imagePath: "assets/images/products.png",
-                    label: "Return",
-                     onTap: (){Get.to(()=>const LabourReturnProduct());},
-                  ),
-                   MainContainer(
-                    imagePath: "assets/images/Expense.png",
-                    label: "Add Expense",
-                    onTap: (){Get.to(()=>const LabourAddExpenseScreen());},
+                    onTap: () {
+                      Get.to(() => const LabourAddSales());
+                    },
                   ),
                   MainContainer(
-                    imagePath: "assets/images/CD_report.png",
+                    imagePath: "assets/images/intakeadd.png",
+                    label: "Add Intake",
+                    onTap: () {
+                      Get.to(() => const LabourAddIntake());
+                    },
+                  ),
+                  MainContainer(
+                    imagePath: "assets/images/return.png",
+                    label: "Return",
+                    onTap: () {
+                      Get.to(() => const LabourReturnProduct());
+                    },
+                  ),
+                  MainContainer(
+                    imagePath: "assets/images/AddExpensee.png",
+                    label: "Add Expense",
+                    onTap: () {
+                      Get.to(() => const LabourAddExpenseScreen());
+                    },
+                  ),
+                  MainContainer(
+                    imagePath: "assets/images/loanamountdue.png",
                     label: "Credit & amount due",
-                    onTap: (){Get.to(()=> LabourTransactionsScreen());},
+                    onTap: () {
+                      Get.to(() => LabourTransactionsScreen());
+                    },
                   ),
                 ],
               ),

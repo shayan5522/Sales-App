@@ -60,7 +60,8 @@ class OwnerDashboard extends StatelessWidget {
           color: Colors.blue,
           backgroundColor: Colors.white,
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(), // Required for pull-to-refresh
+            physics:
+                const AlwaysScrollableScrollPhysics(), // Required for pull-to-refresh
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,21 +87,27 @@ class OwnerDashboard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SalesCard(
-                      imagePath: "assets/images/sales.png",
+                      imagePath: "assets/images/totalsales.png",
                       label: "Total Sales",
-                      value: NumberFormatter.compact(controller.totalSales.value.toDouble()),
+                      value: NumberFormatter.compact(
+                        controller.totalSales.value.toDouble(),
+                      ),
                     ),
                     const SizedBox(width: 0),
                     SalesCard(
-                      imagePath: "assets/images/sales1111.png",
+                      imagePath: "assets/images/totalintake.png",
                       label: "Total Intake",
-                      value: NumberFormatter.compact(controller.totalIntake.value.toDouble()),
+                      value: NumberFormatter.compact(
+                        controller.totalIntake.value.toDouble(),
+                      ),
                     ),
                     const SizedBox(width: 0),
                     SalesCard(
-                      imagePath: "assets/images/earning.png",
+                      imagePath: "assets/images/earningss.png",
                       label: "Total Profit",
-                      value: NumberFormatter.compact(controller.totalProfit.value.toDouble()),
+                      value: NumberFormatter.compact(
+                        controller.totalProfit.value.toDouble(),
+                      ),
                     ),
                   ],
                 ),
@@ -122,15 +129,22 @@ class OwnerDashboard extends StatelessWidget {
                               spreadRadius: 1,
                               blurRadius: 5,
                               offset: const Offset(0, 2),
-                            )
+                            ),
                           ],
                         ),
                         child: Column(
                           children: [
-                            Text("Cash Sales", style: AppTextStyles.description),
                             Text(
-                              NumberFormatter.currency(controller.cashSales.value),  // ✅ updated
-                              style: AppTextStyles.heading.copyWith(fontSize: 18),
+                              "Cash Sales",
+                              style: AppTextStyles.description,
+                            ),
+                            Text(
+                              NumberFormatter.currency(
+                                controller.cashSales.value,
+                              ), // ✅ updated
+                              style: AppTextStyles.heading.copyWith(
+                                fontSize: 18,
+                              ),
                             ),
                           ],
                         ),
@@ -149,15 +163,22 @@ class OwnerDashboard extends StatelessWidget {
                               spreadRadius: 1,
                               blurRadius: 5,
                               offset: const Offset(0, 2),
-                            )
+                            ),
                           ],
                         ),
                         child: Column(
                           children: [
-                            Text("Online Sales", style: AppTextStyles.description),
                             Text(
-                              NumberFormatter.currency(controller.onlineSales.value), // ✅ updated
-                              style: AppTextStyles.heading.copyWith(fontSize: 18),
+                              "Online Sales",
+                              style: AppTextStyles.description,
+                            ),
+                            Text(
+                              NumberFormatter.currency(
+                                controller.onlineSales.value,
+                              ), // ✅ updated
+                              style: AppTextStyles.heading.copyWith(
+                                fontSize: 18,
+                              ),
                             ),
                           ],
                         ),
@@ -173,8 +194,12 @@ class OwnerDashboard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: EarningsCard(
-                        income: controller.formatCurrency(controller.cashSales.value),
-                        profit: controller.formatCurrency(controller.cashProfit.value),
+                        income: controller.formatCurrency(
+                          controller.cashSales.value,
+                        ),
+                        profit: controller.formatCurrency(
+                          controller.cashProfit.value,
+                        ),
                         imagePath: "assets/images/cash_earning.png",
                         onSeeAll: () => Get.to(() => OfflineEarningsScreen()),
                         label: "Cash Earnings",
@@ -183,8 +208,12 @@ class OwnerDashboard extends StatelessWidget {
                     const SizedBox(width: 12),
                     Flexible(
                       child: EarningsCard(
-                        income: controller.formatCurrency(controller.onlineSales.value),
-                        profit: controller.formatCurrency(controller.onlineProfit.value),
+                        income: controller.formatCurrency(
+                          controller.onlineSales.value,
+                        ),
+                        profit: controller.formatCurrency(
+                          controller.onlineProfit.value,
+                        ),
                         imagePath: "assets/images/online_earning.png",
                         onSeeAll: () => Get.to(() => OnlineEarningsScreen()),
                         label: "Online Earnings",
@@ -201,8 +230,11 @@ class OwnerDashboard extends StatelessWidget {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     int crossAxisCount = 2;
-                    if (constraints.maxWidth >= 800) crossAxisCount = 4;
-                    else if (constraints.maxWidth >= 600) crossAxisCount = 3;
+                    if (constraints.maxWidth >= 800) {
+                      crossAxisCount = 4;
+                    } else if (constraints.maxWidth >= 600)
+                      // ignore: curly_braces_in_flow_control_structures
+                      crossAxisCount = 3;
 
                     return GridView.builder(
                       shrinkWrap: true,
@@ -218,37 +250,37 @@ class OwnerDashboard extends StatelessWidget {
                         final items = [
                           {
                             "label": "Products",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/addproduct.png",
                             "screen": const ProductScreen(),
                           },
                           {
                             "label": "Add Intake",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/intakeadd.png",
                             "screen": AddIntake(),
                           },
                           {
                             "label": "Add Sale",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/Addsalee.png",
                             "screen": Sales(),
                           },
                           {
                             "label": "Add Expense",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/AddExpensee.png",
                             "screen": const AddExpenseScreen(),
                           },
                           {
                             "label": "Return",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/return.png",
                             "screen": const ReturnProduct(),
                           },
                           {
                             "label": "Add Expense Category",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/Category.png",
                             "screen": AddCategoryPage(),
                           },
                           {
                             "label": "Loan & amount due",
-                            "icon": "assets/images/products.png",
+                            "icon": "assets/images/loanamountdue.png",
                             "screen": AmountCreditScreen(),
                           },
                         ];
