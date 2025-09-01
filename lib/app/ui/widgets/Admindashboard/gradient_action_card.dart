@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/colors.dart';
 
 class GradientActionCard extends StatelessWidget {
   final String label;

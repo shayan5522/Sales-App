@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth/auth_controller.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/textfield.dart';
 
+import '../../../themes/styles.dart';
+import '../../widgets/appbar.dart';
+import '../../widgets/buttons.dart';
 import '../../widgets/custom_snackbar.dart';
+import '../../widgets/textfield.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
   const OTPVerificationScreen({super.key}); // also fix constructor

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/datepicker.dart';
 
 import 'stock_report_controller.dart';
 

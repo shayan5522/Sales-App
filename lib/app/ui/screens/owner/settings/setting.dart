@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/controllers/owner/owner_invite_controller.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
+import 'package:shoporbit/app/controllers/owner/owner_invite_controller.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/buttons.dart';
+import 'package:shoporbit/app/ui/widgets/custom_snackbar.dart';
 import '../../../../controllers/auth/logout_helper.dart';
-import '../../../../controllers/owner/owner_invite_controller.dart';
 import '../../../widgets/logout_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {

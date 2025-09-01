@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
+import 'package:shoporbit/app/ui/widgets/custom_snackbar.dart';
 import '../../../../widgets/chart.dart';
 class SalesReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -81,7 +81,7 @@ class SalesReportController extends GetxController {
       }
 
       salesData.sort((a, b) => (b['createdAt'] as DateTime).compareTo(a['createdAt'] as DateTime));
-    } catch (e, stackTrace) {
+    } catch (e) {
       //debugPrint('Error fetching sales: $e');
      // debugPrint('Stack trace: $stackTrace');
       // Get.snackbar('Error', 'Failed to load sales data');

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/transaction_view_controller.dart';
-import 'package:salesapp/app/ui/widgets/Expense/expenselist.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/ui/screens/owner/Reports/transaction_view_controller.dart';
+import 'package:shoporbit/app/ui/widgets/datepicker.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
 import '../../../widgets/Amountcard.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/custom_snackbar.dart';

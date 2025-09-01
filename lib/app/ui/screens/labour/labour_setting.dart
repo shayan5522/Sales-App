@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
 import '../../../controllers/auth/logout_helper.dart';
 import '../../widgets/logout_dialog.dart';
 

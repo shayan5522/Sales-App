@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
 import '../../../../widgets/appbar.dart';
 import '../../../../widgets/chart.dart';
 import '../../../../widgets/datepicker.dart';

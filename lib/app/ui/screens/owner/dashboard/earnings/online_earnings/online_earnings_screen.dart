@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/widgets/datepicker.dart';
 import '../../../../../widgets/amount_card.dart';
 import '../../../../../widgets/appbar.dart';
 import '../../../../../widgets/transaction_list_item.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
+import 'package:shoporbit/app/ui/screens/owner/dashboard/Add_Sales/addSalesController.dart';
 import '../../../../../themes/colors.dart';
 import '../../../../widgets/appbar.dart';
 import '../../../../widgets/grid_container.dart';

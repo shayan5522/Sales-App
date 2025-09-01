@@ -1,9 +1,8 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/colors.dart';
+import 'app/themes/colors.dart';
 import 'app/ui/screens/auth/splash.dart';
 import 'firebase_options.dart';
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
-      title: 'Sales App',
+      title: 'ShopOrbit',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/textfield.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/textfield.dart';
+import 'package:shoporbit/app/ui/widgets/buttons.dart';
 
 import 'categoryController.dart'; // path may vary
 

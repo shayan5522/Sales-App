@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/Reports/IntakeReport/intake_report_controller.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/screens/owner/Reports/IntakeReport/intake_report_controller.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
 import '../../../../widgets/datepicker.dart';
 
 class AllIntakeProductsPage extends StatelessWidget {

@@ -1,8 +1,8 @@
 // lib/app/ui/widgets/Admindashboard/dashboard_main-container.dart
 
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
 
 class MainContainer extends StatelessWidget {
   final String imagePath;

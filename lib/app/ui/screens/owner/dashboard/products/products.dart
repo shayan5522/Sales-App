@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/ui/screens/owner/dashboard/products/productController.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/grid_container.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/ui/screens/owner/dashboard/products/productController.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/buttons.dart';
+import 'package:shoporbit/app/ui/widgets/grid_container.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});

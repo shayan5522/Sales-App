@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/textfield.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/buttons.dart';
+import 'package:shoporbit/app/ui/widgets/textfield.dart';
 import '../../../controllers/auth/labour_signup_controller.dart';
 
 class LabourSignUpScreen extends StatelessWidget {

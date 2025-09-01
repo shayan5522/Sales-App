@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../widgets/chart.dart';
 import '../../../../widgets/chart_formatter.dart';
 import '../../../../widgets/custom_snackbar.dart';
-import 'dart:math';
 
 class IntakeReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

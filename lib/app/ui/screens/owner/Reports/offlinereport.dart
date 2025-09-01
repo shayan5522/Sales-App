@@ -1,12 +1,11 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/widgets/Amountcard.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
-import 'package:salesapp/app/ui/widgets/transactionlist.dart';
+import 'package:shoporbit/app/themes/colors.dart';
+import 'package:shoporbit/app/themes/styles.dart';
+import 'package:shoporbit/app/ui/widgets/Amountcard.dart';
+import 'package:shoporbit/app/ui/widgets/appbar.dart';
+import 'package:shoporbit/app/ui/widgets/datepicker.dart';
+import 'package:shoporbit/app/ui/widgets/transactionlist.dart';
 
 class OfflineReport extends StatefulWidget {
   const OfflineReport({super.key});

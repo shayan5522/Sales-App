@@ -1,14 +1,12 @@
 import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:salesapp/app/ui/screens/labour/labour_dashboard.dart';
-import 'package:salesapp/app/ui/screens/labour/panel/labour_panel.dart';
-import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
 import '../../ui/screens/auth/otp.dart';
 import '../../ui/screens/auth/owner_signup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../ui/screens/labour/panel/labour_panel.dart';
 import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
+import '../../ui/widgets/custom_snackbar.dart';
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   var verificationId = ''.obs;

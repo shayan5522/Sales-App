@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../../themes/styles.dart';
 import '../labour/panel/labour_panel.dart';
-import '../owner/dashboard/owner_dashboard.dart';
-import '../auth/signup_as.dart'; // or your login/start screen
+import '../auth/signup_as.dart';
 import '../owner/owner_Panel/owner_panel.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkLoginStatus() async {
-    await Future.delayed(Duration(seconds: 2)); // Optional: splash delay
+    await Future.delayed(const Duration(seconds: 3));
 
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -37,15 +36,48 @@ class _SplashScreenState extends State<SplashScreen> {
         Get.offAll(() => SignUpAsScreen());
       }
     } else {
-      Get.offAll(() => SignUpAsScreen()); // Not logged in
+      Get.offAll(() => SignUpAsScreen());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white, // Clean background
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App icon with animation
+            AnimatedContainer(
+              duration: const Duration(seconds: 2),
+              curve: Curves.easeInOut,
+              height: 120,
+              width: 120,
+              child: Image.asset("assets/icon/app_icon.png"),
+            ),
+
+            const SizedBox(height: 20),
+
+            // App name
+            Text(
+              "Shop Orbit",
+              style: AppTextStyles.title.copyWith(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // Progress indicator
+            const CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: Colors.blueAccent,
+            ),
+          ],
+        ),
       ),
     );
   }

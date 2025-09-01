@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/colors.dart';
-import 'package:salesapp/app/themes/styles.dart';
-import 'package:salesapp/app/ui/screens/owner/dashboard/credit_amount%20_due/transactionController.dart';
-import 'package:salesapp/app/ui/widgets/appbar.dart';
-import 'package:salesapp/app/ui/widgets/buttons.dart';
-import 'package:salesapp/app/ui/widgets/custom_snackbar.dart';
-import 'package:salesapp/app/ui/widgets/datepicker.dart';
-import 'package:salesapp/app/ui/widgets/textfield.dart';
+import '../../../../themes/colors.dart';
+import '../../../../themes/styles.dart';
+import '../../../widgets/appbar.dart';
+import '../../../widgets/buttons.dart';
+import '../../../widgets/custom_snackbar.dart';
+import '../../../widgets/datepicker.dart';
+import '../../../widgets/textfield.dart';
+import '../../owner/dashboard/credit_amount _due/transactionController.dart';
 
 class LabourTransactionsScreen extends StatefulWidget {
   const LabourTransactionsScreen({super.key});

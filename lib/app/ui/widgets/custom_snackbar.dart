@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salesapp/app/themes/snackbar_theme.dart';
+import 'package:shoporbit/app/themes/snackbar_theme.dart';
 
 class CustomSnackbar {
   static void show({
