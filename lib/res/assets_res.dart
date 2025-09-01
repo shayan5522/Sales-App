@@ -8,6 +8,7 @@ class AssetsRes {
 
   static const String PROJECT_NAME = 'salesapp';
   static const String PROJECT_VERSION = '1.0.0+1';
+  static const String APP_ICON = 'assets/icon/app_icon.png';
   static const String APPLE = 'assets/images/Apple.jpg';
   static const String CD_REPORT = 'assets/images/CD_report.png';
   static const String EXPENSE = 'assets/images/Expense.png';

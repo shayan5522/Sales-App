@@ -1,12 +1,9 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salesapp/app/themes/colors.dart';
 import 'package:salesapp/app/ui/screens/auth/splash.dart';
-import 'package:salesapp/app/ui/screens/owner/dashboard/owner_dashboard.dart';
-import 'app/ui/screens/auth/splash.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

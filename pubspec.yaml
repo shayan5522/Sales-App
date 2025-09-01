@@ -46,6 +46,7 @@ dependencies:
   shared_preferences: ^2.5.3
   firebase_storage: ^13.0.0
   blue_thermal_printer: ^1.2.3
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +72,7 @@ flutter:
 
 
   assets:
+    - assets/icon/app_icon.png
     - assets/images/
     - assets/images/Apple.jpg
     - assets/images/CD_report.png
