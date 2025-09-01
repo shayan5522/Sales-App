@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="shoporbit"
-        android:name="${applicationName}"
+        android:label="Shop Orbit"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -20,6 +19,12 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data
+                android:name="firebase_app_check_provider"
+                android:value="playIntegrity"/>
+            <meta-data
+                android:name="com.google.firebase.auth.package.signing_certificate_fingerprint"
+                android:value="@string/firebase_auth_sign_in_certificate_hash"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

@@ -43,7 +43,7 @@ class AuthController extends GetxController {
         message: lastError.value,
         isError: true,
       );
-      rethrow;
+      print('error is: $e');
     }
   }
 

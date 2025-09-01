@@ -15,4 +15,6 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+    <string name="firebase_auth_sign_in_certificate_hash">A6:46:40:CC:47:F7:C7:C7:AE:EB:23:29:68:00:09:6F:76:E2:7B:19:D0:F2:4C:1F:8C:3B:A3:C3:59:FD:5E:02
+</string>
 </resources>
