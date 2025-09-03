@@ -1,4 +1,6 @@
 // 🔹 Controller for managing invites (labours)
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -99,8 +101,10 @@ class UserManagementController extends GetxController {
     }
   }
 
+
   String _generateRandomCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    return List.generate(6, (index) => chars[DateTime.now().millisecondsSinceEpoch % chars.length]).join();
+    final random = Random.secure(); // better randomness
+    return List.generate(6, (index) => chars[random.nextInt(chars.length)]).join();
   }
 }
