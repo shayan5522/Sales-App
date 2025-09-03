@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../../../widgets/chart.dart';
 import '../../../../widgets/custom_snackbar.dart';
+import 'low_stock_controller.dart';
 
 class StockReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -20,7 +22,7 @@ class StockReportController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchStockData();
+    loadStockData(); // Changed from fetchStockData() to loadStockData()
   }
 
   Future<void> fetchStockData() async {
@@ -92,25 +94,32 @@ class StockReportController extends GetxController {
       }
 
       /// ---- Calculate Stock ----
-      /// ---- Calculate Stock ----
+      final List<Map<String, dynamic>> tempStockList = [];
+      int tempTotalItems = 0;
+      double tempTotalValue = 0.0;
+
       for (var entry in productMap.values) {
         final currentStock = ((entry['purchaseQty'] ?? 0) as int) -
             ((entry['soldQty'] ?? 0) as int);
         final value = currentStock * ((entry['price'] ?? 0.0) as double);
 
-        stockList.add({
+        tempStockList.add({
           ...entry,
           'currentStock': currentStock,
           'totalValue': value,
         });
 
-        totalItems.value += currentStock; // now definitely an int
-        totalValue.value += value;
+        tempTotalItems += currentStock;
+        tempTotalValue += value;
       }
 
+      tempStockList.sort((a, b) => b['currentStock'].compareTo(a['currentStock']));
 
+      // Assign the values after all calculations
+      stockList.assignAll(tempStockList);
+      totalItems.value = tempTotalItems;
+      totalValue.value = tempTotalValue;
 
-      stockList.sort((a, b) => b['currentStock'].compareTo(a['currentStock']));
     } catch (e) {
       CustomSnackbar.show(title: 'Error', message: e.toString());
     } finally {
@@ -120,12 +129,12 @@ class StockReportController extends GetxController {
 
   void updateFromDate(DateTime date) {
     fromDate.value = date;
-    fetchStockData();
+    loadStockData(); // Changed from fetchStockData() to loadStockData()
   }
 
   void updateToDate(DateTime date) {
     toDate.value = date;
-    fetchStockData();
+    loadStockData(); // Changed from fetchStockData() to loadStockData()
   }
 
   String formatDate(DateTime date) {
@@ -154,5 +163,49 @@ class StockReportController extends GetxController {
     if (maxValue <= 0) return [0, 200, 400, 600, 800];
     final step = maxValue / 4;
     return List.generate(5, (i) => step * i);
+  }
+
+  // Add this method to check for low stock
+  void checkLowStock() {
+    final lowStockController = Get.find<LowStockController>();
+    final lowStockProducts = stockList.where((product) {
+      return lowStockController.isLowStock(product['currentStock'] ?? 0);
+    }).toList();
+
+    if (lowStockProducts.isNotEmpty) {
+      // Show notification only once when the page loads
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.snackbar(
+          "Low Stock Alert",
+          "${lowStockProducts.length} product(s) are below the threshold",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+          isDismissible: true,
+          mainButton: TextButton(
+            onPressed: () {
+              Get.back(); // Close the snackbar
+            },
+            child: const Text("Dismiss", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      });
+    }
+  }
+
+  // Modified loadStockData method
+  Future<void> loadStockData() async {
+    isLoading.value = true;
+    try {
+      // Call fetchStockData which handles the data loading
+      await fetchStockData();
+
+      // Check for low stock after loading
+      checkLowStock();
+    } catch (e) {
+      CustomSnackbar.show(title: 'Error', message: 'Failed to load stock data: ${e.toString()}');
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

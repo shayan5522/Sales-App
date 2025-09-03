@@ -9,6 +9,8 @@ import 'package:shoporbit/app/ui/widgets/chart.dart';
 import 'package:shoporbit/app/ui/widgets/Amountcard.dart';
 import 'package:shoporbit/app/ui/widgets/intakeproduct.dart';
 import 'all_stock.dart';
+import 'low_stock_controller.dart';
+import 'low_stock_settings_page.dart';
 import 'stock_report_controller.dart';
 
 class StockReportPage extends StatelessWidget {
@@ -17,6 +19,7 @@ class StockReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(StockReportController());
+    final lowStockController = Get.put(LowStockController());
 
     // Helper method to group stock items by date
     List<Widget> _buildGroupedStockList() {
@@ -83,6 +86,7 @@ class StockReportPage extends StatelessWidget {
                 intaken: product['purchaseQty'] ?? 0,
                 stockCount: product['currentStock'] ?? 0,
                 totalexpense: (product['totalValue'] ?? 0).toInt(),
+                isLowStock: lowStockController.isLowStock(product['currentStock'] ?? 0),
               );
             }).toList(),
           ],
@@ -222,7 +226,17 @@ class StockReportPage extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text("Purchased: ${product['purchaseQty']}"),
                               Text("Sold: ${product['soldQty']}"),
-                              Text("Stock: ${product['currentStock']}"),
+                              Text(
+                                "Stock: ${product['currentStock']}",
+                                style: TextStyle(
+                                  color: lowStockController.isLowStock(product['currentStock'] ?? 0)
+                                      ? Colors.red
+                                      : Colors.black,
+                                  fontWeight: lowStockController.isLowStock(product['currentStock'] ?? 0)
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
                               Text("Value: ₹${(product['totalValue'] as double).toStringAsFixed(2)}"),
                             ],
                           ),
@@ -258,11 +272,13 @@ class StockReportPage extends StatelessWidget {
                               /// Settings Icon button
                               GestureDetector(
                                 onTap: () {
-                                  // TODO: Open settings page
+                                  Get.to(() => LowStockSettingsPage());
                                 },
                                 child: IconButton(
-                                  icon: Icon(Icons.settings,color: AppColors.primary,),
-                                  onPressed: () {  },
+                                  icon: Icon(Icons.settings, color: AppColors.primary),
+                                  onPressed: () {
+                                    Get.to(() => LowStockSettingsPage());
+                                  },
                                 ),
                               ),
                             ],

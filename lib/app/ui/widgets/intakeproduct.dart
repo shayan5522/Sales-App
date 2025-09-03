@@ -8,6 +8,7 @@ class IntakeProduct extends StatelessWidget {
   final int intaken;
   final int? totalexpense;
   final int? stockCount;
+  final bool isLowStock;
 
   const IntakeProduct({
     super.key,
@@ -16,6 +17,7 @@ class IntakeProduct extends StatelessWidget {
     required this.intaken,
     this.totalexpense,
     this.stockCount,
+    this.isLowStock = false,
   });
 
   @override
@@ -73,7 +75,7 @@ class IntakeProduct extends StatelessWidget {
                       ],
                     ),
                   ),
-                Text(productName, style: AppTextStyles.title),
+                Text(productName, style: AppTextStyles.title.copyWith(color: isLowStock ? Colors.red : Colors.black,)),
                 const SizedBox(height: 4),
                 Text(
                   'Intaken: $intaken',
@@ -87,7 +89,7 @@ class IntakeProduct extends StatelessWidget {
                       ? 'Total: $totalexpense'
                       : 'Stock Count: $stockCount',
                   style: AppTextStyles.subtitleSmall.copyWith(
-                    color: AppColors.textseconadry,
+                    color: isLowStock ? Colors.red : Colors.grey,
                   ),
                 ),
                 if (stockCount != null) ...[
