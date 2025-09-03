@@ -318,12 +318,12 @@ class _CreditDebitPageState extends State<CreditDebitPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              CenteredAmountCard(
-                title: "Pending Amount",
-                subtitle: "₹${controller.totalPending.value.toStringAsFixed(0)}",
-                subtitleColor: Colors.orange,
-              ),
+              // const SizedBox(height: 12),
+              // CenteredAmountCard(
+              //   title: "Pending Amount",
+              //   subtitle: "₹${controller.totalPending.value.toStringAsFixed(0)}",
+              //   subtitleColor: Colors.orange,
+              // ),
 
               const SizedBox(height: 16),
 

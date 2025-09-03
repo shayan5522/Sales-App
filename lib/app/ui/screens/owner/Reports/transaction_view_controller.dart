@@ -69,8 +69,8 @@ class TransactionViewController extends GetxController {
       allTransactions.assignAll([...creditList, ...debitList]);
       filteredTransactions.assignAll(allTransactions);
 
-      totalCredit.value = creditList.fold(0.0, (sum, item) => sum + (item['originalAmount'] ?? 0));
-      totalDebit.value = debitList.fold(0.0, (sum, item) => sum + (item['originalAmount'] ?? 0));
+      totalCredit.value = creditList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0));
+      totalDebit.value = debitList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0));
       totalPending.value = creditList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0)) +
           debitList.fold(0.0, (sum, item) => sum + (item['remainingAmount'] ?? 0));
     } catch (e) {

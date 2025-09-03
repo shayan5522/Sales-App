@@ -157,7 +157,7 @@ class ReportsMainPage extends StatelessWidget {
                           Row(
                             children: [
                               const Icon(
-                                Icons.monetization_on_rounded,
+                                Icons.assignment_ind_rounded,
                                 color: Colors.green,
                                 size: 28,
                               ),
