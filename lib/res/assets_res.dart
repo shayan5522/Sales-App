@@ -15,6 +15,7 @@ class AssetsRes {
   static const String ADD_CATEGORY = 'assets/images/add_category.png';
   static const String CASH_EARNING = 'assets/images/cash_earning.png';
   static const String EARNINGS = 'assets/images/earnings.jpeg';
+  static const String IMAGE_UNAVAILABLE = 'assets/images/image_unavailable.png';
   static const String INTAKE = 'assets/images/intake.png';
   static const String ONLINE_EARNING = 'assets/images/online_earning.png';
   static const String REPORT = 'assets/images/report.png';

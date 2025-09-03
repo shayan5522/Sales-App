@@ -89,6 +89,7 @@ flutter:
     - assets/images/add_category.png
     - assets/images/cash_earning.png
     - assets/images/earnings.jpeg
+    - assets/images/image_unavailable.png
     - assets/images/intake.png
     - assets/images/online_earning.png
     - assets/images/report.png
