@@ -43,11 +43,8 @@ class SignUpScreen extends StatelessWidget {
       return;
     }
 
-    // Indian numbers → 10 digits starting from 6-9
+    // Regex for number formats
     final indiaRegex = RegExp(r'^[6-9]\d{9}$');
-
-    // Pakistani numbers → 10 digits after 0 (03xxxxxxxxx → write without leading 0)
-    // Example: user enters 3xxxxxxxxx (not 03xxxxxxxxx)
     final pakistanRegex = RegExp(r'^[3]\d{9}$');
 
     String fullPhone = "";
@@ -65,12 +62,35 @@ class SignUpScreen extends StatelessWidget {
       return;
     }
 
+    // 🔥 Tester numbers (must be added in Firebase Console)
+    final Set<String> testerNumbers = {
+      "+911234567890",
+      "+923001234567",
+    };
+
+    if (testerNumbers.contains(fullPhone)) {
+      // ✅ Show info but still go to OTP screen
+      CustomSnackbar.show(
+        title: "Test Mode",
+        message: "Use the fixed OTP you set in Firebase Console.",
+        isError: false,
+      );
+
+      // Instead of calling Firebase sendOtp (which sends SMS),
+      // just navigate to OTP screen and let user enter the test OTP
+      authController.sendOtp(fullPhone);
+      return;
+    }
+
+    // Normal flow for real numbers
     try {
       await authController.sendOtp(fullPhone);
     } catch (e) {
       // Already handled in controller
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
