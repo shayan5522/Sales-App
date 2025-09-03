@@ -202,10 +202,18 @@ class _IntakePopoverState extends State<Intakepopover> {
               ),
               child: Row(
                 children: [
-                  Image.asset(
+                  Image.network(
                     widget.product['imagePath'],
                     width: 40,
                     height: 40,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/image_unavailable.png', // your local asset
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                   const SizedBox(width: 10),
                   Text(
