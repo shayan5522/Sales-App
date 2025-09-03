@@ -14,26 +14,54 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  // Constants for SharedPreferences keys
+  static const String _isLoggedInKey = 'isLoggedIn';
+  static const String _roleKey = 'role';
+  static const String _labourRole = 'labour';
+  static const String _ownerRole = 'owner';
+
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    _checkLoginStatus();
   }
 
-  Future<void> checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 3));
+  Future<void> _checkLoginStatus() async {
+    try {
+      // Add delay for splash screen
+      await Future.delayed(const Duration(seconds: 3));
 
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    final role = prefs.getString('role');
+      // Check if widget is still mounted before proceeding
+      if (!mounted) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
+      final role = prefs.getString(_roleKey);
+
+      _navigateBasedOnAuthStatus(isLoggedIn, role);
+    } catch (e) {
+      // Handle any errors gracefully
+      if (mounted) {
+        Get.offAll(() => SignUpAsScreen());
+      }
+    }
+  }
+
+  void _navigateBasedOnAuthStatus(bool isLoggedIn, String? role) {
+    if (!mounted) return;
 
     if (isLoggedIn && role != null) {
-      if (role == 'labour') {
-        Get.offAll(() => LaborPanel());
-      } else if (role == 'owner') {
-        Get.offAll(() => OwnerPanel());
-      } else {
-        Get.offAll(() => SignUpAsScreen());
+      switch (role) {
+        case _labourRole:
+          Get.offAll(() => LaborPanel());
+          break;
+        case _ownerRole:
+          Get.offAll(() => OwnerPanel());
+          break;
+        default:
+        // Handle unexpected role values
+          Get.offAll(() => SignUpAsScreen());
+          break;
       }
     } else {
       Get.offAll(() => SignUpAsScreen());
@@ -43,12 +71,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Clean background
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // App icon with animation
             AnimatedContainer(
               duration: const Duration(seconds: 2),
               curve: Curves.easeInOut,
@@ -56,10 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 120,
               child: Image.asset("assets/icon/app_icon.png"),
             ),
-
             const SizedBox(height: 20),
-
-            // App name
             Text(
               "Shop Orbit",
               style: AppTextStyles.title.copyWith(
@@ -68,10 +92,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.black87,
               ),
             ),
-
             const SizedBox(height: 40),
-
-            // Progress indicator
             const CircularProgressIndicator(
               strokeWidth: 2.5,
               color: Colors.blueAccent,

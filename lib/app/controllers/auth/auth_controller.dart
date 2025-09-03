@@ -16,7 +16,6 @@ class AuthController extends GetxController {
   Future<void> sendOtp(String phone) async {
     isLoading.value = true;
     lastError.value = '';
-
     try {
       await _authService.sendOtp(
         phone: phone,

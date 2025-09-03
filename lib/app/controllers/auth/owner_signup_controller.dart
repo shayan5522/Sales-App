@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../ui/screens/owner/owner_Panel/owner_panel.dart';
 import '../../ui/widgets/custom_snackbar.dart';
 
@@ -93,6 +94,10 @@ class OwnerSignupController extends GetxController {
       for (final code in inviteCodes) {
         await createInviteCode(code, sanitizedShopName, uid);
       }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('role', 'owner');
+      await prefs.setString('uid', uid);
 
       print('✅ Shop registered successfully under users/$uid');
       Get.offAll(() => OwnerPanel());
