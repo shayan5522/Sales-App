@@ -13,7 +13,7 @@ class OwnerSignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: "Owner SignUp"),
+      appBar: CustomAppbar(title: "Owner SignUp",showBackButton: false,),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: SingleChildScrollView(
