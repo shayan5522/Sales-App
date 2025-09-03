@@ -100,7 +100,13 @@ class SalesReportPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Center(child: Image.asset(data['imagePath'], height: 50, width: 50, fit: BoxFit.cover)),
+                              Center(child: Image.network(data['imagePath'], height: 50, width: 50, fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Image.asset(
+                                  "assets/images/image_unavailable.png",
+                                  height: 50,
+                                  width: 50,
+                                  fit: BoxFit.cover,
+                                ),)),
                               const SizedBox(height: 8),
                               Text(entry.key, style: AppTextStyles.subtitleSmall.copyWith(fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),

@@ -3,7 +3,6 @@ import '../../../../../themes/colors.dart';
 import '../../../../widgets/appbar.dart';
 import '../../../../widgets/buttons.dart';
 import '../../../../widgets/transactionlist.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 
 class SalesPopover extends StatefulWidget {
   final List<Map<String, dynamic>> cart;

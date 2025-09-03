@@ -17,6 +17,7 @@ class SalesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 105,
       height: 160,
       margin: const EdgeInsets.symmetric(horizontal: 0),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),

@@ -32,11 +32,17 @@ class IntakeProduct extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               width: 30,
               height: 30,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                "assets/images/image_unavailable.png",
+                height: 50,
+                width: 50,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(width: 12),

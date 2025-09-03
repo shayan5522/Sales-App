@@ -46,7 +46,7 @@ class GridCard extends StatelessWidget {
                 children: [
                   // Image container
                   Container(
-                    height: 90,
+                    height: 120,
                     decoration: BoxDecoration(
                       color: AppColors.secondary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -95,7 +95,7 @@ class GridCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const Spacer(),
+                  SizedBox(height: 5,),
 
                   // Price Badge
                   Container(

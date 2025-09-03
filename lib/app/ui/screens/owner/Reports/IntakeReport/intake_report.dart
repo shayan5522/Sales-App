@@ -105,11 +105,17 @@ class IntakeReportPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Center(
-                                child: Image.asset(
+                                child: Image.network(
                                   data['imagePath'] ?? "assets/images/products.png",
                                   height: 50,
                                   width: 50,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                    "assets/images/image_unavailable.png",
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 8),

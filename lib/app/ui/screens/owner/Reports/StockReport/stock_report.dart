@@ -190,11 +190,30 @@ class StockReportPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Center(
-                                child: Image.asset(
-                                  product['imagePath'] ?? "assets/images/products.png",
+                                child: Image.network(
+                                  product['imagePath'] ?? "",
                                   height: 50,
                                   width: 50,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                    "assets/images/image_unavailable.png",
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      height: 50,
+                                      width: 50,
+                                      alignment: Alignment.center,
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               const SizedBox(height: 8),

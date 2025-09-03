@@ -103,7 +103,7 @@ class _LabourReturnProductState extends State<LabourReturnProduct> {
                     crossAxisCount: crossAxisCount.clamp(1, 6),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.9,
+                    childAspectRatio: 0.75,
                   ),
                   itemBuilder: (context, index) {
                     final product = products[index];

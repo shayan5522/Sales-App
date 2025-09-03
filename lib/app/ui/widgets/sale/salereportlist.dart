@@ -28,7 +28,14 @@ class Salereportlist extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imagePath, width: 50, height: 50, fit: BoxFit.contain),
+          Image.network(imagePath, width: 50, height: 50, fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              "assets/images/image_unavailable.png",
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
           const SizedBox(width: 12),
 
           Expanded(
